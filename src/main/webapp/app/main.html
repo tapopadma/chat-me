@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="mainApp">
+<head>
+<meta charset="UTF-8">
+<title>ChatMe | Dashboard</title>
+<script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+</head>
+<body ng-controller="mainController" ng-init="init()">
+	<p>Logged in as <b>{{username}}</b></p>
+	<button type="button" ng-click="logout()">Logout!</button>
+	<div style="text-align:left;margin-top:20px;">
+		<b>List of Users:</b><hr>
+		<table style="border:'1px solid black';">
+			<tr>
+				<th>Serial No</th>
+				<th>Users</th>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>	

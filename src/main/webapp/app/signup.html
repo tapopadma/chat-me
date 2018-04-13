@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang = "en" ng-app="signupApp">
+<head>
+<meta charset="UTF-8">
+<title>Sign up | Chat Messenger</title>
+<script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
+<script type="text/javascript" src="js/signup.js"></script>
+</head>
+<body ng-controller="signupController">
+		<form role="form" ng-submit="signup()">
+			Name: <input type="text" ng-model="name"><br><br>
+			Email: <input type="text" ng-model="email"><br><br>
+			Phone: <input type="text" ng-model="phone"><br><br>
+			User Name: <input type="text" ng-model="username"><br><br>
+			Password: <input type="password" ng-model="password"><br><br>
+			<button type="submit">Sign up</button>
+		</form>
+</body>
+</html>
