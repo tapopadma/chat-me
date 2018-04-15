@@ -8,30 +8,53 @@
 <script type="text/javascript" 
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/components/chat-box.component.js"></script>
 <link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-controller="mainController" ng-init="init()">
 	<p>Logged in as <b>{{username}}</b></p>
 	<button type="button" class="hyperlinkButton" ng-click="logout()">Logout!</button>
 	<div style="text-align:left;margin-top:20px;">
-		<b>List of Users:</b><br>
-		<table class="userlisttable">
-			<tr>
-				<th>Serial No</th>
-				<th>Users</th>
-			</tr>
-			<tr ng-repeat="record in userList">
-				<td>{{userList.indexOf(record) + 1}}</td>
-				<td>
-					<button type="button" class="hyperlinkButton"
-					ng-click="selectUser(record.username)">{{record.username}}</button>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div style="text-align:left;margin-top:20px;">
-		<b>Selected User Info:</b><br>
-		<p>{{selectedUser}}</p>
+		<div style="margin:20px;float:right;">
+			<table>
+				<tr>
+					<th>{{selectedUser.username}}</th>
+				</tr>
+				<tr>
+					<td style="height:200px;">
+						<div style="max-height: 200px;overflow-y:scroll;">
+							{{messageHistory}}						
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<textarea style="height:200px;width:790px;">
+							
+						</textarea><br>
+						<button ng-click="sendMessage()">
+							Send
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="userList">
+			<b>List of Users:</b><br>
+			<table class="userlisttable">
+				<tr>
+					<th>Serial No</th>
+					<th>Users</th>
+				</tr>
+				<tr ng-repeat="record in userList">
+					<td>{{userList.indexOf(record) + 1}}</td>
+					<td>
+						<button type="button" class="hyperlinkButton"
+						ng-click="selectUser(record.username)">{{record.username}}</button>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</div>
 </body>
 </html>	

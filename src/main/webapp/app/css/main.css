@@ -1,6 +1,12 @@
 @charset "UTF-8";
 table, th, td{
 	border : 1px solid black;
+	max-width: 800px;
+	word-wrap: break-word;
+}
+th,td,tbody,thead,tr{
+	max-height: 300px;
+	overflow-y: auto;
 }
 .hyperlinkButton {
     background-color: Transparent;
@@ -11,4 +17,12 @@ table, th, td{
     outline:none;
     text-decoration:underline;
     color: blue;
+}
+
+.chatBox {
+	float:right;
+}
+
+.userList {
+	float:left;
 }

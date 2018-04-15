@@ -15,6 +15,10 @@ angular.module('mainApp', [])
 					$scope.selectedUser = user;
 				}
 			});
+			var val = 'lsdkfsfnslfnksldkfnlskdfnlksndflknsldfknlasdnkldfffffsldfknlssdlf';
+			$scope.messageHistory = val;
+			for(var i=0;i<100;++i)
+				$scope.messageHistory += val;
 		};
 })
 .factory('userService', ['$http', 'commonService', function ($http, commonService){
