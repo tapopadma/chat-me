@@ -13,25 +13,25 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import chat.me.dao.spec.UserAccountDao;
-import chat.me.entity.UserAccountEntity;
+import chat.me.dto.UserAccountDto;
 
 @Service
 public class UserAccountServiceImpl implements UserDetailsService{
 	@Autowired
 	private UserAccountDao userAccountDao;
 
-	public UserAccountEntity saveUserAccountData(UserAccountEntity entity) {
+	public UserAccountDto saveUserAccountData(UserAccountDto entity) {
 		userAccountDao.insert(entity);
 		return entity;
 	}
 
-	public List<UserAccountEntity> getAllUsers(){
+	public List<UserAccountDto> getAllUsers(){
 		return userAccountDao.getAllUserAccounts();
 	}
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserAccountEntity entity = userAccountDao.getByUsername(username);
+		UserAccountDto entity = userAccountDao.getByUsername(username);
 		if(entity == null) {
 			throw new UsernameNotFoundException("username doesn't exist!!!");
 		}

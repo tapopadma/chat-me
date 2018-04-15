@@ -9,6 +9,13 @@ angular.module('mainApp', [])
 			userService.getUsername();
 			userService.getAllUsers();
 		};
+		$scope.selectUser = function (selectedUsername){
+			angular.forEach(this.userList, function(user){
+				if(user.username == selectedUsername){
+					$scope.selectedUser = user;
+				}
+			});
+		};
 })
 .factory('userService', ['$http', 'commonService', function ($http, commonService){
 	return {

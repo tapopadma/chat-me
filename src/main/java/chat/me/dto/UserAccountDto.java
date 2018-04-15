@@ -1,7 +1,13 @@
-package chat.me.entity;
+package chat.me.dto;
 
-public class UserAccountEntity {
+import java.io.Serializable;
 
+public class UserAccountDto implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3553481746640720276L;
 	private String name;
 	private String email;
 	private String phone;
@@ -70,13 +76,13 @@ public class UserAccountEntity {
 
 
 
-	public UserAccountEntity() {
+	public UserAccountDto() {
 
 	}
 
 
 
-	public UserAccountEntity(String email, String name, String password, String phone, String username) {
+	public UserAccountDto(String email, String name, String password, String phone, String username) {
 		this.name = name;
 		this.email = email;
 		this.phone = phone;

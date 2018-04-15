@@ -8,18 +8,30 @@
 <script type="text/javascript" 
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-controller="mainController" ng-init="init()">
 	<p>Logged in as <b>{{username}}</b></p>
-	<button type="button" ng-click="logout()">Logout!</button>
+	<button type="button" class="hyperlinkButton" ng-click="logout()">Logout!</button>
 	<div style="text-align:left;margin-top:20px;">
-		<b>List of Users:</b><hr>
-		<table style="border:'1px solid black';">
+		<b>List of Users:</b><br>
+		<table class="userlisttable">
 			<tr>
 				<th>Serial No</th>
 				<th>Users</th>
 			</tr>
+			<tr ng-repeat="record in userList">
+				<td>{{userList.indexOf(record) + 1}}</td>
+				<td>
+					<button type="button" class="hyperlinkButton"
+					ng-click="selectUser(record.username)">{{record.username}}</button>
+				</td>
+			</tr>
 		</table>
+	</div>
+	<div style="text-align:left;margin-top:20px;">
+		<b>Selected User Info:</b><br>
+		<p>{{selectedUser}}</p>
 	</div>
 </body>
 </html>	

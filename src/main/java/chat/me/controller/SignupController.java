@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.entity.UserAccountEntity;
+import chat.me.dto.UserAccountDto;
 import chat.me.service.impl.UserAccountServiceImpl;
 
 
@@ -20,7 +20,7 @@ public class SignupController {
 
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.POST)
-	public UserAccountEntity saveUserData(@RequestBody UserAccountEntity entity) {
+	public UserAccountDto saveUserData(@RequestBody UserAccountDto entity) {
 		return userAccountServiceImpl.saveUserAccountData(entity);
 	}
 }
