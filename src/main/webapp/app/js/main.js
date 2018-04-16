@@ -1,6 +1,6 @@
 angular.module('mainApp', [])
 .controller('mainController',  
-	function mainController($scope, mainService, userService, commonService){
+	function mainController($scope, mainService, userService, commonService, messengerService){
 		commonService.set('mainController', $scope);
 		$scope.logout = function() {
 			mainService.logout();
@@ -20,7 +20,36 @@ angular.module('mainApp', [])
 			for(var i=0;i<100;++i)
 				$scope.messageHistory += val;
 		};
+		$scope.sendMessage = function () {
+			//alert('from: ' + $scope.username + '\nto: ' + $scope.selectedUser.username + '\nmessage: ' + $scope.message);
+			messengerService.saveMessage({
+				'fromUsername' : $scope.username,
+				'toUsername' : $scope.selectedUser.username,
+				'message' : $scope.message
+			});
+		};
 })
+.factory('messengerService', ['$http', 'commonService', function($http, commonService) {
+	return {
+		saveMessage: function (data) {
+			$http(
+				{
+					method: 'POST',
+					url: '/chat-me/messenger/saveMessage',
+					data: data
+				}
+			)
+			.then(function (response){
+				if(response.status == 200){
+					alert('message sent successfully!!!');
+				}
+				else{
+					alert('something went wrong!!!');
+				}
+			});
+		}
+	};
+}])
 .factory('userService', ['$http', 'commonService', function ($http, commonService){
 	return {
 		getAllUsers : function () {

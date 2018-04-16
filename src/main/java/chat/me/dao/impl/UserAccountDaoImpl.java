@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import chat.me.dao.spec.UserAccountDao;
-import chat.me.dto.UserAccountDto;
+import chat.me.dto.AccountMstDto;
 
 @Component
 public class UserAccountDaoImpl implements UserAccountDao{
@@ -21,19 +21,19 @@ public class UserAccountDaoImpl implements UserAccountDao{
 	
 	private final String SQL_SELECT_ALL = "select * from account_mst";
 	
-	public void insert(UserAccountDto entity) {
-		jdbcTemplate.update(SQL_INSERT, null, entity.getName(), entity.getEmail(), entity.getPhone(),
-				entity.getUsername(), entity.getPassword());
+	public void insert(AccountMstDto dto) {
+		jdbcTemplate.update(SQL_INSERT, dto.getAccountMstId(), dto.getName(), dto.getEmail(), dto.getPhone(),
+				dto.getUsername(), dto.getPassword());
 	}
 
-	public List<UserAccountDto> getAllUserAccounts() {
-		return jdbcTemplate.query(SQL_SELECT_ALL, new BeanPropertyRowMapper(UserAccountDto.class));
+	public List<AccountMstDto> getAllUserAccounts() {
+		return jdbcTemplate.query(SQL_SELECT_ALL, new BeanPropertyRowMapper(AccountMstDto.class));
 	}
 	
 	@Override
-	public UserAccountDto getByUsername(String username) {
-		UserAccountDto result = (UserAccountDto) jdbcTemplate.queryForObject(SQL_SELECT, 
-				new Object[] {username}, new BeanPropertyRowMapper(UserAccountDto.class));
+	public AccountMstDto getByUsername(String username) {
+		AccountMstDto result = (AccountMstDto) jdbcTemplate.queryForObject(SQL_SELECT, 
+				new Object[] {username}, new BeanPropertyRowMapper(AccountMstDto.class));
 		return result;
 	}
 	

@@ -2,12 +2,13 @@ package chat.me.dto;
 
 import java.io.Serializable;
 
-public class UserAccountDto implements Serializable{
+public class AccountMstDto implements Serializable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3553481746640720276L;
+	private Long accountMstId;
 	private String name;
 	private String email;
 	private String phone;
@@ -76,18 +77,30 @@ public class UserAccountDto implements Serializable{
 
 
 
-	public UserAccountDto() {
+	public AccountMstDto() {
 
 	}
 
 
 
-	public UserAccountDto(String email, String name, String password, String phone, String username) {
+	public AccountMstDto(String email, String name, String password, String phone, String username) {
 		this.name = name;
 		this.email = email;
 		this.phone = phone;
 		this.username = username;
 		this.password = password;
+	}
+
+
+
+	public Long getAccountMstId() {
+		return accountMstId;
+	}
+
+
+
+	public void setAccountMstId(Long accountMstId) {
+		this.accountMstId = accountMstId;
 	}
 	
 }

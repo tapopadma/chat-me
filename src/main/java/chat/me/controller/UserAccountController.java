@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.dto.UserAccountDto;
+import chat.me.dto.AccountMstDto;
 import chat.me.service.impl.UserAccountServiceImpl;
 
 @Controller
@@ -21,8 +21,8 @@ public class UserAccountController {
 
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getLoggedInUser")
-	public UserAccountDto getAuthentication() {
-		UserAccountDto entity = new UserAccountDto();
+	public AccountMstDto getAuthentication() {
+		AccountMstDto entity = new AccountMstDto();
 		entity.setUsername(
 				SecurityContextHolder.getContext().getAuthentication().getName());
 		return entity;
@@ -30,7 +30,7 @@ public class UserAccountController {
 	
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getAllUsers")
-	public List<UserAccountDto> getAllUsers(){
+	public List<AccountMstDto> getAllUsers(){
 		return userAccountServiceImpl.getAllUsers();
 	}
 	

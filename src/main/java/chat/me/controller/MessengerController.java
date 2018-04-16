@@ -7,20 +7,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.dto.AccountMstDto;
-import chat.me.service.impl.UserAccountServiceImpl;
-
+import chat.me.entity.MessageInfoEntity;
+import chat.me.service.impl.MessengerServiceImpl;
 
 @Controller
-@RequestMapping("/signup")
-public class SignupController {
-	
-	@Autowired
-	private UserAccountServiceImpl userAccountServiceImpl;
+@RequestMapping("/messenger")
+public class MessengerController {
 
+	@Autowired
+	private MessengerServiceImpl messengerServiceImpl;
+	
 	@ResponseBody
-	@RequestMapping(method = RequestMethod.POST)
-	public AccountMstDto saveUserData(@RequestBody AccountMstDto dto) {
-		return userAccountServiceImpl.saveUserAccountData(dto);
+	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
+	public void saveMessage(@RequestBody MessageInfoEntity entity) {
+		messengerServiceImpl.saveMessage(entity);
 	}
 }
