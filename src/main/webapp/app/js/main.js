@@ -1,6 +1,6 @@
 angular.module('mainApp', [])
 .controller('mainController',  
-	function mainController($scope, $compile, mainService, userService, 
+	function mainController($scope, $compile, $interval, mainService, userService, 
 			commonService, messengerService){
 		commonService.set('mainController', $scope);
 		$scope.logout = function() {
@@ -16,7 +16,28 @@ angular.module('mainApp', [])
 					$scope.selectedUser = user;
 				}
 			});
-			$scope.messageHistory = '';
+			//saves to $scope.messageHistoryList
+			messengerService.fetchAllMessage({
+				'fromUsername' : $scope.username,
+				'toUsername' : $scope.selectedUser.username
+			});
+		};
+		$scope.displayMessageHistoryOnChatBox = function (){
+			angular.forEach(this.messageHistoryList, function (message) {
+				if(message.fromUsername == $scope.username){// current user is the sender
+					$scope.addSenderMessageTemplateToChatBox(message.message);
+				}
+				else{// current user is the receiver
+					$scope.addReceipientMessageTemplateToChatBox(message.message);
+				}
+			});
+			$scope.scrollToEnd(document.getElementById('message-history'));
+		};
+		$scope.scrollToEnd = function (objDiv){
+			objDiv.scrollTop = objDiv.scrollHeight;
+		};
+		$scope.clearChatBox = function () {
+			angular.element(document.getElementById('message-history')).empty();
 		};
 		$scope.sendMessage = function () {
 			messengerService.saveMessage({
@@ -24,14 +45,12 @@ angular.module('mainApp', [])
 				'toUsername' : $scope.selectedUser.username,
 				'message' : $scope.message
 			});
-			this.addSenderMessageTemplate($scope.message);
-			$scope.message = '';
 		};
-		$scope.addSenderMessageTemplate = function (text) {
+		$scope.addSenderMessageTemplateToChatBox = function (text) {
 			angular.element(document.getElementById('message-history'))
-			.append($compile('<div style="color:green"><b>You:</b> '+text+'</div>')($scope));
+			.append($compile('<div style="color:green"><b>'+$scope.username+':</b> '+text+'</div>')($scope));
 		};
-		$scope.addReceipientMessageTemplate = function (text) {
+		$scope.addReceipientMessageTemplateToChatBox = function (text) {
 			angular.element(document.getElementById('message-history'))
 				.append($compile(
 						'<div style="color:red"><b>'+$scope.selectedUser.username
@@ -40,6 +59,33 @@ angular.module('mainApp', [])
 })
 .factory('messengerService', ['$http', 'commonService', function($http, commonService) {
 	return {
+		fetchAllMessage: function (data) {
+			$http(
+				{
+					method : 'POST',
+					url: '/chat-me/messenger/fetchAllMessage',
+					data: data
+				}
+			)
+			.then(function (response) {
+				if(response.status == 200){
+					var scope = commonService.get('mainController');
+					if(scope.messageHistoryList != null && response.data.length == scope.messageHistoryList.length){						
+						console.log('no update needed!!!');
+						scope.selectUser(scope.selectedUser.username);
+						return;
+					}
+					scope.messageHistoryList = response.data;
+					scope.clearChatBox();
+					scope.displayMessageHistoryOnChatBox();
+					scope.selectUser(scope.selectedUser.username);
+					console.log('fetched message history data successfully!!!');
+				}
+				else{
+					console.log('unable to fetch the data!!!');
+				}
+			});
+		},
 		saveMessage: function (data) {
 			$http(
 				{
@@ -50,6 +96,9 @@ angular.module('mainApp', [])
 			)
 			.then(function (response){
 				if(response.status == 200){
+					var scope = commonService.get('mainController'); 
+					scope.selectUser(scope.selectedUser.username);
+					scope.message = '';
 					console.log('message sent successfully!!!');
 				}
 				else{

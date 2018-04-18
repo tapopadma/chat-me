@@ -1,5 +1,7 @@
 package chat.me.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,5 +23,11 @@ public class MessengerController {
 	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
 	public void saveMessage(@RequestBody MessageInfoEntity entity) {
 		messengerServiceImpl.saveMessage(entity);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/fetchAllMessage", method=RequestMethod.POST)
+	public List<MessageInfoEntity> fetchAllMessage(@RequestBody MessageInfoEntity entity) {
+		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
 	}
 }

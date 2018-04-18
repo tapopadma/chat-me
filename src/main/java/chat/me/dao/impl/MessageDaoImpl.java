@@ -1,13 +1,16 @@
 package chat.me.dao.impl;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import chat.me.dao.spec.MessageDao;
 import chat.me.dto.MessageTrnDto;
+import chat.me.entity.MessageInfoEntity;
 
 @Component
 public class MessageDaoImpl implements MessageDao{
@@ -28,6 +31,21 @@ public class MessageDaoImpl implements MessageDao{
 		jdbcTemplate.update(INSERT_SQL, dto.getMessageTrnId(), dto.getMessage(), 
 				dto.getUsername(), dto.getLastUpdated(), dto.getMessageId());
 		return dto.getMessageId();
+	}
+
+	@Override
+	public List<MessageInfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT m1.message_id, m1.message, m1.username as fromUsername, m2.username as toUsername, m1.last_updated\n" + 
+				"FROM message_trn m1\n" + 
+				"LEFT JOIN message_users_trn m2 ON m1.message_id = m2.message_id\n" + 
+				"WHERE m1.username IN (?, ?)\n" + 
+				"and m2.username IN (?, ?)\n" + 
+				"and m1.username != m2.username\n" + 
+				"order by m1.last_updated;");
+		
+		return jdbcTemplate.query(sb.toString(), new Object [] {fromUsername, toUsername, fromUsername, toUsername},
+				new BeanPropertyRowMapper(MessageInfoEntity.class));
 	}
 
 	

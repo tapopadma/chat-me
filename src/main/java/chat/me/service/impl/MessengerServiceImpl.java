@@ -1,5 +1,7 @@
 package chat.me.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,11 @@ public class MessengerServiceImpl implements MessengerService{
 		String messageId = messageDaoImpl.saveMessageByUsername(entity.getMessage(), entity.getFromUsername());
 		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageId, entity.getFromUsername());
 		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageId, entity.getToUsername());
+	}
+
+	@Override
+	public List<MessageInfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
+		return messageDaoImpl.fetchAllMessage(fromUsername, toUsername);
 	}
 
 	

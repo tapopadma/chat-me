@@ -1,10 +1,15 @@
 package chat.me.entity;
 
+import java.sql.Timestamp;
+
 public class MessageInfoEntity {
 	
 	private String fromUsername;
 	private String toUsername;
 	private String message;
+	private String messageId;
+	private Timestamp lastUpdated;
+	
 	public String getFromUsername() {
 		return fromUsername;
 	}
@@ -23,14 +28,28 @@ public class MessageInfoEntity {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public MessageInfoEntity(String fromUsername, String toUsername, String message) {
-		super();
+	public String getMessageId() {
+		return messageId;
+	}
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
+	}
+	public Timestamp getLastUpdated() {
+		return lastUpdated;
+	}
+	public void setLastUpdated(Timestamp lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+	public MessageInfoEntity(String fromUsername, String toUsername, String message, String messageId,
+			Timestamp lastUpdated) {
 		this.fromUsername = fromUsername;
 		this.toUsername = toUsername;
 		this.message = message;
+		this.messageId = messageId;
+		this.lastUpdated = lastUpdated;
 	}
 	public MessageInfoEntity() {
-
+		// TODO Auto-generated constructor stub
 	}
 	
 	
