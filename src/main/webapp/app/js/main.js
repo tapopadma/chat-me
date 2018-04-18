@@ -1,6 +1,7 @@
 angular.module('mainApp', [])
 .controller('mainController',  
-	function mainController($scope, mainService, userService, commonService, messengerService){
+	function mainController($scope, $compile, mainService, userService, 
+			commonService, messengerService){
 		commonService.set('mainController', $scope);
 		$scope.logout = function() {
 			mainService.logout();
@@ -27,12 +28,14 @@ angular.module('mainApp', [])
 			$scope.message = '';
 		};
 		$scope.addSenderMessageTemplate = function (text) {
-			var htmlContent = $('#message-history');
-			htmlContent.load('<div style="color:green;">'+text+'</div>');
-			$compile(htmlContent.contents())($scope);
+			angular.element(document.getElementById('message-history'))
+			.append($compile('<div style="color:green"><b>You:</b> '+text+'</div>')($scope));
 		};
 		$scope.addReceipientMessageTemplate = function (text) {
-			
+			angular.element(document.getElementById('message-history'))
+				.append($compile(
+						'<div style="color:red"><b>'+$scope.selectedUser.username
+						+':</b>'+text+'</div>')($scope));
 		};
 })
 .factory('messengerService', ['$http', 'commonService', function($http, commonService) {

@@ -8,7 +8,6 @@
 <script type="text/javascript" 
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
-<script type="text/javascript" src="js/components/chat-box.component.js"></script>
 <link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-controller="mainController" ng-init="init()">
@@ -22,7 +21,8 @@
 				</tr>
 				<tr>
 					<td style="height:200px;">
-						<div style="width: 790px;height: 200px;max-height: 200px;overflow-y:scroll;" id="message-history">
+						<div style="width: 790px;height: 200px;max-height: 200px;overflow-y:scroll;"
+						 id="message-history">
 							{{messageHistory}}
 						</div>
 					</td>
