@@ -1,7 +1,7 @@
 angular.module('mainApp', [])
 .controller('mainController',  
 	function mainController($scope, $compile, $interval, mainService, userService, 
-			commonService, messengerService){
+			commonService, messengerService, socketService){
 		commonService.set('mainController', $scope);
 		$scope.logout = function() {
 			mainService.logout();
@@ -40,12 +40,17 @@ angular.module('mainApp', [])
 			angular.element(document.getElementById('message-history')).empty();
 		};
 		$scope.sendMessage = function () {
-			messengerService.saveMessage({
+			socketService.send({
 				'fromUsername' : $scope.username,
 				'toUsername' : $scope.selectedUser.username,
 				'message' : $scope.message
 			});
+			$scope.message = '';
 		};
+		/*socketService.receive().then(null, null, function(message) {
+			alert(message);
+		    //$scope.messages.push(message);
+		  });*/
 		$scope.addSenderMessageTemplateToChatBox = function (text) {
 			angular.element(document.getElementById('message-history'))
 			.append($compile('<div style="color:green"><b>'+$scope.username+':</b> '+text+'</div>')($scope));
@@ -57,6 +62,70 @@ angular.module('mainApp', [])
 						+':</b>'+text+'</div>')($scope));
 		};
 })
+.factory('socketService', ['$q', '$timeout', 'commonService', function($q, $timeout, commonService){
+	var service = {};
+	var listener = $q.defer();
+	var socket = {
+	    client: null,
+	    stomp: null
+	};
+	var messageIds = [];
+	    
+    service.RECONNECT_TIMEOUT = 30000;
+    service.SOCKET_URL = "/chat-me/chat";
+    service.CHAT_TOPIC = "/topic/message";
+    service.CHAT_BROKER = "/app/chat";
+    
+    service.receive = function() {
+      return listener.promise;
+    };
+    
+    service.send = function(message) {
+      socket.stomp.send(
+    		  service.CHAT_BROKER, 
+    		  {},
+    		  JSON.stringify(message)
+      );
+    };
+    
+    var reconnect = function() {
+      $timeout(function() {
+        initialize();
+      }, this.RECONNECT_TIMEOUT);
+    };
+    
+    var getMessage = function(data) {
+      var messageInfo = JSON.parse(data);
+      var scope = commonService.get('mainController');
+      if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
+    	  if(messageInfo.fromUsername == scope.username && messageInfo.toUsername == scope.selectedUser.username){
+    		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
+    	  }
+    	  else if(message.fromUsername == scope.selectedUser.username && message.toUsername == scope.username){
+    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
+    	  }
+      }
+      else{
+    	  console.log('something wrong with message received: ' + message);
+      }
+    };
+    
+    var startListener = function() {
+      socket.stomp.subscribe(service.CHAT_TOPIC, function(data) {
+        listener.notify(getMessage(data.body));
+      });
+    };
+    
+    var initialize = function() {
+      socket.client = new SockJS(service.SOCKET_URL);
+      socket.stomp = Stomp.over(socket.client);
+      socket.stomp.connect({}, startListener);
+      socket.stomp.onclose = reconnect;
+    };
+    
+    initialize();
+    return service;
+}])
 .factory('messengerService', ['$http', 'commonService', function($http, commonService) {
 	return {
 		fetchAllMessage: function (data) {
@@ -71,7 +140,7 @@ angular.module('mainApp', [])
 				if(response.status == 200){
 					var scope = commonService.get('mainController');
 					if(scope.messageHistoryList != null && response.data.length == scope.messageHistoryList.length){						
-						console.log('no update needed!!!');
+						//console.log('no update needed!!!');
 						scope.selectUser(scope.selectedUser.username);
 						return;
 					}
@@ -79,7 +148,7 @@ angular.module('mainApp', [])
 					scope.clearChatBox();
 					scope.displayMessageHistoryOnChatBox();
 					scope.selectUser(scope.selectedUser.username);
-					console.log('fetched message history data successfully!!!');
+					//console.log('fetched message history data successfully!!!');
 				}
 				else{
 					console.log('unable to fetch the data!!!');
@@ -96,10 +165,10 @@ angular.module('mainApp', [])
 			)
 			.then(function (response){
 				if(response.status == 200){
-					var scope = commonService.get('mainController'); 
+					var scope = commonService.get('mainController');
 					scope.selectUser(scope.selectedUser.username);
 					scope.message = '';
-					console.log('message sent successfully!!!');
+					//console.log('message sent successfully!!!');
 				}
 				else{
 					console.log('something went wrong!!!');

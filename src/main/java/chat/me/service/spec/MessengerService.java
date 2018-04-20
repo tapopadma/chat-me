@@ -6,6 +6,6 @@ import chat.me.entity.MessageInfoEntity;
 
 public interface MessengerService {
 
-	void saveMessage(MessageInfoEntity entity);
+	MessageInfoEntity saveMessage(MessageInfoEntity entity);
 	List<MessageInfoEntity> fetchAllMessage(String fromUsername, String toUsername);
 }

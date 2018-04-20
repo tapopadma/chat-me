@@ -21,7 +21,7 @@ public class MessageDaoImpl implements MessageDao{
 	private final String INSERT_SQL = "insert into message_trn values(?,?,?,?,?)";
 	
 	@Override
-	public String saveMessageByUsername(String message, String username) {
+	public MessageTrnDto saveMessageByUsername(String message, String username) {
 		if(message.isEmpty())
 			return null;
 		MessageTrnDto dto = new MessageTrnDto();
@@ -30,7 +30,7 @@ public class MessageDaoImpl implements MessageDao{
 		dto.setMessageId(UUID.randomUUID().toString());
 		jdbcTemplate.update(INSERT_SQL, dto.getMessageTrnId(), dto.getMessage(), 
 				dto.getUsername(), dto.getLastUpdated(), dto.getMessageId());
-		return dto.getMessageId();
+		return dto;
 	}
 
 	@Override

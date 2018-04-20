@@ -3,7 +3,6 @@ package chat.me.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -22,6 +21,7 @@ public class MessengerController {
 	@Autowired
 	private MessengerServiceImpl messengerServiceImpl;
 	
+	@Deprecated
 	@ResponseBody
 	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
 	public void saveMessage(@RequestBody MessageInfoEntity entity) {
@@ -36,9 +36,8 @@ public class MessengerController {
 	
 	@MessageMapping("/chat")
 	@SendTo("/topic/message")
-	public MessageInfoEntity sendMessage(Message message) {
-		return new MessageInfoEntity();
-		
+	public MessageInfoEntity sendMessage(MessageInfoEntity entity) {
+		return messengerServiceImpl.saveMessage(entity);
 	}
 	
 }
