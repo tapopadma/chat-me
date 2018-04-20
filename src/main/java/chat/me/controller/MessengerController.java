@@ -3,6 +3,9 @@ package chat.me.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,4 +33,12 @@ public class MessengerController {
 	public List<MessageInfoEntity> fetchAllMessage(@RequestBody MessageInfoEntity entity) {
 		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
 	}
+	
+	@MessageMapping("/chat")
+	@SendTo("/topic/message")
+	public MessageInfoEntity sendMessage(Message message) {
+		return new MessageInfoEntity();
+		
+	}
+	
 }

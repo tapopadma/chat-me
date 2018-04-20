@@ -21,6 +21,25 @@
 		<artifactId>spring-webmvc</artifactId>
 		<version>${org.springframework-version}</version>
   	</dependency>
+  	
+  	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-websocket</artifactId>
+	    <version>${org.springframework-version}</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-messaging</artifactId>
+	    <version>${org.springframework-version}</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>javax.websocket</groupId>
+	    <artifactId>javax.websocket-api</artifactId>
+	    <version>1.0</version>
+	    <scope>provided</scope>
+	</dependency>
   	<!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
 	<dependency>
 	    <groupId>javax.ws.rs</groupId>
@@ -41,6 +60,12 @@
 	    <artifactId>servlet-api</artifactId>
 	    <version>2.5</version>
 	    <scope>provided</scope>
+	</dependency>
+	
+	<dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>jstl</artifactId>
+	    <version>1.2</version>
 	</dependency>
 	
 	<!-- https://mvnrepository.com/artifact/org.springframework.hateoas/spring-hateoas -->

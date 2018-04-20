@@ -23,7 +23,7 @@
     </context-param>
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>chat.me.spring.security.config</param-value>
+        <param-value>chat.me.spring.config</param-value>
     </context-param>
     <listener>
         <listener-class>

@@ -1,4 +1,4 @@
-package chat.me.spring.security.config;
+package chat.me.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
