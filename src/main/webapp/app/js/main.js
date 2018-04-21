@@ -98,12 +98,15 @@ angular.module('mainApp', [])
       var messageInfo = JSON.parse(data);
       var scope = commonService.get('mainController');
       if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
-    	  if(messageInfo.fromUsername == scope.username && messageInfo.toUsername == scope.selectedUser.username){
+    	  if(messageInfo.fromUsername == scope.username && 
+    			  messageInfo.toUsername == scope.selectedUser.username){
     		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
     	  }
-    	  else if(message.fromUsername == scope.selectedUser.username && message.toUsername == scope.username){
+    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
+    			  messageInfo.toUsername == scope.username){
     		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
     	  }
+    	  scope.scrollToEnd(document.getElementById('message-history'));
       }
       else{
     	  console.log('something wrong with message received: ' + message);
@@ -139,16 +142,10 @@ angular.module('mainApp', [])
 			.then(function (response) {
 				if(response.status == 200){
 					var scope = commonService.get('mainController');
-					if(scope.messageHistoryList != null && response.data.length == scope.messageHistoryList.length){						
-						//console.log('no update needed!!!');
-						scope.selectUser(scope.selectedUser.username);
-						return;
-					}
 					scope.messageHistoryList = response.data;
 					scope.clearChatBox();
 					scope.displayMessageHistoryOnChatBox();
-					scope.selectUser(scope.selectedUser.username);
-					//console.log('fetched message history data successfully!!!');
+					console.log('fetched message history data successfully!!!');
 				}
 				else{
 					console.log('unable to fetch the data!!!');
@@ -156,6 +153,7 @@ angular.module('mainApp', [])
 			});
 		},
 		saveMessage: function (data) {
+			return;//polling no more useful
 			$http(
 				{
 					method: 'POST',
@@ -168,7 +166,7 @@ angular.module('mainApp', [])
 					var scope = commonService.get('mainController');
 					scope.selectUser(scope.selectedUser.username);
 					scope.message = '';
-					//console.log('message sent successfully!!!');
+					console.log('message sent successfully!!!');
 				}
 				else{
 					console.log('something went wrong!!!');
