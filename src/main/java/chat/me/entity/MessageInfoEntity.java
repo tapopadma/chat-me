@@ -9,7 +9,8 @@ public class MessageInfoEntity {
 	private String message;
 	private String messageId;
 	private Timestamp lastUpdated;
-	private boolean isUsertyping;
+	private boolean isUsertyping;//of course refers to other user
+	private boolean isUserloggedin;//of course refers to other user
 	
 	public String getFromUsername() {
 		return fromUsername;
@@ -50,8 +51,14 @@ public class MessageInfoEntity {
 	public void setIsUsertyping(boolean isUsertyping) {
 		this.isUsertyping = isUsertyping;
 	}
+	public boolean isUserloggedin() {
+		return isUserloggedin;
+	}
+	public void setUserloggedin(boolean isUserloggedin) {
+		this.isUserloggedin = isUserloggedin;
+	}
 	public MessageInfoEntity(String fromUsername, String toUsername, String message, String messageId,
-			Timestamp lastUpdated, boolean isUsertyping) {
+			Timestamp lastUpdated, boolean isUsertyping, boolean isUserloggedin) {
 		super();
 		this.fromUsername = fromUsername;
 		this.toUsername = toUsername;
@@ -59,6 +66,9 @@ public class MessageInfoEntity {
 		this.messageId = messageId;
 		this.lastUpdated = lastUpdated;
 		this.isUsertyping = isUsertyping;
+		this.isUserloggedin = isUserloggedin;
 	}
+	
+	
 	
 }

@@ -40,7 +40,8 @@
 				</tr>
 				<tr>
 					<td>
-						<textarea style="height:200px;width:790px;" ng-model="message" 
+						<textarea id="chat-text-area"
+							style="height:100px;width:790px;" ng-model="message" 
 							ng-change="sendUserTypingStatus()"></textarea><br>
 						<button ng-click="sendMessage()">
 							Send

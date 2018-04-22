@@ -18,7 +18,7 @@ public class UserAccountController {
 	
 	@Autowired
 	private UserAccountServiceImpl userAccountServiceImpl;
-
+	
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getLoggedInUser")
 	public AccountMstDto getAuthentication() {

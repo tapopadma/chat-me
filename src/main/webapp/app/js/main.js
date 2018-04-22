@@ -1,7 +1,7 @@
 angular.module('mainApp', [])
 .controller('mainController',  
-	function mainController($scope, $compile, $interval, mainService, userService, 
-			commonService, messengerService, socketService){
+	function mainController($scope, $compile, $interval, $document, 
+			mainService, userService, commonService, messengerService, socketService){
 		commonService.set('mainController', $scope);
 		$scope.logout = function() {
 			mainService.logout();
@@ -47,7 +47,6 @@ angular.module('mainApp', [])
 				'message' : $scope.message,
 				'isUsertyping': false
 			});
-			$scope.message = '';
 		};
 		$scope.addSenderMessageTemplateToChatBox = function (text) {
 			angular.element(document.getElementById('message-history'))
@@ -65,7 +64,22 @@ angular.module('mainApp', [])
 				'fromUsername' : $scope.username,
 				'toUsername' : $scope.selectedUser.username
 			});
-		}
+		};
+		$document.bind("keypress", function (event){
+			if(event.target != null && event.target.getAttribute('id') != null 
+					&& event.target.getAttribute('id') == 'chat-text-area'
+					&& event.code != null && event.code == "Enter"){
+				event.preventDefault();
+				if($scope.message != null && $scope.message.length > 0){
+					socketService.send({
+						'fromUsername' : $scope.username,
+						'toUsername' : $scope.selectedUser.username,
+						'message' : $scope.message,
+						'isUsertyping': false
+					});
+				}
+			}
+		});
 })
 .factory('socketService', ['$q', '$timeout', 'commonService', function($q, $timeout, commonService){
 	var service = {};
@@ -102,28 +116,34 @@ angular.module('mainApp', [])
     var getMessage = function(data) {
       var messageInfo = JSON.parse(data);
       var scope = commonService.get('mainController');
-      if(messageInfo.fromUsername != null && messageInfo.toUsername != null
-    		  && messageInfo.message != null){
-    	  if(messageInfo.fromUsername == scope.username && 
-    			  messageInfo.toUsername == scope.selectedUser.username){
-    		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
+      if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
+    	  if(messageInfo.message != null){
+	    	  if(messageInfo.fromUsername == scope.username && 
+	    			  messageInfo.toUsername == scope.selectedUser.username){
+	    		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
+	    	  }
+	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
+	    			  messageInfo.toUsername == scope.username){
+	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
+	    	  }
+	    	  scope.scrollToEnd(document.getElementById('message-history'));
+	    	  scope.message = '';
+	    	  scope.$apply();
     	  }
-    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
-    			  messageInfo.toUsername == scope.username){
-    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
-    	  }
-    	  scope.scrollToEnd(document.getElementById('message-history'));
-      }
-      else if(messageInfo.fromUsername != null && messageInfo.toUsername != null
-    		  && messageInfo.isUsertyping){
-    	  if(messageInfo.fromUsername == scope.selectedUser.username && 
-    			  messageInfo.toUsername == scope.username){
-    		  scope.selectedUser.status = 'typing...';
-			  scope.$apply();
-    		  $timeout(function () {
-    			  scope.selectedUser.status = 'online';
+    	  else if(messageInfo.isUsertyping){
+        	  if(messageInfo.fromUsername == scope.selectedUser.username && 
+        			  messageInfo.toUsername == scope.username){
+        		  scope.selectedUser.status = 'typing...';
     			  scope.$apply();
-    		  },1000);
+        		  $timeout(function () {
+        			  scope.selectedUser.status = 'online';
+        			  scope.$apply();
+        		  },1000);
+        	  }
+          }
+    	  if(messageInfo.toUsername == scope.selectedUser.username){
+    		  scope.selectedUser.status = messageInfo.isUserloggedin ? 'online' : 'offline';
+    		  scope.$apply();
     	  }
       }
       else{
