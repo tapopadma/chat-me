@@ -21,6 +21,9 @@ public class MessengerServiceImpl implements MessengerService{
 	
 	@Override
 	public MessageInfoEntity saveMessage(MessageInfoEntity entity) {
+		if(entity.getIsUsertyping()) {
+			return entity;
+		}
 		MessageTrnDto messageDto = messageDaoImpl.saveMessageByUsername(entity.getMessage(), entity.getFromUsername());
 		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), entity.getFromUsername());
 		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), entity.getToUsername());

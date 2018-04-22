@@ -9,6 +9,7 @@ public class MessageInfoEntity {
 	private String message;
 	private String messageId;
 	private Timestamp lastUpdated;
+	private boolean isUsertyping;
 	
 	public String getFromUsername() {
 		return fromUsername;
@@ -40,18 +41,24 @@ public class MessageInfoEntity {
 	public void setLastUpdated(Timestamp lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
+	public MessageInfoEntity() {
+		// TODO Auto-generated constructor stub
+	}
+	public boolean getIsUsertyping() {
+		return isUsertyping;
+	}
+	public void setIsUsertyping(boolean isUsertyping) {
+		this.isUsertyping = isUsertyping;
+	}
 	public MessageInfoEntity(String fromUsername, String toUsername, String message, String messageId,
-			Timestamp lastUpdated) {
+			Timestamp lastUpdated, boolean isUsertyping) {
+		super();
 		this.fromUsername = fromUsername;
 		this.toUsername = toUsername;
 		this.message = message;
 		this.messageId = messageId;
 		this.lastUpdated = lastUpdated;
+		this.isUsertyping = isUsertyping;
 	}
-	public MessageInfoEntity() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	
 	
 }

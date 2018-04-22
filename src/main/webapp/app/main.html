@@ -21,7 +21,14 @@
 		<div style="margin:20px;float:right;">
 			<table>
 				<tr>
-					<th>{{selectedUser.username}}</th>
+					<th>
+						<div id="selected-user-info">
+							{{selectedUser.username}}
+						</div>
+						<div id="selected-user-status" style="color:blue;">
+							{{selectedUser.status}}
+						</div>
+					</th>
 				</tr>
 				<tr>
 					<td style="height:200px;">
@@ -33,7 +40,8 @@
 				</tr>
 				<tr>
 					<td>
-						<textarea style="height:200px;width:790px;" ng-model="message"></textarea><br>
+						<textarea style="height:200px;width:790px;" ng-model="message" 
+							ng-change="sendUserTypingStatus()"></textarea><br>
 						<button ng-click="sendMessage()">
 							Send
 						</button>

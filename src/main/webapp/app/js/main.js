@@ -13,7 +13,8 @@ angular.module('mainApp', [])
 		$scope.selectUser = function (selectedUsername){
 			angular.forEach(this.userList, function(user){
 				if(user.username == selectedUsername){
-					$scope.selectedUser = user;
+					$scope.selectedUser = user; 
+					$scope.selectedUser.status = 'online';
 				}
 			});
 			//saves to $scope.messageHistoryList
@@ -43,14 +44,11 @@ angular.module('mainApp', [])
 			socketService.send({
 				'fromUsername' : $scope.username,
 				'toUsername' : $scope.selectedUser.username,
-				'message' : $scope.message
+				'message' : $scope.message,
+				'isUsertyping': false
 			});
 			$scope.message = '';
 		};
-		/*socketService.receive().then(null, null, function(message) {
-			alert(message);
-		    //$scope.messages.push(message);
-		  });*/
 		$scope.addSenderMessageTemplateToChatBox = function (text) {
 			angular.element(document.getElementById('message-history'))
 			.append($compile('<div style="color:green"><b>'+$scope.username+':</b> '+text+'</div>')($scope));
@@ -61,6 +59,13 @@ angular.module('mainApp', [])
 						'<div style="color:red"><b>'+$scope.selectedUser.username
 						+':</b>'+text+'</div>')($scope));
 		};
+		$scope.sendUserTypingStatus = function (){
+			socketService.send({
+				'isUsertyping': true,
+				'fromUsername' : $scope.username,
+				'toUsername' : $scope.selectedUser.username
+			});
+		}
 })
 .factory('socketService', ['$q', '$timeout', 'commonService', function($q, $timeout, commonService){
 	var service = {};
@@ -97,7 +102,8 @@ angular.module('mainApp', [])
     var getMessage = function(data) {
       var messageInfo = JSON.parse(data);
       var scope = commonService.get('mainController');
-      if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
+      if(messageInfo.fromUsername != null && messageInfo.toUsername != null
+    		  && messageInfo.message != null){
     	  if(messageInfo.fromUsername == scope.username && 
     			  messageInfo.toUsername == scope.selectedUser.username){
     		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
@@ -108,8 +114,20 @@ angular.module('mainApp', [])
     	  }
     	  scope.scrollToEnd(document.getElementById('message-history'));
       }
+      else if(messageInfo.fromUsername != null && messageInfo.toUsername != null
+    		  && messageInfo.isUsertyping){
+    	  if(messageInfo.fromUsername == scope.selectedUser.username && 
+    			  messageInfo.toUsername == scope.username){
+    		  scope.selectedUser.status = 'typing...';
+			  scope.$apply();
+    		  $timeout(function () {
+    			  scope.selectedUser.status = 'online';
+    			  scope.$apply();
+    		  },1000);
+    	  }
+      }
       else{
-    	  console.log('something wrong with message received: ' + message);
+		  console.log('something wrong with message received: ' + message);
       }
     };
     
