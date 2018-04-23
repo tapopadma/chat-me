@@ -38,3 +38,19 @@ Hence server can broadcast a message to each client whenever necessary without t
 Developer just needs to add a spring configuration to configure the endpoint and application destination. At client side just need to connect to the 
 server at the socket url and send message to the desired end point and get reply from the corresponding desitnation url.
 This is efficient since in this environment client doesn't bother about updates from the server.
+
+(iv) Displaying user's current loggedin status and message typing status
+------------------------------------------------------------------------
+#Message typing status
+----------------------
+Every time user types something this information should be broadcasted through web-socket to all relevant users. so spring-web-socket is enough here. every time
+the text area is changed an event has to be triggered that will send signal to the server through socket and the server will broadcast it through the some socket-endpoint
+in no time. In this way the other users dont have to send separate requests each to the server to get the current user's typing status. so socket conncection is a must here.
+#User loggedin status
+---------------------
+a) Sending requests every second to server to get the latest active user list in current session is super inefficient.
+Again socket has to be the need. Every time a user logs in or logs out the server should broadcast the updated session status of that particular user through socket-endpoint.
+This updates 1 user status per broadcast and hence efficient. 
+b) Spring security framework will trigger an event each time a user logs in / out(for this developer needs to define login/outSucessHandler). So a Event Handler class implementing HttpSessionBindingListener will be good enough to update 
+our activeUserList. Developer has to maintain a bean for the activeuserlist which is nothing but a list of usernames. as soon as this list is updated it can be broadcasted over
+socket.

@@ -40,11 +40,6 @@ public class MessengerController {
 		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
 	}
 	
-	public boolean getLoggedInStatusByUsername(String username) {
-		List<String> allUsers = getAllLoggedInUsers();
-		return allUsers.contains(username);
-	}
-	
 	private List<String> getAllLoggedInUsers(){
 		List<String> allUsers = new ArrayList<>();
 		List<Object> principals = sessionRegistry.getAllPrincipals();
@@ -60,8 +55,6 @@ public class MessengerController {
 	@MessageMapping("/chat")
 	@SendTo("/topic/message")
 	public MessageInfoEntity sendMessage(MessageInfoEntity entity) {
-		entity.setUserloggedin(
-				getLoggedInStatusByUsername(entity.getToUsername()));
 		return messengerServiceImpl.saveMessage(entity);
 	}
 	
