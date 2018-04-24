@@ -75,8 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http
 		.csrf().disable();
         
-		http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
-		
         http
         .authorizeRequests()
         .antMatchers("/login*").permitAll()
@@ -99,6 +97,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         .logoutUrl("/perform_logout")
         .logoutSuccessHandler(userLogoutSuccessHandler)
         .deleteCookies("JSESSIONID");
+        
+        http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
 	}
 	
 	@Bean

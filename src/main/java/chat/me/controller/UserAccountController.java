@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import chat.me.dto.AccountMstDto;
-import chat.me.entity.ActiveUserEntity;
 import chat.me.service.impl.UserAccountServiceImpl;
 
 @Controller
@@ -20,8 +19,6 @@ public class UserAccountController {
 	@Autowired
 	private UserAccountServiceImpl userAccountServiceImpl;
 	
-	@Autowired
-	private ActiveUserEntity activeUserEntity;
 	
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getLoggedInUser")
