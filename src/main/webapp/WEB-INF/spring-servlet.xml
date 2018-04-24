@@ -37,5 +37,6 @@
               <value>.jsp</value>
            </property>
     </bean>
+	<bean id="activeUserEntity" class="chat.me.entity.ActiveUserEntity"></bean>
 
 </beans>

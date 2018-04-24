@@ -2,7 +2,6 @@ package chat.me.controller;
 
 import java.util.List;
 
-import org.apache.catalina.core.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -36,7 +35,6 @@ public class UserAccountController {
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getAllUsers")
 	public List<AccountMstDto> getAllUsers(){
-		activeUserEntity.getUsers().add("val");
 		return userAccountServiceImpl.getAllUsers();
 	}
 	

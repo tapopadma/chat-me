@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-import chat.me.entity.ActiveUserEntity;
 import chat.me.service.impl.UserAccountServiceImpl;
 
 @Configuration
@@ -34,6 +33,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
 	private UserAccountServiceImpl userAccountServiceImpl;
+	
+	@Autowired
+	private UserLoginSuccessHandler userLoginSuccessHandler;
+	
+	@Autowired
+	private UserLogoutSuccessHandler userLogoutSuccessHandler;
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
@@ -85,25 +90,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         .and()
         .formLogin()
         .loginProcessingUrl("/perform_login")
-        .successHandler(userLoginSuccessHandler())
+        .successHandler(userLoginSuccessHandler)
         .failureUrl("/perform_login")
         .and()
         .httpBasic()
         .and()
         .logout()
         .logoutUrl("/perform_logout")
-        .logoutSuccessHandler(userLogoutSuccessHandler())
+        .logoutSuccessHandler(userLogoutSuccessHandler)
         .deleteCookies("JSESSIONID");
-	}
-	
-	@Bean
-	public UserLoginSuccessHandler userLoginSuccessHandler() {
-		return new UserLoginSuccessHandler();
-	}
-	
-	@Bean
-	public UserLogoutSuccessHandler userLogoutSuccessHandler() {
-		return new UserLogoutSuccessHandler();
 	}
 	
 	@Bean
@@ -111,11 +106,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
 		db.setDataSource(jdbcTemplate.getDataSource());
 		return db;
-	}
-	
-	@Bean
-	public ActiveUserEntity activeUserEntity() {
-		return new ActiveUserEntity();
 	}
 	
 }
