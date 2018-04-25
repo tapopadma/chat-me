@@ -1,5 +1,6 @@
 package chat.me.spring.config;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@ComponentScan("chat.me.controller")
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer{
 
 	@Override

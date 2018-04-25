@@ -1,4 +1,4 @@
-package chat.me.spring.config;
+package chat.me.spring.security.authentication.handlers;
 
 import java.io.IOException;
 

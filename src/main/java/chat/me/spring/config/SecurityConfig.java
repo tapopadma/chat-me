@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import chat.me.service.impl.UserAccountServiceImpl;
+import chat.me.spring.security.authentication.handlers.UserLoginSuccessHandler;
+import chat.me.spring.security.authentication.handlers.UserLogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
