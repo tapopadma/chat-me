@@ -15,11 +15,16 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import chat.me.entity.ActiveUserStore;
+
 @Component("userLoginSuccessHandler")
 public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
 
 	@Autowired
 	private RedirectStrategy redirectStrategy;
+	
+	@Autowired
+	private ActiveUserStore activeUserStore;
 	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -27,6 +32,8 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
 		HttpSession session = request.getSession(false);
         if (session != null) {
             session.setAttribute("user", authentication.getName());
+            if(!activeUserStore.getUserList().contains(authentication.getName()))
+            	activeUserStore.getUserList().add(authentication.getName());
         }
         redirectStrategy.sendRedirect(request, response, "/app/main.html");
 	}

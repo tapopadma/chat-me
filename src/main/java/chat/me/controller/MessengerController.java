@@ -2,6 +2,7 @@ package chat.me.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import chat.me.entity.ActiveUserStore;
 import chat.me.entity.MessageInfoEntity;
 import chat.me.service.impl.MessengerServiceImpl;
 
@@ -27,6 +29,9 @@ public class MessengerController {
 	@Autowired
 	private SessionRegistry sessionRegistry;
 	
+	@Autowired
+	private ActiveUserStore activeUserStore;
+	
 	@Deprecated
 	@ResponseBody
 	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
@@ -34,22 +39,20 @@ public class MessengerController {
 		messengerServiceImpl.saveMessage(entity);
 	}
 	
+	
+	@ResponseBody
+	@RequestMapping(value="getAllLoggedInUsers", method=RequestMethod.GET)
+	public List<String> getAllLoggedInUsers(){
+		return sessionRegistry.getAllPrincipals().stream()
+				.filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
+				.map(principal -> ((User)principal).getUsername())
+				.collect(Collectors.toList());
+	}
+	
 	@ResponseBody
 	@RequestMapping(value="/fetchAllMessage", method=RequestMethod.POST)
 	public List<MessageInfoEntity> fetchAllMessage(@RequestBody MessageInfoEntity entity) {
 		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
-	}
-	
-	private List<String> getAllLoggedInUsers(){
-		List<String> allUsers = new ArrayList<>();
-		List<Object> principals = sessionRegistry.getAllPrincipals();
-		for(Object principal : principals) {
-			if(principal instanceof User) {
-				User user = (User) principal;
-				allUsers.add(user.getUsername());
-			}
-		}
-		return allUsers;
 	}
 	
 	@MessageMapping("/chat")

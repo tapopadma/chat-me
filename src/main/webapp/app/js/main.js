@@ -9,6 +9,7 @@ angular.module('mainApp', [])
 		$scope.init = function (){
 			userService.getUsername();
 			userService.getAllUsers();
+			//userService.getAllLoggedInUsers();
 		};
 		$scope.selectUser = function (selectedUsername){
 			angular.forEach(this.userList, function(user){
@@ -215,6 +216,19 @@ angular.module('mainApp', [])
 }])
 .factory('userService', ['$http', 'commonService', function ($http, commonService){
 	return {
+		getAllLoggedInUsers : function () {
+			$http(
+				{
+					method: 'GET',
+					url: '/chat-me/messenger/getAllLoggedInUsers'
+				}
+			)
+			.then(function (response){
+				if(response.status == 200){
+					alert(response.data);
+				}
+			});
+		},
 		getAllUsers : function () {
 			$http(
 				{

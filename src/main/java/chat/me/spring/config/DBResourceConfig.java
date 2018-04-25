@@ -10,7 +10,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
 @ComponentScan({
-	"chat.me.dao", "chat.me.service", "chat.me.spring.security.authentication.handlers"
+	"chat.me.dao", "chat.me.service", "chat.me.spring.security.authentication.handlers", "chat.me.entity"
 })
 public class DBResourceConfig {
 		
