@@ -294,6 +294,4 @@ angular.module('mainApp', [])
 	
 	}
 	
-})
-
-;
+});
