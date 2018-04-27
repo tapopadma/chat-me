@@ -4,18 +4,29 @@ angular.module('mainApp', [])
 			mainService, userService, commonService, messengerService, socketService){
 		commonService.set('mainController', $scope);
 		$scope.logout = function() {
+			socketService.send({
+				'sessioninfoEntity':{
+					'username' : $scope.username,
+					'islogoutRequest' : true
+				 }
+			});
 			mainService.logout();
 		};
 		$scope.init = function (){
 			userService.getUsername();
 			userService.getAllUsers();
 			//userService.getAllLoggedInUsers();
+			socketService.send({
+				'sessioninfoEntity':{
+					'username' : $scope.username,
+					'isloginRequest' : true
+				 }
+			});
 		};
 		$scope.selectUser = function (selectedUsername){
 			angular.forEach(this.userList, function(user){
 				if(user.username == selectedUsername){
-					$scope.selectedUser = user; 
-					$scope.selectedUser.status = 'online';
+					$scope.selectedUser = user;
 				}
 			});
 			//saves to $scope.messageHistoryList
@@ -43,10 +54,12 @@ angular.module('mainApp', [])
 		};
 		$scope.sendMessage = function () {
 			socketService.send({
-				'fromUsername' : $scope.username,
-				'toUsername' : $scope.selectedUser.username,
-				'message' : $scope.message,
-				'isUsertyping': false
+				'messageinfoEntity':{
+					'fromUsername' : $scope.username,
+					'toUsername' : $scope.selectedUser.username,
+					'message' : $scope.message,
+					'isUsertyping': false
+				}
 			});
 		};
 		$scope.addSenderMessageTemplateToChatBox = function (text) {
@@ -61,9 +74,11 @@ angular.module('mainApp', [])
 		};
 		$scope.sendUserTypingStatus = function (){
 			socketService.send({
-				'isUsertyping': true,
-				'fromUsername' : $scope.username,
-				'toUsername' : $scope.selectedUser.username
+				'messageinfoEntity':{
+					'isUsertyping': true,
+					'fromUsername' : $scope.username,
+					'toUsername' : $scope.selectedUser.username
+				 }
 			});
 		};
 		$document.bind("keypress", function (event){
@@ -73,10 +88,12 @@ angular.module('mainApp', [])
 				event.preventDefault();
 				if($scope.message != null && $scope.message.length > 0){
 					socketService.send({
-						'fromUsername' : $scope.username,
-						'toUsername' : $scope.selectedUser.username,
-						'message' : $scope.message,
-						'isUsertyping': false
+						'messageinfoEntity':{
+							'fromUsername' : $scope.username,
+							'toUsername' : $scope.selectedUser.username,
+							'message' : $scope.message,
+							'isUsertyping': false
+						 }
 					});
 				}
 			}
@@ -115,7 +132,9 @@ angular.module('mainApp', [])
     };
     
     var getMessage = function(data) {
-      var messageInfo = JSON.parse(data);
+      var socketMessageInfo = JSON.parse(data);
+      var messageInfo = socketMessageInfo.messageinfoEntity;
+      var sessionInfo = socketMessageInfo.sessioninfoEntity;
       var scope = commonService.get('mainController');
       if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
     	  if(messageInfo.message != null){
@@ -149,6 +168,18 @@ angular.module('mainApp', [])
       }
       else{
 		  console.log('something wrong with message received: ' + message);
+      }
+      if(sessionInfo != null){
+    	  if(sessionInfo.username == scope.selectedUser.uername){
+    		  if(sessionInfo.isloginRequest){
+    			  scope.selectedUser.status = 'online';
+        		  scope.$apply();
+    		  }
+    		  else if(sessionInfo.islogoutRequest){
+    			  scope.selectedUser.status = 'offline';
+        		  scope.$apply();
+    		  }
+    	  }
       }
     };
     

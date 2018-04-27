@@ -2,7 +2,7 @@ package chat.me.entity;
 
 import java.sql.Timestamp;
 
-public class MessageInfoEntity {
+public class MessageinfoEntity {
 	
 	private String fromUsername;
 	private String toUsername;
@@ -42,7 +42,7 @@ public class MessageInfoEntity {
 	public void setLastUpdated(Timestamp lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
-	public MessageInfoEntity() {
+	public MessageinfoEntity() {
 		// TODO Auto-generated constructor stub
 	}
 	public boolean getIsUsertyping() {
@@ -57,7 +57,7 @@ public class MessageInfoEntity {
 	public void setUserloggedin(boolean isUserloggedin) {
 		this.isUserloggedin = isUserloggedin;
 	}
-	public MessageInfoEntity(String fromUsername, String toUsername, String message, String messageId,
+	public MessageinfoEntity(String fromUsername, String toUsername, String message, String messageId,
 			Timestamp lastUpdated, boolean isUsertyping, boolean isUserloggedin) {
 		super();
 		this.fromUsername = fromUsername;

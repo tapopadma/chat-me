@@ -1,6 +1,5 @@
 package chat.me.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.entity.ActiveUserStore;
-import chat.me.entity.MessageInfoEntity;
+import chat.me.entity.MessageinfoEntity;
+import chat.me.entity.SocketMessageEntity;
 import chat.me.service.impl.MessengerServiceImpl;
 
 @Controller
@@ -29,13 +28,10 @@ public class MessengerController {
 	@Autowired
 	private SessionRegistry sessionRegistry;
 	
-	@Autowired
-	private ActiveUserStore activeUserStore;
-	
 	@Deprecated
 	@ResponseBody
 	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
-	public void saveMessage(@RequestBody MessageInfoEntity entity) {
+	public void saveMessage(@RequestBody MessageinfoEntity entity) {
 		messengerServiceImpl.saveMessage(entity);
 	}
 	
@@ -51,14 +47,18 @@ public class MessengerController {
 	
 	@ResponseBody
 	@RequestMapping(value="/fetchAllMessage", method=RequestMethod.POST)
-	public List<MessageInfoEntity> fetchAllMessage(@RequestBody MessageInfoEntity entity) {
+	public List<MessageinfoEntity> fetchAllMessage(@RequestBody MessageinfoEntity entity) {
 		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
 	}
 	
 	@MessageMapping("/chat")
 	@SendTo("/topic/message")
-	public MessageInfoEntity sendMessage(MessageInfoEntity entity) {
-		return messengerServiceImpl.saveMessage(entity);
+	public SocketMessageEntity sendMessage(SocketMessageEntity entity) {
+		SocketMessageEntity res = new SocketMessageEntity();
+		res.setmessageinfoEntity(messengerServiceImpl.saveMessage(
+				entity.getmessageinfoEntity()));
+		res.setSessioninfoEntity(entity.getSessioninfoEntity());
+		return res;
 	}
 	
 }
