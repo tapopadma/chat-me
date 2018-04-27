@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import chat.me.dao.impl.MessageDaoImpl;
 import chat.me.dao.impl.MessageUserDaoImpl;
 import chat.me.dto.MessageTrnDto;
-import chat.me.entity.MessageInfoEntity;
+import chat.me.entity.MessageinfoEntity;
 import chat.me.service.spec.MessengerService;
 
 @Service
@@ -20,14 +20,16 @@ public class MessengerServiceImpl implements MessengerService{
 	private MessageUserDaoImpl messageUserDaoImpl;
 	
 	@Override
-	public MessageInfoEntity saveMessage(MessageInfoEntity entity) {
+	public MessageinfoEntity saveMessage(MessageinfoEntity entity) {
+		if(entity == null)
+			return null;
 		if(entity.getIsUsertyping()) {
 			return entity;
 		}
 		MessageTrnDto messageDto = messageDaoImpl.saveMessageByUsername(entity.getMessage(), entity.getFromUsername());
 		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), entity.getFromUsername());
 		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), entity.getToUsername());
-		MessageInfoEntity res = new MessageInfoEntity();
+		MessageinfoEntity res = new MessageinfoEntity();
 		res.setFromUsername(entity.getFromUsername());
 		res.setLastUpdated(messageDto.getLastUpdated());
 		res.setMessage(messageDto.getMessage());
@@ -37,7 +39,7 @@ public class MessengerServiceImpl implements MessengerService{
 	}
 
 	@Override
-	public List<MessageInfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
+	public List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
 		return messageDaoImpl.fetchAllMessage(fromUsername, toUsername);
 	}
 

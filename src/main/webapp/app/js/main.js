@@ -3,7 +3,15 @@ angular.module('mainApp', [])
 	function mainController($scope, $compile, $interval, $document, 
 			mainService, userService, commonService, messengerService, socketService){
 		commonService.set('mainController', $scope);
+		$scope.ONLINE_COLOR = 'blue';
+		$scope.OFFLINE_COLOR = 'yellow';
 		$scope.logout = function() {
+			socketService.send({
+				'sessioninfoEntity':{
+					'username' : $scope.username,
+					'islogoutRequest' : true
+				 }
+			});
 			mainService.logout();
 		};
 		$scope.init = function (){
@@ -14,14 +22,19 @@ angular.module('mainApp', [])
 		$scope.selectUser = function (selectedUsername){
 			angular.forEach(this.userList, function(user){
 				if(user.username == selectedUsername){
-					$scope.selectedUser = user; 
-					$scope.selectedUser.status = 'online';
+					$scope.selectedUser = user;					
 				}
 			});
 			//saves to $scope.messageHistoryList
 			messengerService.fetchAllMessage({
 				'fromUsername' : $scope.username,
 				'toUsername' : $scope.selectedUser.username
+			});
+			socketService.send({
+				'sessioninfoEntity':{
+					'username' : $scope.username,
+					'isloginRequest' : true
+				 }
 			});
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
@@ -43,10 +56,12 @@ angular.module('mainApp', [])
 		};
 		$scope.sendMessage = function () {
 			socketService.send({
-				'fromUsername' : $scope.username,
-				'toUsername' : $scope.selectedUser.username,
-				'message' : $scope.message,
-				'isUsertyping': false
+				'messageinfoEntity':{
+					'fromUsername' : $scope.username,
+					'toUsername' : $scope.selectedUser.username,
+					'message' : $scope.message,
+					'isUsertyping': false
+				}
 			});
 		};
 		$scope.addSenderMessageTemplateToChatBox = function (text) {
@@ -61,9 +76,11 @@ angular.module('mainApp', [])
 		};
 		$scope.sendUserTypingStatus = function (){
 			socketService.send({
-				'isUsertyping': true,
-				'fromUsername' : $scope.username,
-				'toUsername' : $scope.selectedUser.username
+				'messageinfoEntity':{
+					'isUsertyping': true,
+					'fromUsername' : $scope.username,
+					'toUsername' : $scope.selectedUser.username
+				 }
 			});
 		};
 		$document.bind("keypress", function (event){
@@ -73,10 +90,12 @@ angular.module('mainApp', [])
 				event.preventDefault();
 				if($scope.message != null && $scope.message.length > 0){
 					socketService.send({
-						'fromUsername' : $scope.username,
-						'toUsername' : $scope.selectedUser.username,
-						'message' : $scope.message,
-						'isUsertyping': false
+						'messageinfoEntity':{
+							'fromUsername' : $scope.username,
+							'toUsername' : $scope.selectedUser.username,
+							'message' : $scope.message,
+							'isUsertyping': false
+						 }
 					});
 				}
 			}
@@ -115,40 +134,52 @@ angular.module('mainApp', [])
     };
     
     var getMessage = function(data) {
-      var messageInfo = JSON.parse(data);
+      var socketMessageInfo = JSON.parse(data);
+      var messageInfo = socketMessageInfo.messageinfoEntity;
+      var sessionInfo = socketMessageInfo.sessioninfoEntity;
       var scope = commonService.get('mainController');
-      if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
-    	  if(messageInfo.message != null){
-	    	  if(messageInfo.fromUsername == scope.username && 
-	    			  messageInfo.toUsername == scope.selectedUser.username){
-	    		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
-	    	  }
-	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
-	    			  messageInfo.toUsername == scope.username){
-	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
-	    	  }
-	    	  scope.scrollToEnd(document.getElementById('message-history'));
-	    	  scope.message = '';
-	    	  scope.$apply();
-    	  }
-    	  else if(messageInfo.isUsertyping){
-        	  if(messageInfo.fromUsername == scope.selectedUser.username && 
-        			  messageInfo.toUsername == scope.username){
-        		  scope.selectedUser.status = 'typing...';
-    			  scope.$apply();
-        		  $timeout(function () {
-        			  scope.selectedUser.status = 'online';
-        			  scope.$apply();
-        		  },1000);
+      if(messageInfo != null){
+    	  if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
+        	  if(messageInfo.message != null){
+    	    	  if(messageInfo.fromUsername == scope.username && 
+    	    			  messageInfo.toUsername == scope.selectedUser.username){
+    	    		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
+    	    	  }
+    	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
+    	    			  messageInfo.toUsername == scope.username){
+    	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
+    	    	  }
+    	    	  scope.scrollToEnd(document.getElementById('message-history'));
+    	    	  scope.message = '';
+    	    	  scope.$apply();
         	  }
+        	  else if(messageInfo.isUsertyping){
+            	  if(messageInfo.fromUsername == scope.selectedUser.username && 
+            			  messageInfo.toUsername == scope.username){
+            		  scope.selectedUser.status = 'typing...';
+        			  scope.$apply();
+            		  $timeout(function () {
+            			  scope.selectedUser.status = 'online';
+            			  scope.$apply();
+            		  },1000);
+            	  }
+              }
           }
-    	  if(messageInfo.toUsername == scope.selectedUser.username){
-    		  scope.selectedUser.status = messageInfo.isUserloggedin ? 'online' : 'offline';
-    		  scope.$apply();
-    	  }
+          else{
+    		  console.log('something wrong with message received: ' + message);
+          }
       }
-      else{
-		  console.log('something wrong with message received: ' + message);
+      if(sessionInfo != null){
+    	  if(sessionInfo.username == scope.selectedUser.username){
+    		  if(sessionInfo.isloginRequest){
+    			  scope.selectedUser.status = 'online';
+        		  scope.$apply();
+    		  }
+    		  else if(sessionInfo.islogoutRequest){
+    			  scope.selectedUser.status = 'offline';
+        		  scope.$apply();
+    		  }
+    	  }
       }
     };
     
@@ -238,8 +269,15 @@ angular.module('mainApp', [])
 			)
 			.then(function (response){
 				if(response.status == 200){
-					commonService.get('mainController').userList 
-						=  response.data;
+					var responseData = response.data;
+					var userList = [];
+					angular.forEach(responseData, function(data){
+						var obj = data.accountMstDto;
+						obj.isloggedIn = data.loggedIn;
+						obj.status = obj.isloggedIn ? 'online' : 'offline';
+						userList.push(obj);
+					});
+					commonService.get('mainController').userList = userList;
 				}
 			});
 		},

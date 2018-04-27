@@ -2,10 +2,10 @@ package chat.me.service.spec;
 
 import java.util.List;
 
-import chat.me.entity.MessageInfoEntity;
+import chat.me.entity.MessageinfoEntity;
 
 public interface MessengerService {
 
-	MessageInfoEntity saveMessage(MessageInfoEntity entity);
-	List<MessageInfoEntity> fetchAllMessage(String fromUsername, String toUsername);
+	MessageinfoEntity saveMessage(MessageinfoEntity entity);
+	List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername);
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import chat.me.dao.spec.MessageDao;
 import chat.me.dto.MessageTrnDto;
-import chat.me.entity.MessageInfoEntity;
+import chat.me.entity.MessageinfoEntity;
 
 @Component
 public class MessageDaoImpl implements MessageDao{
@@ -34,7 +34,7 @@ public class MessageDaoImpl implements MessageDao{
 	}
 
 	@Override
-	public List<MessageInfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
+	public List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT m1.message_id, m1.message, m1.username as fromUsername, m2.username as toUsername, m1.last_updated\n" + 
 				"FROM message_trn m1\n" + 
@@ -45,7 +45,7 @@ public class MessageDaoImpl implements MessageDao{
 				"order by m1.last_updated;");
 		
 		return jdbcTemplate.query(sb.toString(), new Object [] {fromUsername, toUsername, fromUsername, toUsername},
-				new BeanPropertyRowMapper(MessageInfoEntity.class));
+				new BeanPropertyRowMapper(MessageinfoEntity.class));
 	}
 
 	
