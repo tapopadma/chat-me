@@ -7,12 +7,14 @@ public class SessioninfoEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SessioninfoEntity(String username, boolean isLoginRequest, boolean isLogoutRequest) {
+
+	public SessioninfoEntity(String username, boolean isloginRequest, boolean islogoutRequest) {
 		super();
 		this.username = username;
-		this.isloginRequest = isLoginRequest;
-		this.islogoutRequest = isLogoutRequest;
+		this.isloginRequest = isloginRequest;
+		this.islogoutRequest = islogoutRequest;
 	}
+
 
 	private String username;
 	
@@ -28,19 +30,20 @@ public class SessioninfoEntity {
 		this.username = username;
 	}
 
-	public boolean isLoginRequest() {
+	public boolean getIsloginRequest() {
 		return isloginRequest;
 	}
 
-	public void setLoginRequest(boolean isLoginRequest) {
-		this.isloginRequest = isLoginRequest;
+	public void setIsloginRequest(boolean isloginRequest) {
+		this.isloginRequest = isloginRequest;
 	}
 
-	public boolean isLogoutRequest() {
+	public boolean getIslogoutRequest() {
 		return islogoutRequest;
 	}
 
-	public void setLogoutRequest(boolean isLogoutRequest) {
-		this.islogoutRequest = isLogoutRequest;
+	public void setIslogoutRequest(boolean islogoutRequest) {
+		this.islogoutRequest = islogoutRequest;
 	}
+
 }
