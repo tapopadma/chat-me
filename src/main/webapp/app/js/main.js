@@ -5,6 +5,7 @@ angular.module('mainApp', [])
 		commonService.set('mainController', $scope);
 		$scope.ONLINE_COLOR = 'blue';
 		$scope.OFFLINE_COLOR = 'yellow';
+		$scope.TYPING_COLOR = 'black';
 		$scope.logout = function() {
 			socketService.send({
 				'sessioninfoEntity':{
@@ -100,6 +101,23 @@ angular.module('mainApp', [])
 				}
 			}
 		});
+		$scope.setUserActiveStatus = function (value) {
+			switch (value){
+			case 'online':
+				$scope.selectedUser.USER_STATUS_COLOR = $scope.ONLINE_COLOR;
+				break;
+			case 'offline':
+				$scope.selectedUser.USER_STATUS_COLOR = $scope.OFFLINE_COLOR;
+				break;
+			case 'typing...':
+				$scope.selectedUser.USER_STATUS_COLOR = $scope.TYPING_COLOR;
+				break;
+			default:
+				break;
+			};
+			$scope.selectedUser.status = value;
+			$scope.$apply();
+		};
 })
 .factory('socketService', ['$q', '$timeout', 'commonService', function($q, $timeout, commonService){
 	var service = {};
@@ -156,11 +174,9 @@ angular.module('mainApp', [])
         	  else if(messageInfo.isUsertyping){
             	  if(messageInfo.fromUsername == scope.selectedUser.username && 
             			  messageInfo.toUsername == scope.username){
-            		  scope.selectedUser.status = 'typing...';
-        			  scope.$apply();
+            		  scope.setUserActiveStatus('typing...');
             		  $timeout(function () {
-            			  scope.selectedUser.status = 'online';
-            			  scope.$apply();
+            			  scope.setUserActiveStatus('online');
             		  },1000);
             	  }
               }
@@ -172,12 +188,10 @@ angular.module('mainApp', [])
       if(sessionInfo != null){
     	  if(sessionInfo.username == scope.selectedUser.username){
     		  if(sessionInfo.isloginRequest){
-    			  scope.selectedUser.status = 'online';
-        		  scope.$apply();
+    			  scope.setUserActiveStatus('online');
     		  }
     		  else if(sessionInfo.islogoutRequest){
-    			  scope.selectedUser.status = 'offline';
-        		  scope.$apply();
+    			  scope.setUserActiveStatus('offline');
     		  }
     	  }
       }
@@ -269,15 +283,18 @@ angular.module('mainApp', [])
 			)
 			.then(function (response){
 				if(response.status == 200){
+					var scope = commonService.get('mainController');
 					var responseData = response.data;
 					var userList = [];
 					angular.forEach(responseData, function(data){
 						var obj = data.accountMstDto;
 						obj.isloggedIn = data.loggedIn;
 						obj.status = obj.isloggedIn ? 'online' : 'offline';
+						obj.USER_STATUS_COLOR = 
+							obj.isloggedIn ? scope.ONLINE_COLOR : scope.OFFLINE_COLOR;
 						userList.push(obj);
 					});
-					commonService.get('mainController').userList = userList;
+					scope.userList = userList;
 				}
 			});
 		},
