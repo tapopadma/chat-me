@@ -12,6 +12,7 @@
 <script type="text/javascript" 
 	src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/service/channelService.js"></script>
 <link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-controller="mainController" ng-init="init()">
@@ -52,7 +53,7 @@
 		</div>
 		<div class="userList">
 			<b>List of Users:</b><br>
-			<table class="userlisttable">
+			<table>
 				<tr>
 					<th>Serial No</th>
 					<th>Users</th>
@@ -62,6 +63,22 @@
 					<td>
 						<button type="button" class="hyperlinkButton"
 						ng-click="selectUser(record.username)">{{record.username}}</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="channelList">
+			<b>List of Channels:</b><br>
+			<table>
+				<tr>
+					<th>Serial No</th>
+					<th>Channels</th>
+				</tr>
+				<tr ng-repeat="record in channelList">
+					<td>{{channelList.indexOf(record) + 1}}</td>
+					<td>
+						<button type="button" class="hyperlinkButton"
+						ng-click="selectChannel(record.channelName)">{{record.channelName}}</button>
 					</td>
 				</tr>
 			</table>

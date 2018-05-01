@@ -4,7 +4,7 @@ angular.module('mainApp', [])
 			mainService, userService, commonService, messengerService, socketService){
 		commonService.set('mainController', $scope);
 		$scope.ONLINE_COLOR = 'blue';
-		$scope.OFFLINE_COLOR = 'yellow';
+		$scope.OFFLINE_COLOR = 'grey';
 		$scope.TYPING_COLOR = 'black';
 		$scope.logout = function() {
 			socketService.send({
@@ -19,11 +19,12 @@ angular.module('mainApp', [])
 			userService.getUsername();
 			userService.getAllUsers();
 			//userService.getAllLoggedInUsers();
+			channelService.getAllChannels();
 		};
 		$scope.selectUser = function (selectedUsername){
 			angular.forEach(this.userList, function(user){
 				if(user.username == selectedUsername){
-					$scope.selectedUser = user;					
+					$scope.selectedUser = user;			
 				}
 			});
 			//saves to $scope.messageHistoryList

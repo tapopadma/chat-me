@@ -42,6 +42,5 @@ public class MessengerServiceImpl implements MessengerService{
 	public List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
 		return messageDaoImpl.fetchAllMessage(fromUsername, toUsername);
 	}
-
 	
 }

@@ -23,6 +23,6 @@ th,td,tbody,thead,tr{
 	float:right;
 }
 
-.userList {
+.userList, .channelList {
 	float:left;
 }
