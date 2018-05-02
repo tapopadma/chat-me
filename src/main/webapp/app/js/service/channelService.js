@@ -1,8 +1,8 @@
-angular.module('mainApp', [])
+angular.module('mainApp')
 .factory('channelService', function channelService(){
 	return {
 		getAllChannels: function(){
-			alert('success');
+			console.log('success');
 		}
 	};
 });

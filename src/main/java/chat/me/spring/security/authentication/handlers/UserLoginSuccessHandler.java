@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,12 +28,8 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
-		HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.setAttribute("user", authentication.getName());
-            if(!activeUserStore.getUserList().contains(authentication.getName()))
-            	activeUserStore.getUserList().add(authentication.getName());
-        }
+        if(!activeUserStore.getUserList().contains(authentication.getName()))
+        	activeUserStore.getUserList().add(authentication.getName());
         redirectStrategy.sendRedirect(request, response, "/app/main.html");
 	}
 

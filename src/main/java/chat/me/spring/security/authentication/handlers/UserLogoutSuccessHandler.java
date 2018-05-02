@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -23,12 +22,8 @@ public class UserLogoutSuccessHandler implements LogoutSuccessHandler{
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
-		HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.removeAttribute("user");
-            if(activeUserStore.getUserList().contains(authentication.getName()))
-            	activeUserStore.getUserList().remove(authentication.getName());
-        }
+        if(activeUserStore.getUserList().contains(authentication.getName()))
+        	activeUserStore.getUserList().remove(authentication.getName());
 	}
 
 }

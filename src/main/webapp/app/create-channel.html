@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="createChannelApp">
+<head>
+<meta charset="UTF-8">
+<title>New Channel | ChatMe</title>
+<script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
+<script type="text/javascript" src="js/controller/create-channel.js"></script>
+</head>
+<body ng-controller="createChannelController" ng-init="init()">
+	<form role="form" ng-submit="createNewChannel()">
+		Channel Name: <input type="text" ng-model="channelName"><br><br>
+		<input list="user-list" type="text"> <button type="button" ng-click="saveUserList()">add</button>
+		<datalist id="user-list">
+			<option ng-repeat="user in userList" value="{{user.username}}"></option>
+		</datalist>
+		<button type="submit">Create</button>
+	</form>
+</body>
+</html>
