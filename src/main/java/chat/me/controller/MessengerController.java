@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import chat.me.entity.ChannelmessageinfoEntity;
 import chat.me.entity.MessageinfoEntity;
 import chat.me.entity.SocketMessageEntity;
 import chat.me.service.impl.MessengerServiceImpl;
@@ -51,12 +52,22 @@ public class MessengerController {
 		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
 	}
 	
+	@ResponseBody
+	@RequestMapping(value="/fetchAllChannelMessage", method=RequestMethod.POST)
+	public List<ChannelmessageinfoEntity> fetchAllChannelMessage(
+			@RequestBody ChannelmessageinfoEntity entity) {
+		return messengerServiceImpl.fetchAllChannelMessage(entity.getChannelName());
+	}
+	
 	@MessageMapping("/chat")
 	@SendTo("/topic/message")
 	public SocketMessageEntity sendMessage(SocketMessageEntity entity) {
 		SocketMessageEntity res = new SocketMessageEntity();
+		res.setIsUsertyping(entity.getIsUsertyping());
+		res.setChannelmessageinfoEntity(messengerServiceImpl.saveMessage(
+				entity.getChannelmessageinfoEntity(), entity.getIsUsertyping()));
 		res.setmessageinfoEntity(messengerServiceImpl.saveMessage(
-				entity.getmessageinfoEntity()));
+				entity.getmessageinfoEntity(), entity.getIsUsertyping()));
 		res.setSessioninfoEntity(entity.getSessioninfoEntity());
 		return res;
 	}

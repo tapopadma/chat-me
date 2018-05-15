@@ -7,16 +7,27 @@
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 <script type="text/javascript" 
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
-<script type="text/javascript" src="js/controller/create-channel.js"></script>
+<script type="text/javascript" src="js/service/commonService.js"></script>
+<script type="text/javascript" src="js/controller/createChannel.js"></script>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-controller="createChannelController" ng-init="init()">
 	<form role="form" ng-submit="createNewChannel()">
 		Channel Name: <input type="text" ng-model="channelName"><br><br>
-		<input list="user-list" type="text"> <button type="button" ng-click="saveUserList()">add</button>
+		<input list="user-list" type="text" ng-model="selectedMember">
+		 <button type="button" ng-click="addUser()">add</button>
 		<datalist id="user-list">
-			<option ng-repeat="user in userList" value="{{user.username}}"></option>
+			<option ng-repeat="user in userList" value="{{user}}"></option>
 		</datalist>
 		<button type="submit">Create</button>
-	</form>
+	</form><br><br>
+	<table ng-show="memberList.length > 0">
+		<tr><th>Member</th><th></th></tr>
+		<tr ng-repeat="member in memberList">
+			<td>{{member}}</td>
+			<td> <button type="button" ng-show="member != username"
+			ng-click="removeUser(member)">remove</button></td>
+		</tr>
+	</table>
 </body>
 </html>

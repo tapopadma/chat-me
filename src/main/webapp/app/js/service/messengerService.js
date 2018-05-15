@@ -1,6 +1,27 @@
 angular.module('mainApp')
 .factory('messengerService', ['$http', 'commonService', function($http, commonService) {
 	return {
+		fetchAllChannelMessage: function (data) {
+			$http(
+				{
+					method : 'POST',
+					url: '/chat-me/messenger/fetchAllChannelMessage',
+					data: data
+				}
+			)
+			.then(function (response) {
+				if(response.status == 200){
+					var scope = commonService.get('mainController');
+					scope.messageHistoryList = response.data;
+					scope.clearChatBox();
+					scope.displayChannelMessageHistoryOnChatBox();
+					console.log('fetched message history data successfully!!!');
+				}
+				else{
+					console.log('unable to fetch the data!!!');
+				}
+			});
+		},
 		fetchAllMessage: function (data) {
 			$http(
 				{

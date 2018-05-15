@@ -1,5 +1,6 @@
 angular.module('mainApp')
-.factory('userService', ['$http', 'commonService', function ($http, commonService){
+.factory('userService', ['$http', 'commonService', 'channelService', 
+	function ($http, commonService, channelService){
 	return {
 		getAllLoggedInUsers : function () {
 			$http(
@@ -49,6 +50,7 @@ angular.module('mainApp')
 				if(response.status == 200){
 					commonService.get('mainController').username 
 						=  response.data.username;
+					channelService.getAllChannels(response.data.username);
 				}
 			});
 		}

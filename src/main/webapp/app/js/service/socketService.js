@@ -33,10 +33,41 @@ angular.module('mainApp')
     
     var getMessage = function(data) {
       var socketMessageInfo = JSON.parse(data);
+      var isUserTyping = socketMessageInfo.isUsertyping;
+      var channelMessageInfo =socketMessageInfo.channelmessageinfoEntity; 
       var messageInfo = socketMessageInfo.messageinfoEntity;
       var sessionInfo = socketMessageInfo.sessioninfoEntity;
       var scope = commonService.get('mainController');
-      if(messageInfo != null){
+      if(channelMessageInfo != null){
+    	  if(channelMessageInfo.channelName != null){
+    		  if(channelMessageInfo.message != null){
+    			  if(channelMessageInfo.channelName == scope.selectedUser.username){
+    				  if(channelMessageInfo.username == scope.username){
+    					  scope.addSenderMessageTemplateToChatBox(
+    							  channelMessageInfo.message);
+    				  } 	    			  
+    				  else {
+    					  scope.addReceipientMessageTemplateToChatBox(
+    							  channelMessageInfo.message, channelMessageInfo.username);
+    				  }
+    	    	  }
+    	    	  scope.scrollToEnd(document.getElementById('message-history'));
+    	    	  scope.message = '';
+    	    	  scope.$apply();
+    		  }
+    		  else if(isUserTyping){
+            	  if(channelMessageInfo.channelName == scope.selectedUser.username
+            			  && channelMessageInfo.username != scope.username){
+            		  scope.setUserActiveStatus(
+            				  channelMessageInfo.username + ' ' + scope.TYPING_CAPTION);
+            		  $timeout(function () {
+            			  scope.setUserActiveStatus('');
+            		  },1000);
+            	  }
+              }
+    	  }
+      }
+      else if(messageInfo != null){
     	  if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
         	  if(messageInfo.message != null){
     	    	  if(messageInfo.fromUsername == scope.username && 
@@ -51,12 +82,12 @@ angular.module('mainApp')
     	    	  scope.message = '';
     	    	  scope.$apply();
         	  }
-        	  else if(messageInfo.isUsertyping){
+        	  else if(isUserTyping){
             	  if(messageInfo.fromUsername == scope.selectedUser.username && 
             			  messageInfo.toUsername == scope.username){
-            		  scope.setUserActiveStatus('typing...');
+            		  scope.setUserActiveStatus(scope.TYPING_CAPTION);
             		  $timeout(function () {
-            			  scope.setUserActiveStatus('online');
+            			  scope.setUserActiveStatus(scope.ONLINE_CAPTION);
             		  },1000);
             	  }
               }
@@ -68,10 +99,10 @@ angular.module('mainApp')
       if(sessionInfo != null){
     	  if(sessionInfo.username == scope.selectedUser.username){
     		  if(sessionInfo.isloginRequest){
-    			  scope.setUserActiveStatus('online');
+    			  scope.setUserActiveStatus(scope.ONLINE_CAPTION);
     		  }
     		  else if(sessionInfo.islogoutRequest){
-    			  scope.setUserActiveStatus('offline');
+    			  scope.setUserActiveStatus(scope.OFFLINE_CAPTION);
     		  }
     	  }
       }

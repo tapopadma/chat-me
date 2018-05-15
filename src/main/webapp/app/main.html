@@ -11,10 +11,10 @@
 	src="http://cdn.sockjs.org/sockjs-0.3.4.min.js"></script>
 <script type="text/javascript" 
 	src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="text/javascript" src="js/service/commonService.js"></script>	
 <script type="text/javascript" src="js/controller/main.js"></script>
 <script type="text/javascript" src="js/service/channelService.js"></script>
 <script type="text/javascript" src="js/service/socketService.js"></script>
-<script type="text/javascript" src="js/service/commonService.js"></script>
 <script type="text/javascript" src="js/service/mainService.js"></script>
 <script type="text/javascript" src="js/service/userService.js"></script>
 <script type="text/javascript" src="js/service/messengerService.js"></script>
@@ -74,20 +74,19 @@
 				</table>
 			</div>
 			<br>
-			<button type="button" ng-click="createNewChannel()">Create New Channel</button>
-			<br>
 			<div class="channelList">
-				<b>List of Channels:</b><br>
+				<b>List of Channels:</b><button type="button"  class="hyperlinkButton" 
+			ng-click="createNewChannel()" title="Create New Channel">+</button><br>
 				<table>
 					<tr>
 						<th>Serial No</th>
 						<th>Channels</th>
 					</tr>
-					<tr ng-repeat="record in channelList">
-						<td>{{channelList.indexOf(record) + 1}}</td>
+					<tr ng-repeat="channel in channelList">
+						<td>{{channelList.indexOf(channel) + 1}}</td>
 						<td>
 							<button type="button" class="hyperlinkButton"
-							ng-click="selectChannel(record.channelName)">{{record.channelName}}</button>
+							ng-click="selectChannel(channel)">{{channel}}</button>
 						</td>
 					</tr>
 				</table>

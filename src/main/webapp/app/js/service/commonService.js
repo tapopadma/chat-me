@@ -1,5 +1,4 @@
-angular.module('mainApp')
-.factory('commonService', function() {
+var __commonService = function() {
 	var map = {};
 	
 	return {
@@ -14,4 +13,4 @@ angular.module('mainApp')
 	
 	}
 	
-});
+};

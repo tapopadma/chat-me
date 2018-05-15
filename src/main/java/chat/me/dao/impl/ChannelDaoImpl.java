@@ -3,6 +3,7 @@ package chat.me.dao.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -34,9 +35,10 @@ public class ChannelDaoImpl implements ChannelDao {
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				ChannelMstDto dto = dtoList.get(i);
+				ps.setString(1, null);
 				ps.setString(2, dto.getChannelId());
 				ps.setString(3, dto.getUsername());
-				ps.setString(3, dto.getChannelName());
+				ps.setString(4, dto.getChannelName());
 			}
 
 			@Override
@@ -52,6 +54,15 @@ public class ChannelDaoImpl implements ChannelDao {
 		String sql = "select * from channel_mst where username=?";
 		return jdbcTemplate.query(sql, new Object[] { username }, 
 				new BeanPropertyRowMapper(ChannelMstDto.class));
+	}
+
+	@Override
+	public String getChannelIdFromChannelName(String channelName) {
+		String sql = "select * from channel_mst where channel_name = ?";
+		ChannelMstDto result = (ChannelMstDto) jdbcTemplate.query(sql, 
+				new Object[] {channelName}, 
+				new BeanPropertyRowMapper(ChannelMstDto.class)).get(0);
+		return result.getChannelId();
 	}
 
 }

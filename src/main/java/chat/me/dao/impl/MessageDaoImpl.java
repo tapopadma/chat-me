@@ -36,7 +36,8 @@ public class MessageDaoImpl implements MessageDao{
 	@Override
 	public List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT m1.message_id, m1.message, m1.username as fromUsername, m2.username as toUsername, m1.last_updated\n" + 
+		sb.append("SELECT m1.message_id, m1.message, m1.username as fromUsername, "
+				+ "m2.username as toUsername, m1.last_updated\n" + 
 				"FROM message_trn m1\n" + 
 				"LEFT JOIN message_users_trn m2 ON m1.message_id = m2.message_id\n" + 
 				"WHERE m1.username IN (?, ?)\n" + 
@@ -44,7 +45,8 @@ public class MessageDaoImpl implements MessageDao{
 				"and m1.username != m2.username\n" + 
 				"order by m1.last_updated;");
 		
-		return jdbcTemplate.query(sb.toString(), new Object [] {fromUsername, toUsername, fromUsername, toUsername},
+		return jdbcTemplate.query(sb.toString(), new Object [] {fromUsername, toUsername, 
+				fromUsername, toUsername},
 				new BeanPropertyRowMapper(MessageinfoEntity.class));
 	}
 

@@ -9,7 +9,6 @@ public class MessageinfoEntity {
 	private String message;
 	private String messageId;
 	private Timestamp lastUpdated;
-	private boolean isUsertyping;//of course refers to other user
 	
 	public String getFromUsername() {
 		return fromUsername;
@@ -44,12 +43,6 @@ public class MessageinfoEntity {
 	public MessageinfoEntity() {
 		// TODO Auto-generated constructor stub
 	}
-	public boolean getIsUsertyping() {
-		return isUsertyping;
-	}
-	public void setIsUsertyping(boolean isUsertyping) {
-		this.isUsertyping = isUsertyping;
-	}
 	public MessageinfoEntity(String fromUsername, String toUsername, String message, String messageId,
 			Timestamp lastUpdated, boolean isUsertyping) {
 		super();
@@ -58,7 +51,6 @@ public class MessageinfoEntity {
 		this.message = message;
 		this.messageId = messageId;
 		this.lastUpdated = lastUpdated;
-		this.isUsertyping = isUsertyping;
 	}
 	
 	
