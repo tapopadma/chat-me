@@ -9,6 +9,14 @@ angular.module('createChannelApp', [])
 			userService.getAllUsers();
 		};
 		$scope.addUser = function (){
+			var validSelection = false;
+			angular.forEach($scope.userList, function(username){
+				if(username == $scope.selectedMember){
+					validSelection = true;
+				}
+			});
+			if(!validSelection)
+				return;
 			$scope.memberList.push($scope.selectedMember);
 			var userListCopy = $scope.userList;
 			$scope.userList = [];
@@ -67,7 +75,7 @@ angular.module('createChannelApp', [])
 					var scope = commonService.get('createChannelController');
 					scope.userList = [];
 					angular.forEach(response.data, function(data){
-						if(data.accountMstDto.name != scope.username)
+						if(data.accountMstDto.username != scope.username)
 							scope.userList.push(data.accountMstDto.username);
 					});
 				}

@@ -11,11 +11,11 @@
 </head>
 <body ng-controller="signupController">
 		<form role="form" ng-submit="signup()">
-			Name: <input type="text" ng-model="name"><br><br>
-			Email: <input type="text" ng-model="email"><br><br>
+			Name: <input type="text" ng-model="name" required><br><br>
+			Email: <input type="text" ng-model="email" required><br><br>
 			Phone: <input type="text" ng-model="phone"><br><br>
-			User Name: <input type="text" ng-model="username"><br><br>
-			Password: <input type="password" ng-model="password"><br><br>
+			User Name: <input type="text" ng-model="username" required><br><br>
+			Password: <input type="password" ng-model="password" required><br><br>
 			<button type="submit">Sign up</button>
 		</form>
 </body>
