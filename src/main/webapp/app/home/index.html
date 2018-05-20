@@ -3,6 +3,7 @@
 <head>
 	<title>ChatMe | Home</title>
 	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script type="text/javascript" 
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 <script type="text/javascript" 
@@ -40,17 +41,19 @@
 				<form class="login100-form validate-form"
 				action = "/chat-me/perform_login" method='POST'>
 					<span class="login100-form-title p-b-33">
-						ChatMe Login
+					<a title = "ChatMe" href="/chat-me/app/home/">
+					<span class="glyphicon glyphicon-leaf"></span></a>
+					ChatMe Login
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-						<input class="input100" type="text" name="username" placeholder="Email">
+						<input class="input100" type="text" name="username" placeholder="Username" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>
 
 					<div class="wrap-input100 rs1 validate-input" data-validate="Password is required">
-						<input class="input100" type="password" name="password" placeholder="Password">
+						<input class="input100" type="password" name="password" placeholder="Password" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>
@@ -76,7 +79,7 @@
 							Create an account?
 						</span>
 
-						<a href="/chat-me/app/signup.html" class="txt2 hov1">
+						<a href="/chat-me/app/home/signup.html" class="txt2 hov1">
 							Sign up
 						</a>
 					</div>

@@ -1,13 +1,13 @@
 angular.module('signupApp', [])
 .controller('signupController', function signupController($scope, signupService) {
-	$scope.signup = function() {
+	$scope.signup = function(name, email, phone, username, password) {
 		signupService.signup(
 			{
-				"name" : $scope.name,
-				"email" : $scope.email,
-				"phone" : $scope.phone,
-				"username" : $scope.username,
-				"password" : $scope.password
+				"name" : name,
+				"email" : email,
+				"phone" : phone,
+				"username" : username,
+				"password" : password
 			}
 		);
 	}
@@ -24,7 +24,7 @@ angular.module('signupApp', [])
 			).then(
 				function (response) {
 					if(response.status == 200) {
-						$window.location.href = '/chat-me/login';
+						$window.location.href = '/chat-me/app/login';
 					}
 					else {
 						console.log('error in signup!!!');
