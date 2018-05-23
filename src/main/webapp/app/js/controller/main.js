@@ -59,10 +59,10 @@ angular.module('mainApp', [])
 		$scope.displayChannelMessageHistoryOnChatBox = function (){
 			angular.forEach(this.messageHistoryList, function (message) {
 				if(message.username == $scope.username){// current user is the sender
-					$scope.addSenderMessageTemplateToChatBox(message.message);
+					$scope.addSenderMessageTemplateToChatBox(message);
 				}
 				else{// current user is the receiver
-					$scope.addReceipientMessageTemplateToChatBox(message.message, message.username);
+					$scope.addReceipientMessageTemplateToChatBox(message);
 				}
 			});
 			$scope.scrollToEnd(document.getElementById('message-history'));
@@ -70,10 +70,10 @@ angular.module('mainApp', [])
 		$scope.displayMessageHistoryOnChatBox = function (){
 			angular.forEach(this.messageHistoryList, function (message) {
 				if(message.fromUsername == $scope.username){// current user is the sender
-					$scope.addSenderMessageTemplateToChatBox(message.message);
+					$scope.addSenderMessageTemplateToChatBox(message);
 				}
 				else{// current user is the receiver
-					$scope.addReceipientMessageTemplateToChatBox(message.message);
+					$scope.addReceipientMessageTemplateToChatBox(message);
 				}
 			});
 			$scope.scrollToEnd(document.getElementById('message-history'));
@@ -107,16 +107,17 @@ angular.module('mainApp', [])
 			}
 			socketService.send(data);
 		};
-		$scope.addSenderMessageTemplateToChatBox = function (text) {
+		$scope.addSenderMessageTemplateToChatBox = function (message) {
 			angular.element(document.getElementById('message-history'))
-			.append($compile('<div style="color:green"><b>'+$scope.username+':</b> '+text+'</div>')($scope));
+			.append($compile('<div id="'+ message.messageId+'" style="color:green"><b>'+
+					$scope.username+':</b> '+message.message+'</div>')($scope));
 		};
-		$scope.addReceipientMessageTemplateToChatBox = function (text, channelMemberName=null) {
+		$scope.addReceipientMessageTemplateToChatBox = function (message, channelMemberName=null) {
 			angular.element(document.getElementById('message-history'))
 				.append($compile(
-						'<div style="color:red"><b>'
+						'<div id="' +message.messageId+'" style="color:red"><b>'
 						+(channelMemberName == null ? $scope.selectedUser.username :channelMemberName) 
-						+':</b>'+text+'</div>')($scope));
+						+':</b>'+message.message+'</div>')($scope));
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};

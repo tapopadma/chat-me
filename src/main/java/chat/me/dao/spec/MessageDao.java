@@ -7,7 +7,7 @@ import chat.me.entity.MessageinfoEntity;
 
 public interface MessageDao {
 
-	MessageTrnDto saveMessageByUsername(String message, String username);
+	MessageTrnDto saveMessageByUsername(String message, String username, String deliveryStatus);
 	
 	
 	List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername);

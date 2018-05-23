@@ -42,6 +42,7 @@ angular.module('mainApp')
     	  if(channelMessageInfo.channelName != null){
     		  if(channelMessageInfo.message != null){
     			  if(channelMessageInfo.channelName == scope.selectedUser.username){
+    				  scope.messageHistoryList.push(channelMessageInfo);
     				  if(channelMessageInfo.username == scope.username){
     					  scope.addSenderMessageTemplateToChatBox(
     							  channelMessageInfo.message);
@@ -70,13 +71,17 @@ angular.module('mainApp')
       else if(messageInfo != null){
     	  if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
         	  if(messageInfo.message != null){
+        		  scope.messageHistoryList.push(messageInfo);
     	    	  if(messageInfo.fromUsername == scope.username && 
     	    			  messageInfo.toUsername == scope.selectedUser.username){
-    	    		  scope.addSenderMessageTemplateToChatBox(messageInfo.message);
+    	    		  scope.addSenderMessageTemplateToChatBox(
+    	    				  messageInfo.message+"("+messageInfo.deliveryStatus+")");
     	    	  }
     	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
     	    			  messageInfo.toUsername == scope.username){
     	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
+    	    		  messageInfo.deliveryStatus = 'READ';
+    	    		  service.send(messageInfo);
     	    	  }
     	    	  scope.scrollToEnd(document.getElementById('message-history'));
     	    	  scope.message = '';

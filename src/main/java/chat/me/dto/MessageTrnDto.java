@@ -16,6 +16,8 @@ public class MessageTrnDto implements Serializable{
 	private String username;
 	private Timestamp lastUpdated;
 	private String messageId;
+	private String deliveryStatus;
+	
 	public Long getMessageTrnId() {
 		return messageTrnId;
 	}
@@ -40,11 +42,15 @@ public class MessageTrnDto implements Serializable{
 	public void setLastUpdated(Timestamp lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
-	public MessageTrnDto(Long messageTrnId, String message, String username, Timestamp lastUpdated) {
+	
+	public MessageTrnDto(Long messageTrnId, String message, String username, 
+			Timestamp lastUpdated, String messageId, String deliveryStatus) {
 		this.messageTrnId = messageTrnId;
 		this.message = message;
 		this.username = username;
 		this.lastUpdated = lastUpdated;
+		this.messageId = messageId;
+		this.deliveryStatus = deliveryStatus;
 	}
 	public MessageTrnDto() {
 
@@ -54,6 +60,12 @@ public class MessageTrnDto implements Serializable{
 	}
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
+	}
+	public String getDeliveryStatus() {
+		return deliveryStatus;
+	}
+	public void setDeliveryStatus(String deliveryStatus) {
+		this.deliveryStatus = deliveryStatus;
 	}
 	
 	
