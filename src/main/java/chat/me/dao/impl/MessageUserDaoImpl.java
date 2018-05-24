@@ -1,6 +1,9 @@
 package chat.me.dao.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,5 +28,14 @@ public class MessageUserDaoImpl implements MessageUserDao{
 		jdbcTemplate.update(INSERT_SQL, dto.getMessageUsersTrnId(), dto.getMessageId(), dto.getUsername());
 	}
 
+	@Override
+	public List<MessageUsersTrnDto> getByUsername(String username) {
+		return jdbcTemplate.query("select m1.* from \n" + 
+				"message_users_trn m1 left join message_trn m2\n" + 
+				"on m1.message_id = m2.message_id\n" + 
+				"where m1.username = ? && m2.username != ?", 
+				new Object[] {username, username}, 
+				new BeanPropertyRowMapper(MessageUsersTrnDto.class));
+	}
 	
 }

@@ -96,12 +96,12 @@ angular.module('mainApp', [])
 			var data = {};
 			data.isUsertyping = false;
 			if($scope.chatType == $scope.USER_SELECTED){
-				data.messageinfoEntity = {
+				data.messageinfoentityList = [{
 						'fromUsername' : $scope.username,
 						'toUsername' : $scope.selectedUser.username,
 						'message' : $scope.message,
 						'isUsertyping': false
-				};
+				}];
 			}
 			else{
 				data.channelmessageinfoEntity = {
@@ -138,23 +138,23 @@ angular.module('mainApp', [])
 		};
 		$scope.notifyMessageAsRead = function (message){
 			var data = {};
-			data.messageinfoEntity = {
+			data.messageinfoentityList = [{
 					'fromUsername' : $scope.username,
 					'toUsername' : $scope.selectedUser.username,
 					'message' : message.message,
 					'messageId' : message.messageId,
 					'deliveryStatus' : 'READ'
-			};
+			}];
 			socketService.send(data);
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};
 			data.isUsertyping = true;
 			if($scope.chatType == $scope.USER_SELECTED){
-				data.messageinfoEntity = {
+				data.messageinfoentityList = [{
 					'fromUsername' : $scope.username,
 					'toUsername' : $scope.selectedUser.username
-				};
+				}];
 			}
 			else{
 				data.channelmessageinfoEntity = {
@@ -181,7 +181,7 @@ angular.module('mainApp', [])
 				}
 			});
 			var captionValue = value;
-			if(value.search($scope.TYPING_CAPTION)){
+			if(value.search($scope.TYPING_CAPTION) >= 0){
 				value = $scope.TYPING_CAPTION;
 			}
 			switch (value){

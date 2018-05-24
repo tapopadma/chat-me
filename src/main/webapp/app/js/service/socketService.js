@@ -35,7 +35,7 @@ angular.module('mainApp')
       var socketMessageInfo = JSON.parse(data);
       var isUserTyping = socketMessageInfo.isUsertyping;
       var channelMessageInfo =socketMessageInfo.channelmessageinfoEntity;
-      var messageInfo = socketMessageInfo.messageinfoEntity;
+      var messageInfoList = socketMessageInfo.messageinfoentityList;
       var sessionInfo = socketMessageInfo.sessioninfoEntity;
       var scope = commonService.get('mainController');
       if(channelMessageInfo != null){
@@ -68,35 +68,37 @@ angular.module('mainApp')
               }
     	  }
       }
-      else if(messageInfo != null){
-    	  if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
-        	  if(messageInfo.message != null){
-        		  scope.messageHistoryList.push(messageInfo);
-    	    	  if(messageInfo.fromUsername == scope.username && 
-    	    			  messageInfo.toUsername == scope.selectedUser.username){
-    	    		  scope.addSenderMessageTemplateToChatBox(messageInfo);
-    	    	  }
-    	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
-    	    			  messageInfo.toUsername == scope.username){
-    	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo);
-    	    	  }
-    	    	  scope.scrollToEnd(document.getElementById('message-history'));
-    	    	  scope.message = '';
-    	    	  scope.$apply();
-        	  }
-        	  else if(isUserTyping){
-            	  if(messageInfo.fromUsername == scope.selectedUser.username && 
-            			  messageInfo.toUsername == scope.username){
-            		  scope.setUserActiveStatus(scope.TYPING_CAPTION);
-            		  $timeout(function () {
-            			  scope.setUserActiveStatus(scope.ONLINE_CAPTION);
-            		  },1000);
+      else if(messageInfoList != null){
+    	  angular.forEach(messageInfoList, function(messageInfo){
+    		  if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
+            	  if(messageInfo.message != null){
+            		  scope.messageHistoryList.push(messageInfo);
+        	    	  if(messageInfo.fromUsername == scope.username && 
+        	    			  messageInfo.toUsername == scope.selectedUser.username){
+        	    		  scope.addSenderMessageTemplateToChatBox(messageInfo);
+        	    	  }
+        	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
+        	    			  messageInfo.toUsername == scope.username){
+        	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo);
+        	    	  }
+        	    	  scope.scrollToEnd(document.getElementById('message-history'));
+        	    	  scope.message = '';
+        	    	  scope.$apply();
             	  }
+            	  else if(isUserTyping){
+                	  if(messageInfo.fromUsername == scope.selectedUser.username && 
+                			  messageInfo.toUsername == scope.username){
+                		  scope.setUserActiveStatus(scope.TYPING_CAPTION);
+                		  $timeout(function () {
+                			  scope.setUserActiveStatus(scope.ONLINE_CAPTION);
+                		  },1000);
+                	  }
+                  }
               }
-          }
-          else{
-    		  console.log('something wrong with message received: ' + messageInfo);
-          }
+              else{
+        		  console.log('something wrong with message received: ' + messageInfo);
+              }
+    	  });
       }
       if(sessionInfo != null){
     	  if(sessionInfo.username == scope.selectedUser.username){

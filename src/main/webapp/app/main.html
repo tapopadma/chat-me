@@ -61,11 +61,9 @@
 				<b>List of Users:</b><br>
 				<table>
 					<tr>
-						<th>Serial No</th>
 						<th>Users</th>
 					</tr>
-					<tr ng-repeat="record in userList">
-						<td>{{userList.indexOf(record) + 1}}</td>
+					<tr ng-repeat="record in userList" ng-show="record.username != username">
 						<td>
 							<button type="button" class="hyperlinkButton"
 							ng-click="selectUser(record.username)">{{record.username}}</button>
@@ -79,11 +77,9 @@
 			ng-click="createNewChannel()" title="Create New Channel">+</button><br>
 				<table>
 					<tr>
-						<th>Serial No</th>
 						<th>Channels</th>
 					</tr>
 					<tr ng-repeat="channel in channelList">
-						<td>{{channelList.indexOf(channel) + 1}}</td>
 						<td>
 							<button type="button" class="hyperlinkButton"
 							ng-click="selectChannel(channel)">{{channel}}</button>

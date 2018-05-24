@@ -26,3 +26,6 @@ th,td,tbody,thead,tr{
 .left-nav {
 	float:left;
 }
+.channelList{
+	padding-bottom:50px;
+}

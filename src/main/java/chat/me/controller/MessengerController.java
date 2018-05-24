@@ -1,5 +1,6 @@
 package chat.me.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,8 +67,19 @@ public class MessengerController {
 		res.setIsUsertyping(entity.getIsUsertyping());
 		res.setChannelmessageinfoEntity(messengerServiceImpl.saveMessage(
 				entity.getChannelmessageinfoEntity(), entity.getIsUsertyping()));
-		res.setmessageinfoEntity(messengerServiceImpl.saveMessage(
-				entity.getmessageinfoEntity(), entity.getIsUsertyping()));
+		res.setMessageinfoentityList(messengerServiceImpl.saveMessage(
+				entity.getMessageinfoentityList(), entity.getIsUsertyping()));
+		if(entity.getSessioninfoEntity() != null && 
+				entity.getSessioninfoEntity().getIsloginRequest()) {
+			// update all message status to unread if sent
+			List<MessageinfoEntity> L = res.getMessageinfoentityList();
+			if(L == null) {
+				L = new ArrayList<>();
+			}
+			L.addAll(messengerServiceImpl.updateMessageDeliveryStatusByRecipientName(
+					entity.getSessioninfoEntity().getUsername()));
+			res.setMessageinfoentityList(L);
+		}
 		res.setSessioninfoEntity(entity.getSessioninfoEntity());
 		return res;
 	}

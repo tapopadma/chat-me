@@ -1,31 +1,24 @@
 package chat.me.entity;
 
+import java.util.List;
+
 public class SocketMessageEntity {
 
 	private boolean isUsertyping;
 	
 	private ChannelmessageinfoEntity channelmessageinfoEntity; 
 	
-	private MessageinfoEntity messageinfoEntity;
+	private List<MessageinfoEntity> messageinfoentityList;
 	
 	private SessioninfoEntity sessioninfoEntity;
 
 
 	public SocketMessageEntity(boolean isUsertyping, ChannelmessageinfoEntity channelmessageinfoEntity,
-			MessageinfoEntity messageinfoEntity, SessioninfoEntity sessioninfoEntity) {
-		super();
+			List<MessageinfoEntity> messageinfoEntityList, SessioninfoEntity sessioninfoEntity) {
 		this.isUsertyping = isUsertyping;
 		this.channelmessageinfoEntity = channelmessageinfoEntity;
-		this.messageinfoEntity = messageinfoEntity;
+		this.setMessageinfoentityList(messageinfoEntityList);
 		this.sessioninfoEntity = sessioninfoEntity;
-	}
-
-	public MessageinfoEntity getmessageinfoEntity() {
-		return messageinfoEntity;
-	}
-
-	public void setmessageinfoEntity(MessageinfoEntity messageinfoEntity) {
-		this.messageinfoEntity = messageinfoEntity;
 	}
 
 	public SessioninfoEntity getSessioninfoEntity() {
@@ -37,8 +30,7 @@ public class SocketMessageEntity {
 	}
 
 	public SocketMessageEntity() {
-		super();
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public ChannelmessageinfoEntity getChannelmessageinfoEntity() {
@@ -55,6 +47,16 @@ public class SocketMessageEntity {
 
 	public void setIsUsertyping(boolean isUsertyping) {
 		this.isUsertyping = isUsertyping;
+	}
+
+
+	public List<MessageinfoEntity> getMessageinfoentityList() {
+		return messageinfoentityList;
+	}
+
+
+	public void setMessageinfoentityList(List<MessageinfoEntity> messageinfoEntityList) {
+		this.messageinfoentityList = messageinfoEntityList;
 	}
 	
 }

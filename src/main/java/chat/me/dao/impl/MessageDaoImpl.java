@@ -20,9 +20,6 @@ public class MessageDaoImpl implements MessageDao{
 	
 	private final String INSERT_SQL = "insert into message_trn values(?,?,?,?,?,?)";
 	
-	private final String UPDATE_SQL = "update message_trn set delivery_status = ? "
-			+ "where message_id = ?";
-	
 	@Override
 	public MessageTrnDto saveMessageByUsername(String message, 
 			String username, String deliveryStatus) {
@@ -56,15 +53,40 @@ public class MessageDaoImpl implements MessageDao{
 	}
 
 	@Override
-	public MessageTrnDto updateMessageDeliveryStatus(String messageId, String deliveryStatus) {
-		jdbcTemplate.update(UPDATE_SQL, deliveryStatus, messageId);
-		return getDtoByMessageId(messageId);
+	public List<MessageTrnDto> updateMessageDeliveryStatus(
+			List<String> messageIds, String deliveryStatus) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update message_trn set delivery_status = ? where ( ");
+		for(int i=0;i<messageIds.size();++i) {
+			sb.append(" message_id = ? ");
+			if(i < messageIds.size() - 1) {
+				sb.append(" or ");
+			}
+		}
+		sb.append(" ) and delivery_status != 'READ' ");
+		Object[] args = new Object[messageIds.size()+1];
+		args[0] = deliveryStatus;
+		for(int i=1;i<=messageIds.size();++i)
+			args[i] = messageIds.get(i - 1);
+		jdbcTemplate.update(sb.toString(), args);
+		return getDtoByMessageId(messageIds);
 	}
 	
-	private MessageTrnDto getDtoByMessageId(String messageId) {
-		return (MessageTrnDto) jdbcTemplate.query("select * from message_trn where message_id = ?", new Object [] {messageId}, 
-				new BeanPropertyRowMapper(MessageTrnDto.class)).get(0);
+	private List<MessageTrnDto> getDtoByMessageId(List<String> messageIds) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from message_trn where ");
+		for(int i=0;i<messageIds.size();++i) {
+			sb.append(" message_id = ? ");
+			if(i < messageIds.size() - 1) {
+				sb.append(" or ");
+			}
+		}
+		Object[] args = new Object[messageIds.size()];
+		for(int i=0;i<messageIds.size();++i)
+			args[i] = messageIds.get(i);
+		return jdbcTemplate.query(sb.toString(), 
+				args, 
+				new BeanPropertyRowMapper(MessageTrnDto.class));
 	}
-
 	
 }

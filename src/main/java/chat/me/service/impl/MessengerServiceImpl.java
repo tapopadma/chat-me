@@ -1,6 +1,8 @@
 package chat.me.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import chat.me.dao.impl.MessageDaoImpl;
 import chat.me.dao.impl.MessageUserDaoImpl;
 import chat.me.dto.MessageChannelTrnDto;
 import chat.me.dto.MessageTrnDto;
+import chat.me.dto.MessageUsersTrnDto;
 import chat.me.entity.ActiveUserStore;
 import chat.me.entity.ChannelmessageinfoEntity;
 import chat.me.entity.MessageinfoEntity;
@@ -46,7 +49,10 @@ public class MessengerServiceImpl implements MessengerService{
 		MessageTrnDto messageDto = new MessageTrnDto();
 		if(entity.getDeliveryStatus() != null && 
 				entity.getDeliveryStatus().equals(MESSAGE_READ)) {//Message already saved and needs deliveryStatus to 'READ'
-			messageDto = messageDaoImpl.updateMessageDeliveryStatus(entity.getMessageId(), MESSAGE_READ);
+			List<String> messageIds = new ArrayList<>();
+			messageIds.add(entity.getMessageId());
+			messageDto = messageDaoImpl.
+					updateMessageDeliveryStatus(messageIds, MESSAGE_READ).get(0);
 		}
 		else {
 			messageDto = messageDaoImpl.saveMessageByUsername(entity.getMessage(), 
@@ -68,11 +74,14 @@ public class MessengerServiceImpl implements MessengerService{
 	}
 	
 	@Override
-	public MessageinfoEntity saveMessage(MessageinfoEntity entity,
+	public List<MessageinfoEntity> saveMessage(List<MessageinfoEntity> entityList,
 			boolean isUserTyping) {
 		if(isUserTyping)
-			return entity;
-		return saveMessage(entity); 
+			return entityList;
+		if(entityList == null)
+			return null;
+		return entityList.stream().map(
+				entity->saveMessage(entity)).collect(Collectors.toList());
 	}
 	
 
@@ -106,6 +115,25 @@ public class MessengerServiceImpl implements MessengerService{
 	public List<ChannelmessageinfoEntity> fetchAllChannelMessage(String channelName) {
 		String channelId = channelDaoImpl.getChannelIdFromChannelName(channelName);
 		return messageChannelDaoImpl.getAllMessageByChannel(channelId);
+	}
+
+	@Override
+	public List<MessageinfoEntity> updateMessageDeliveryStatusByRecipientName(String toUsername) {
+		List<String> allMessageIds = 
+				messageUserDaoImpl.getByUsername(toUsername).stream().
+				map(MessageUsersTrnDto::getMessageId).distinct().collect(Collectors.toList());
+		return messageDaoImpl.updateMessageDeliveryStatus(
+				allMessageIds, MESSAGE_UNREAD).stream()
+				.map(dto->{
+					MessageinfoEntity entity = new MessageinfoEntity();
+					entity.setDeliveryStatus(dto.getDeliveryStatus());
+					entity.setFromUsername(dto.getUsername());
+					entity.setLastUpdated(dto.getLastUpdated());
+					entity.setMessage(dto.getMessage());
+					entity.setMessageId(dto.getMessageId());
+					entity.setToUsername(toUsername);
+					return entity;
+				}).collect(Collectors.toList());
 	}
 	
 }

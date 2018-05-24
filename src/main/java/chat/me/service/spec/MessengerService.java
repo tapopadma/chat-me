@@ -11,6 +11,7 @@ public interface MessengerService {
 	MessageinfoEntity saveMessage(MessageinfoEntity entity);
 	List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername);
 	List<ChannelmessageinfoEntity> fetchAllChannelMessage(String channelName);
-	MessageinfoEntity saveMessage(MessageinfoEntity entity, boolean isUserTyping);
+	List<MessageinfoEntity> saveMessage(List<MessageinfoEntity> entityList, boolean isUserTyping);
 	ChannelmessageinfoEntity saveMessage(ChannelmessageinfoEntity entity, boolean isUserTyping);
+	List<MessageinfoEntity> updateMessageDeliveryStatusByRecipientName(String toUsername);
 }
