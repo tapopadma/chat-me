@@ -7,6 +7,8 @@ import chat.me.entity.MessageinfoEntity;
 
 public interface MessageDao {
 
+	MessageTrnDto updateMessageDeliveryStatus(String messageId, String deliveryStatus);
+	
 	MessageTrnDto saveMessageByUsername(String message, String username, String deliveryStatus);
 	
 	

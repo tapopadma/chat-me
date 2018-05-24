@@ -31,6 +31,8 @@ angular.module('mainApp', [])
 			//userService.getAllLoggedInUsers();
 		};
 		$scope.selectChannel = function (channel){
+			$scope.messageIdtoEntityMap = {};
+			$scope.messageHistoryList = [];
 			$scope.chatType = $scope.CHANNEL_SELECTED;
 			$scope.selectedUser = {'username':channel};
 			messengerService.fetchAllChannelMessage({
@@ -39,6 +41,8 @@ angular.module('mainApp', [])
 			});
 		};
 		$scope.selectUser = function (selectedUsername){
+			$scope.messageIdtoEntityMap = {};
+			$scope.messageHistoryList = [];
 			$scope.chatType = $scope.USER_SELECTED;
 			angular.forEach(this.userList, function(user){
 				if(user.username == selectedUsername){
@@ -70,7 +74,6 @@ angular.module('mainApp', [])
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
 			angular.forEach(this.messageHistoryList, function (message) {
-				$scope.messageIdtoEntityMap[message.messageId] = message;
 				if(message.fromUsername == $scope.username){// current user is the sender
 					$scope.addSenderMessageTemplateToChatBox(message);
 				}
@@ -107,28 +110,42 @@ angular.module('mainApp', [])
 						'message' : $scope.message
 				};
 			}
-			socketService.send(data);
+			socketService.send(data);																																																								
 		};
 		$scope.addSenderMessageTemplateToChatBox = function (message) {
+			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(message.messageId);
 			$scope.messageIdtoEntityMap[message.messageId] = message;
-			angular.element(document.getElementById('message-history'))
-			.append($compile('<div id="'+ message.messageId+'" style="color:green"><b>'+
-					$scope.username+':</b> '+message.message+
-					'-{{messageIdtoEntityMap["'+message.messageId+'"].deliveryStatus}}</div>')($scope));
+			if(!exists){
+				angular.element(document.getElementById('message-history'))
+				.append($compile('<div id="'+ message.messageId+'" style="color:green"><b>'+
+						$scope.username+':</b> '+message.message+
+						'-{{messageIdtoEntityMap["'+message.messageId+'"].deliveryStatus}}</div>')($scope));
+			}
 		};
 		$scope.addReceipientMessageTemplateToChatBox = function (message, channelMemberName=null) {
+			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(message.messageId);
 			$scope.messageIdtoEntityMap[message.messageId] = message;
-			angular.element(document.getElementById('message-history'))
-				.append($compile(
-						'<div id="' +message.messageId+'" style="color:red"><b>'
-						+(channelMemberName == null ? $scope.selectedUser.username :channelMemberName) 
-						+':</b>'+message.message+'</div>')($scope));
+			if(!exists){
+				angular.element(document.getElementById('message-history'))
+					.append($compile(
+							'<div id="' +message.messageId+'" style="color:red"><b>'
+							+(channelMemberName == null ? $scope.selectedUser.username :channelMemberName) 
+							+':</b>'+message.message+'</div>')($scope));
+			}
 			if(message.deliveryStatus != 'READ'){
 				$scope.notifyMessageAsRead(message);
 			}
 		};
 		$scope.notifyMessageAsRead = function (message){
-			
+			var data = {};
+			data.messageinfoEntity = {
+					'fromUsername' : $scope.username,
+					'toUsername' : $scope.selectedUser.username,
+					'message' : message.message,
+					'messageId' : message.messageId,
+					'deliveryStatus' : 'READ'
+			};
+			socketService.send(data);
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};

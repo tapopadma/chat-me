@@ -79,8 +79,6 @@ angular.module('mainApp')
     	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
     	    			  messageInfo.toUsername == scope.username){
     	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo);
-    	    		  messageInfo.deliveryStatus = 'READ';
-    	    		  service.send(messageInfo);
     	    	  }
     	    	  scope.scrollToEnd(document.getElementById('message-history'));
     	    	  scope.message = '';
@@ -97,7 +95,7 @@ angular.module('mainApp')
               }
           }
           else{
-    		  console.log('something wrong with message received: ' + message);
+    		  console.log('something wrong with message received: ' + messageInfo);
           }
       }
       if(sessionInfo != null){

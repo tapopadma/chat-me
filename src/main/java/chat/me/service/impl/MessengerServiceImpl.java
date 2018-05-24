@@ -32,8 +32,9 @@ public class MessengerServiceImpl implements MessengerService{
 	
 	private final String MESSAGE_SENT = "SENT";
 	private final String MESSAGE_UNREAD = "UNREAD";
+	private final String MESSAGE_READ = "READ";
 	
-	private String getMessageDeilveryStatusUsingSessionInfo(String receipientName) {
+	private String getMessageDeliveryStatusUsingSessionInfo(String receipientName) {
 		return activeUserStore.getUserList().contains(receipientName)?
 				MESSAGE_UNREAD : MESSAGE_SENT;
 	}
@@ -42,13 +43,20 @@ public class MessengerServiceImpl implements MessengerService{
 	public MessageinfoEntity saveMessage(MessageinfoEntity entity) {
 		if(entity == null)
 			return null;
-		MessageTrnDto messageDto = messageDaoImpl.saveMessageByUsername(entity.getMessage(), 
-				entity.getFromUsername(), getMessageDeilveryStatusUsingSessionInfo(
-						entity.getToUsername()));
-		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), 
-				entity.getFromUsername());
-		messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), 
-				entity.getToUsername());
+		MessageTrnDto messageDto = new MessageTrnDto();
+		if(entity.getDeliveryStatus() != null && 
+				entity.getDeliveryStatus().equals(MESSAGE_READ)) {//Message already saved and needs deliveryStatus to 'READ'
+			messageDto = messageDaoImpl.updateMessageDeliveryStatus(entity.getMessageId(), MESSAGE_READ);
+		}
+		else {
+			messageDto = messageDaoImpl.saveMessageByUsername(entity.getMessage(), 
+					entity.getFromUsername(), getMessageDeliveryStatusUsingSessionInfo(
+							entity.getToUsername()));
+			messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), 
+					entity.getFromUsername());
+			messageUserDaoImpl.saveMessageByMessageIdAndUserName(messageDto.getMessageId(), 
+					entity.getToUsername());
+		}
 		MessageinfoEntity res = new MessageinfoEntity();
 		res.setFromUsername(entity.getFromUsername());
 		res.setLastUpdated(messageDto.getLastUpdated());

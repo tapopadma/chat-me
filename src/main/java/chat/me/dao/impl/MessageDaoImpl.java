@@ -20,6 +20,9 @@ public class MessageDaoImpl implements MessageDao{
 	
 	private final String INSERT_SQL = "insert into message_trn values(?,?,?,?,?,?)";
 	
+	private final String UPDATE_SQL = "update message_trn set delivery_status = ? "
+			+ "where message_id = ?";
+	
 	@Override
 	public MessageTrnDto saveMessageByUsername(String message, 
 			String username, String deliveryStatus) {
@@ -50,6 +53,17 @@ public class MessageDaoImpl implements MessageDao{
 		return jdbcTemplate.query(sb.toString(), new Object [] {fromUsername, toUsername, 
 				fromUsername, toUsername},
 				new BeanPropertyRowMapper(MessageinfoEntity.class));
+	}
+
+	@Override
+	public MessageTrnDto updateMessageDeliveryStatus(String messageId, String deliveryStatus) {
+		jdbcTemplate.update(UPDATE_SQL, deliveryStatus, messageId);
+		return getDtoByMessageId(messageId);
+	}
+	
+	private MessageTrnDto getDtoByMessageId(String messageId) {
+		return (MessageTrnDto) jdbcTemplate.query("select * from message_trn where message_id = ?", new Object [] {messageId}, 
+				new BeanPropertyRowMapper(MessageTrnDto.class)).get(0);
 	}
 
 	
