@@ -15,6 +15,7 @@ angular.module('mainApp', [])
 		$scope.TYPING_COLOR = 'black';
 		$scope.TYPING_CAPTION = 'typing...';
 		$scope.channelList = [];
+		$scope.messageIdtoEntityMap = {};
 		$scope.logout = function() {
 			socketService.send({
 				'sessioninfoEntity':{
@@ -69,6 +70,7 @@ angular.module('mainApp', [])
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
 			angular.forEach(this.messageHistoryList, function (message) {
+				$scope.messageIdtoEntityMap[message.messageId] = message;
 				if(message.fromUsername == $scope.username){// current user is the sender
 					$scope.addSenderMessageTemplateToChatBox(message);
 				}
@@ -108,16 +110,25 @@ angular.module('mainApp', [])
 			socketService.send(data);
 		};
 		$scope.addSenderMessageTemplateToChatBox = function (message) {
+			$scope.messageIdtoEntityMap[message.messageId] = message;
 			angular.element(document.getElementById('message-history'))
 			.append($compile('<div id="'+ message.messageId+'" style="color:green"><b>'+
-					$scope.username+':</b> '+message.message+'</div>')($scope));
+					$scope.username+':</b> '+message.message+
+					'-{{messageIdtoEntityMap["'+message.messageId+'"].deliveryStatus}}</div>')($scope));
 		};
 		$scope.addReceipientMessageTemplateToChatBox = function (message, channelMemberName=null) {
+			$scope.messageIdtoEntityMap[message.messageId] = message;
 			angular.element(document.getElementById('message-history'))
 				.append($compile(
 						'<div id="' +message.messageId+'" style="color:red"><b>'
 						+(channelMemberName == null ? $scope.selectedUser.username :channelMemberName) 
 						+':</b>'+message.message+'</div>')($scope));
+			if(message.deliveryStatus != 'READ'){
+				$scope.notifyMessageAsRead(message);
+			}
+		};
+		$scope.notifyMessageAsRead = function (message){
+			
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};

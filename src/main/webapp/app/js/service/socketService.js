@@ -34,7 +34,7 @@ angular.module('mainApp')
     var getMessage = function(data) {
       var socketMessageInfo = JSON.parse(data);
       var isUserTyping = socketMessageInfo.isUsertyping;
-      var channelMessageInfo =socketMessageInfo.channelmessageinfoEntity; 
+      var channelMessageInfo =socketMessageInfo.channelmessageinfoEntity;
       var messageInfo = socketMessageInfo.messageinfoEntity;
       var sessionInfo = socketMessageInfo.sessioninfoEntity;
       var scope = commonService.get('mainController');
@@ -45,11 +45,11 @@ angular.module('mainApp')
     				  scope.messageHistoryList.push(channelMessageInfo);
     				  if(channelMessageInfo.username == scope.username){
     					  scope.addSenderMessageTemplateToChatBox(
-    							  channelMessageInfo.message);
+    							  channelMessageInfo);
     				  } 	    			  
     				  else {
     					  scope.addReceipientMessageTemplateToChatBox(
-    							  channelMessageInfo.message, channelMessageInfo.username);
+    							  channelMessageInfo, channelMessageInfo.username);
     				  }
     	    	  }
     	    	  scope.scrollToEnd(document.getElementById('message-history'));
@@ -74,12 +74,11 @@ angular.module('mainApp')
         		  scope.messageHistoryList.push(messageInfo);
     	    	  if(messageInfo.fromUsername == scope.username && 
     	    			  messageInfo.toUsername == scope.selectedUser.username){
-    	    		  scope.addSenderMessageTemplateToChatBox(
-    	    				  messageInfo.message+"("+messageInfo.deliveryStatus+")");
+    	    		  scope.addSenderMessageTemplateToChatBox(messageInfo);
     	    	  }
     	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
     	    			  messageInfo.toUsername == scope.username){
-    	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo.message);
+    	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo);
     	    		  messageInfo.deliveryStatus = 'READ';
     	    		  service.send(messageInfo);
     	    	  }
