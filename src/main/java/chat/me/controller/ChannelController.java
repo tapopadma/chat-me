@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.dto.ChannelMstDto;
 import chat.me.entity.ChannelInfoEntity;
 import chat.me.service.impl.ChannelServiceImpl;
 
@@ -22,13 +21,13 @@ public class ChannelController {
 	
 	@ResponseBody
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public List<ChannelMstDto> create(@RequestBody ChannelInfoEntity entity) {
-		return channelServiceImpl.create(entity);
+	public List<ChannelInfoEntity> create(@RequestBody List<ChannelInfoEntity> entityList) {
+		return channelServiceImpl.create(entityList);
 	}
 	
 	@ResponseBody
 	@RequestMapping(value="/getAll", method=RequestMethod.POST)
-	public List<ChannelMstDto> getAll(@RequestBody String username){
-		return channelServiceImpl.getAll(username);
+	public List<ChannelInfoEntity> getAll(@RequestBody String userId){
+		return channelServiceImpl.getAll(userId);
 	}
 }

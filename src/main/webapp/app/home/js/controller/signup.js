@@ -1,12 +1,12 @@
 angular.module('signupApp', [])
 .controller('signupController', function signupController($scope, signupService) {
-	$scope.signup = function(name, email, phone, username, password) {
+	$scope.signup = function(fullName, email, phone, userName, password) {
 		signupService.signup(
 			{
-				"name" : name,
+				"fullName" : fullName,
 				"email" : email,
 				"phone" : phone,
-				"username" : username,
+				"userName" : userName,
 				"password" : password
 			}
 		);

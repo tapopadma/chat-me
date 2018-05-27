@@ -39,7 +39,7 @@
 		<div class="container-login100">
 			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-50">
 				<form class="login100-form validate-form"
-				role = "form"  ng-submit="signup(name, email, phone, username, password)">
+				role = "form"  ng-submit="signup(fullName, email, phone, userName, password)">
 					<span class="login100-form-title p-b-33">
 						<a title="ChatMe" href="/chat-me/app/home/">
 						<span class="glyphicon glyphicon-leaf"></span></a>
@@ -47,7 +47,8 @@
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-						<input class="input100" type="text" name="name" placeholder="Name" ng-model="name" required>
+						<input class="input100" type="text" name="name" placeholder="Full Name" 
+						ng-model="fullName" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>
@@ -66,7 +67,7 @@
 
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
 						<input class="input100" type="text" name="name" placeholder="Username" 
-						ng-model="username" required>
+						ng-model="userName" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>

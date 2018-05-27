@@ -2,16 +2,15 @@ package chat.me.service.spec;
 
 import java.util.List;
 
-import chat.me.entity.ChannelmessageinfoEntity;
-import chat.me.entity.MessageinfoEntity;
+import chat.me.dto.MessageTrnDto;
 
 public interface MessengerService {
 
-	ChannelmessageinfoEntity saveMessage(ChannelmessageinfoEntity entity);
-	MessageinfoEntity saveMessage(MessageinfoEntity entity);
-	List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername);
-	List<ChannelmessageinfoEntity> fetchAllChannelMessage(String channelName);
-	List<MessageinfoEntity> saveMessage(List<MessageinfoEntity> entityList, boolean isUserTyping);
-	ChannelmessageinfoEntity saveMessage(ChannelmessageinfoEntity entity, boolean isUserTyping);
-	List<MessageinfoEntity> updateMessageDeliveryStatusByRecipientName(String toUsername);
+	MessageTrnDto saveMessage(MessageTrnDto dto);
+	List<MessageTrnDto> fetchAllMessageBySourceAndDest(MessageTrnDto dto);
+	List<MessageTrnDto> saveMessage(List<MessageTrnDto> dtoList);
+	List<MessageTrnDto> markSentMessageAsUnreadByDestinationId(String userId);
+	List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds);
+	List<MessageTrnDto> markAllMessageAsReadBySourceAndDest(String sourceId, String destinationId);
+	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(String userId, String deliveryStatus);
 }

@@ -8,22 +8,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActiveUserStore {
 
-	private List<String> userList;
+	private List<String> userIds;
 
-	public List<String> getUserList() {
-		return userList;
+
+	public List<String> getUserIds() {
+		return userIds;
 	}
 
-	public void setUserList(List<String> userList) {
-		this.userList = userList;
+	public void setUserIds(List<String> userIds) {
+		this.userIds = userIds;
 	}
 
 	public ActiveUserStore(List<String> userList) {
-		this.userList = userList;
+		this.userIds = userList;
 	}
 
 	public ActiveUserStore() {
-		this.userList = new ArrayList<>();
+		this.userIds = new ArrayList<>();
 	}
 	
 }

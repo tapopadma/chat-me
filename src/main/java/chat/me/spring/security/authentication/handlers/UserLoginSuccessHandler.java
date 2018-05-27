@@ -14,6 +14,7 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import chat.me.dao.spec.UserAccountDao;
 import chat.me.entity.ActiveUserStore;
 
 @Component("userLoginSuccessHandler")
@@ -25,11 +26,16 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
 	@Autowired
 	private ActiveUserStore activeUserStore;
 	
+	@Autowired
+	private UserAccountDao userAccountDao;
+	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
-        if(!activeUserStore.getUserList().contains(authentication.getName()))
-        	activeUserStore.getUserList().add(authentication.getName());
+		String userName = authentication.getName();
+		String userId = userAccountDao.getByUserName(userName).getUserId();
+        if(!activeUserStore.getUserIds().contains(userId))
+        	activeUserStore.getUserIds().add(userId);
         redirectStrategy.sendRedirect(request, response, "/app/main.html");
 	}
 

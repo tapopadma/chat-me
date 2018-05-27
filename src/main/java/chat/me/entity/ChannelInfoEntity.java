@@ -1,30 +1,55 @@
 package chat.me.entity;
 
-import java.util.List;
+import java.sql.Timestamp;
 
 public class ChannelInfoEntity {
 
+	private String channelId;
 	private String channelName;
-	private List<String> userList;
+	private Timestamp channelCreationDate;
+	private String userId;
+	private String userType;
+	
+	public String getChannelId() {
+		return channelId;
+	}
+	public void setChannelId(String channelId) {
+		this.channelId = channelId;
+	}
 	public String getChannelName() {
 		return channelName;
 	}
 	public void setChannelName(String channelName) {
 		this.channelName = channelName;
 	}
-	public List<String> getUserList() {
-		return userList;
+	public Timestamp getChannelCreationDate() {
+		return channelCreationDate;
 	}
-	public void setUserList(List<String> userList) {
-		this.userList = userList;
+	public void setChannelCreationDate(Timestamp channelCreationDate) {
+		this.channelCreationDate = channelCreationDate;
 	}
-	public ChannelInfoEntity(String channelName, List<String> userList) {
-		super();
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getUserType() {
+		return userType;
+	}
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+	public ChannelInfoEntity(String channelId, String channelName, Timestamp channelCreationDate, String userId,
+			String userType) {
+		this.channelId = channelId;
 		this.channelName = channelName;
-		this.userList = userList;
+		this.channelCreationDate = channelCreationDate;
+		this.userId = userId;
+		this.userType = userType;
 	}
 	public ChannelInfoEntity() {
-		super();
 		// TODO Auto-generated constructor stub
 	}
+	
 }

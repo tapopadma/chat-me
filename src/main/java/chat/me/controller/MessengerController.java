@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.entity.ChannelmessageinfoEntity;
-import chat.me.entity.MessageinfoEntity;
+import chat.me.dto.MessageTrnDto;
+import chat.me.entity.MessageTrnInfoEntity;
 import chat.me.entity.SocketMessageEntity;
 import chat.me.service.impl.MessengerServiceImpl;
 
@@ -33,13 +33,13 @@ public class MessengerController {
 	@Deprecated
 	@ResponseBody
 	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
-	public void saveMessage(@RequestBody MessageinfoEntity entity) {
-		messengerServiceImpl.saveMessage(entity);
+	public void saveMessage(@RequestBody MessageTrnDto dto) {
+		messengerServiceImpl.saveMessage(dto);
 	}
 	
 	
 	@ResponseBody
-	@RequestMapping(value="getAllLoggedInUsers", method=RequestMethod.GET)
+	@RequestMapping(value="/getAllLoggedInUsers", method=RequestMethod.GET)
 	public List<String> getAllLoggedInUsers(){
 		return sessionRegistry.getAllPrincipals().stream()
 				.filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
@@ -48,40 +48,54 @@ public class MessengerController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/fetchAllMessage", method=RequestMethod.POST)
-	public List<MessageinfoEntity> fetchAllMessage(@RequestBody MessageinfoEntity entity) {
-		return messengerServiceImpl.fetchAllMessage(entity.getFromUsername(), entity.getToUsername());
-	}
-	
-	@ResponseBody
-	@RequestMapping(value="/fetchAllChannelMessage", method=RequestMethod.POST)
-	public List<ChannelmessageinfoEntity> fetchAllChannelMessage(
-			@RequestBody ChannelmessageinfoEntity entity) {
-		return messengerServiceImpl.fetchAllChannelMessage(entity.getChannelName());
+	@RequestMapping(value="/fetchAllMessageBySourceAndDest", method=RequestMethod.POST)
+	public List<MessageTrnDto> fetchAllMessageBySourceAndDest(@RequestBody MessageTrnDto dto) {
+		return messengerServiceImpl.fetchAllMessageBySourceAndDest(dto);
 	}
 	
 	@MessageMapping("/chat")
 	@SendTo("/topic/message")
 	public SocketMessageEntity sendMessage(SocketMessageEntity entity) {
-		SocketMessageEntity res = new SocketMessageEntity();
-		res.setIsUsertyping(entity.getIsUsertyping());
-		res.setChannelmessageinfoEntity(messengerServiceImpl.saveMessage(
-				entity.getChannelmessageinfoEntity(), entity.getIsUsertyping()));
-		res.setMessageinfoentityList(messengerServiceImpl.saveMessage(
-				entity.getMessageinfoentityList(), entity.getIsUsertyping()));
-		if(entity.getSessioninfoEntity() != null && 
-				entity.getSessioninfoEntity().getIsloginRequest()) {
-			// update all message status to unread if sent
-			List<MessageinfoEntity> L = res.getMessageinfoentityList();
-			if(L == null) {
-				L = new ArrayList<>();
+		if(entity.getMessageTrnInfoEntity() != null &&
+				entity.getMessageTrnInfoEntity().getMessageTrnDtoList() != null
+				&& !entity.getMessageTrnInfoEntity().getMessageTrnDtoList().isEmpty()) {
+			if(entity.getMessageTrnInfoEntity().isMarkAllMessageAsRead()) {
+				List<String> messageIds = entity.getMessageTrnInfoEntity().getMessageTrnDtoList()
+						.stream().map(MessageTrnDto::getMessageId).collect(Collectors.toList());
+				entity.getMessageTrnInfoEntity().setMessageTrnDtoList(
+						messengerServiceImpl.markAllMessageAsReadByMessageIds(messageIds));
 			}
-			L.addAll(messengerServiceImpl.updateMessageDeliveryStatusByRecipientName(
-					entity.getSessioninfoEntity().getUsername()));
-			res.setMessageinfoentityList(L);
+			else {
+				// save the message to DB
+				messengerServiceImpl.saveMessage(
+					entity.getMessageTrnInfoEntity().getMessageTrnDtoList());				
+			}
 		}
-		res.setSessioninfoEntity(entity.getSessioninfoEntity());
-		return res;
+		if(entity.getUserSessionInfoEntity()!= null && 
+				entity.getUserSessionInfoEntity().isLoginRequest()) {
+			// update all message status to unread if sent
+			MessageTrnInfoEntity messageTrn = new MessageTrnInfoEntity();
+			List<MessageTrnDto> messageTrnDtoList = new ArrayList<>();
+			messageTrnDtoList.addAll(messengerServiceImpl.markSentMessageAsUnreadByDestinationId(
+					entity.getUserSessionInfoEntity().getUserId()));			
+			messageTrn.setMessageTrnDtoList(messageTrnDtoList);
+			entity.setMessageTrnInfoEntity(messageTrn);
+		}
+		return entity;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/fetchAllUnreadMessage", method=RequestMethod.POST)
+	public List<MessageTrnDto> fetchAllUnreadMessage(@RequestBody String userId){
+		return messengerServiceImpl.fetchAllMessageByDestAndDeliveryStatus(userId, "UNREAD");
+	}
+	
+	@Deprecated
+	@ResponseBody
+	@RequestMapping(value="/markAllMessageAsRead", method=RequestMethod.POST)
+	public List<MessageTrnDto> markAllMessageAsRead(@RequestBody MessageTrnDto dto){
+		return messengerServiceImpl.markAllMessageAsReadBySourceAndDest(
+				dto.getSourceId(), dto.getDestinationId());
 	}
 	
 }

@@ -2,11 +2,11 @@ package chat.me.service.spec;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
-import chat.me.dto.AccountMstDto;
+import chat.me.dto.UserMstDto;
 
 public interface UserAccountService {
 
-	AccountMstDto saveUserAccountData(AccountMstDto entity);
+	UserMstDto saveUserAccountData(UserMstDto dto);
 	
 	UserDetails getUserDetailsByUsername(String username);
 }

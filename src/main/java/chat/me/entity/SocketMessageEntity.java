@@ -1,62 +1,51 @@
 package chat.me.entity;
 
-import java.util.List;
-
 public class SocketMessageEntity {
 
-	private boolean isUsertyping;
+	//every time user types 
+	private MessageMiscellaneousInfoEntity messageMiscellaneousInfoEntity;
 	
-	private ChannelmessageinfoEntity channelmessageinfoEntity; 
+	//every time user sends a message
+	private MessageTrnInfoEntity messageTrnInfoEntity; 
 	
-	private List<MessageinfoEntity> messageinfoentityList;
-	
-	private SessioninfoEntity sessioninfoEntity;
+	//every time user logs in/out
+	private UserSessionInfoEntity userSessionInfoEntity;
 
-
-	public SocketMessageEntity(boolean isUsertyping, ChannelmessageinfoEntity channelmessageinfoEntity,
-			List<MessageinfoEntity> messageinfoEntityList, SessioninfoEntity sessioninfoEntity) {
-		this.isUsertyping = isUsertyping;
-		this.channelmessageinfoEntity = channelmessageinfoEntity;
-		this.setMessageinfoentityList(messageinfoEntityList);
-		this.sessioninfoEntity = sessioninfoEntity;
+	public MessageMiscellaneousInfoEntity getMessageMiscellaneousInfoEntity() {
+		return messageMiscellaneousInfoEntity;
 	}
 
-	public SessioninfoEntity getSessioninfoEntity() {
-		return sessioninfoEntity;
+	public void setMessageMiscellaneousInfoEntity(
+			MessageMiscellaneousInfoEntity messageMiscellaneousInfoEntity) {
+		this.messageMiscellaneousInfoEntity = messageMiscellaneousInfoEntity;
 	}
 
-	public void setSessioninfoEntity(SessioninfoEntity sessioninfoEntity) {
-		this.sessioninfoEntity = sessioninfoEntity;
+	public MessageTrnInfoEntity getMessageTrnInfoEntity() {
+		return messageTrnInfoEntity;
+	}
+
+	public void setMessageTrnInfoEntity(MessageTrnInfoEntity messageTrnInfoEntity) {
+		this.messageTrnInfoEntity = messageTrnInfoEntity;
+	}
+
+	public UserSessionInfoEntity getUserSessionInfoEntity() {
+		return userSessionInfoEntity;
+	}
+
+	public void setUserSessionInfoEntity(UserSessionInfoEntity userSessionInfoEntity) {
+		this.userSessionInfoEntity = userSessionInfoEntity;
+	}
+
+	public SocketMessageEntity(MessageMiscellaneousInfoEntity messageMiscellaneousInfoEntity,
+			MessageTrnInfoEntity messageTrnInfoEntity, UserSessionInfoEntity userSessionInfoEntity) {
+		this.messageMiscellaneousInfoEntity = messageMiscellaneousInfoEntity;
+		this.messageTrnInfoEntity = messageTrnInfoEntity;
+		this.userSessionInfoEntity = userSessionInfoEntity;
 	}
 
 	public SocketMessageEntity() {
-
-	}
-
-	public ChannelmessageinfoEntity getChannelmessageinfoEntity() {
-		return channelmessageinfoEntity;
-	}
-
-	public void setChannelmessageinfoEntity(ChannelmessageinfoEntity channelmessageinfoEntity) {
-		this.channelmessageinfoEntity = channelmessageinfoEntity;
-	}
-
-	public boolean getIsUsertyping() {
-		return isUsertyping;
-	}
-
-	public void setIsUsertyping(boolean isUsertyping) {
-		this.isUsertyping = isUsertyping;
+		// TODO Auto-generated constructor stub
 	}
 
 
-	public List<MessageinfoEntity> getMessageinfoentityList() {
-		return messageinfoentityList;
-	}
-
-
-	public void setMessageinfoentityList(List<MessageinfoEntity> messageinfoEntityList) {
-		this.messageinfoentityList = messageinfoEntityList;
-	}
-	
 }

@@ -11,17 +11,20 @@
 	src="http://cdn.sockjs.org/sockjs-0.3.4.min.js"></script>
 <script type="text/javascript" 
 	src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/service/commonService.js"></script>	
-<script type="text/javascript" src="js/controller/main.js"></script>
+<script type="text/javascript" src="js/service/messengerService.js"></script>
 <script type="text/javascript" src="js/service/channelService.js"></script>
 <script type="text/javascript" src="js/service/socketService.js"></script>
-<script type="text/javascript" src="js/service/mainService.js"></script>
 <script type="text/javascript" src="js/service/userService.js"></script>
-<script type="text/javascript" src="js/service/messengerService.js"></script>
+<script type="text/javascript" src="js/controller/main.js"></script>
+<script type="text/javascript" src="js/service/mainService.js"></script>
 <link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-controller="mainController" ng-init="init()">
-	<p>Logged in as <b>{{username}}</b></p>
+	<p>Logged in as <b>{{user.userName}}</b></p>
 	<button type="button" class="hyperlinkButton" ng-click="logout()">Logout!</button>
 	<div style="text-align:left;margin-top:20px;">
 		<div style="margin:20px;float:right;">
@@ -29,7 +32,7 @@
 				<tr>
 					<th>
 						<div id="selected-user-info">
-							{{selectedUser.username}}
+							{{selectedUser.userName}}
 						</div>
 						<div id="selected-user-status" ng-style="{color:selectedUser.USER_STATUS_COLOR}">
 							{{selectedUser.status}}
@@ -63,10 +66,13 @@
 					<tr>
 						<th>Users</th>
 					</tr>
-					<tr ng-repeat="record in userList" ng-show="record.username != username">
+					<tr ng-repeat="record in userList" ng-show="record.userName != user.userName">
 						<td>
 							<button type="button" class="hyperlinkButton"
-							ng-click="selectUser(record.username)">{{record.username}}</button>
+							ng-click="selectUser(record)">{{record.userName}}</button>
+							<span class="label label-danger" 
+							ng-show="record.unReadMessageCounter > 0">
+							{{record.unReadMessageCounter}}</span>
 						</td>
 					</tr>
 				</table>

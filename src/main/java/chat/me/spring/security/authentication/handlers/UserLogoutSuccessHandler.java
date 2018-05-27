@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import chat.me.dao.spec.UserAccountDao;
 import chat.me.entity.ActiveUserStore;
 
 @Component("userLogoutSuccessHandler")
@@ -19,11 +20,15 @@ public class UserLogoutSuccessHandler implements LogoutSuccessHandler{
 	@Autowired
 	private ActiveUserStore activeUserStore;
 	
+	@Autowired
+	private UserAccountDao userAccountDao;
+	
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
-        if(activeUserStore.getUserList().contains(authentication.getName()))
-        	activeUserStore.getUserList().remove(authentication.getName());
+		String userId = userAccountDao.getByUserName(authentication.getName()).getUserId();
+        if(activeUserStore.getUserIds().contains(userId))
+        	activeUserStore.getUserIds().remove(userId);
 	}
 
 }

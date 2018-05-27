@@ -8,8 +8,11 @@
 <script type="text/javascript" 
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
 <script type="text/javascript" src="js/service/commonService.js"></script>
+<script type="text/javascript" src="js/service/channelService.js"></script>
+<script type="text/javascript" src="js/service/userService.js"></script>
 <script type="text/javascript" src="js/controller/createChannel.js"></script>
 <link rel="stylesheet" href="css/main.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>	
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
@@ -20,17 +23,18 @@
 			<input list="user-list" type="text" ng-model="selectedMember">
 			 <button type="button" ng-click="addUser()">add</button>
 			<datalist id="user-list">
-				<option ng-repeat="user in userList" value="{{user}}"></option>
+				<option ng-repeat="user in userList" value="{{user.userName}}"></option>
 			</datalist>
 			<button type="submit">Create</button>
 		</form><br><br>
 		<table ng-show="memberList.length > 0">
 			<tr><th>Member</th><th></th></tr>
 			<tr ng-repeat="member in memberList">
-				<td>{{member}}</td>
-				<td> <button type="button" ng-show="member != username"
+				<td>{{member.userName}}</td>
+				<td> <button type="button" ng-show="member.userName != user.userName"
 				ng-click="removeUser(member)">remove</button>
-				<span class="label label-default" ng-show="member == username">default</span></td>
+				<span class="label label-default" 
+				ng-show="member.userName == user.userName">default</span></td>
 			</tr>
 		</table>
 	</div>

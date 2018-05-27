@@ -1,38 +1,40 @@
 package chat.me.entity;
 
-import chat.me.dto.AccountMstDto;
+import chat.me.dto.UserMstDto;
 
 public class UserBasicInfoEntity {
 
-	private AccountMstDto accountMstDto;
+	private UserMstDto userMstDto;
 	
-	private boolean isloggedIn;
+	private boolean loggedIn;
 
-	public AccountMstDto getAccountMstDto() {
-		return accountMstDto;
+	public UserMstDto getUserMstDto() {
+		return userMstDto;
 	}
 
-	public void setAccountMstDto(AccountMstDto accountMstDto) {
-		this.accountMstDto = accountMstDto;
+	public void setUserMstDto(UserMstDto userMstDto) {
+		this.userMstDto = userMstDto;
 	}
 
-	public boolean isLoggedIn() {
-		return isloggedIn;
-	}
-
-	public void setLoggedIn(boolean isloggedIn) {
-		this.isloggedIn = isloggedIn;
-	}
 
 	public UserBasicInfoEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserBasicInfoEntity(AccountMstDto accountMstDto, boolean isloggedIn) {
-		super();
-		this.accountMstDto = accountMstDto;
-		this.isloggedIn = isloggedIn;
+	public boolean isLoggedIn() {
+		return loggedIn;
 	}
+
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+
+	public UserBasicInfoEntity(UserMstDto userMstDto, boolean loggedIn) {
+		super();
+		this.userMstDto = userMstDto;
+		this.loggedIn = loggedIn;
+	}
+
 	
 }

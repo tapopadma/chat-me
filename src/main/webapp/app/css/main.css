@@ -19,13 +19,13 @@ th,td,tbody,thead,tr{
     color: blue;
 }
 
-.chatBox {
+.chat_box {
 	float:right;
 }
 
 .left-nav {
 	float:left;
 }
-.channelList{
+.channel_list{
 	padding-bottom:50px;
 }

@@ -3,15 +3,18 @@ package chat.me.dao.spec;
 import java.util.List;
 
 import chat.me.dto.MessageTrnDto;
-import chat.me.entity.MessageinfoEntity;
 
 public interface MessageDao {
 
 	
 	List<MessageTrnDto> updateMessageDeliveryStatus(List<String> messageIds, String deliveryStatus);
 	
-	MessageTrnDto saveMessageByUsername(String message, String username, String deliveryStatus);
+	MessageTrnDto saveNewMessage(MessageTrnDto dto);
 	
+	List<MessageTrnDto> getByDestinationIdAndDeliveryStatus(String userId, String messageDeliveryStatus);
 	
-	List<MessageinfoEntity> fetchAllMessage(String fromUsername, String toUsername);
+	List<MessageTrnDto> getBySourceAndDest(MessageTrnDto dto);
+	
+	List<MessageTrnDto> getAllNotReadBySourceAndDest(String sourceId, String destinationId);
+	
 }

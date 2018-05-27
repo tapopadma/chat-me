@@ -3,6 +3,7 @@ angular.module('mainApp', [])
 	function mainController($scope, $compile, $interval, $document, 
 			mainService, userService, commonService, messengerService, 
 			socketService, channelService){
+	
 		commonService.set('mainController', $scope);
 		$scope.NONE_SELECTED = 'none';
 		$scope.USER_SELECTED = 'user';
@@ -14,25 +15,25 @@ angular.module('mainApp', [])
 		$scope.OFFLINE_CAPTION = 'offline';
 		$scope.TYPING_COLOR = 'black';
 		$scope.TYPING_CAPTION = 'typing...';
-		$scope.channelList = [];
-		$scope.messageIdtoEntityMap = {};
+		$scope.DIRECT_MODE = 'DIRECT';
+		$scope.CHANNEL_MODE = 'CHANNEL';
+		
 		$scope.logout = function() {
 			socketService.send({
-				'sessioninfoEntity':{
-					'username' : $scope.username,
-					'islogoutRequest' : true
+				'userSessionInfoEntity':{
+					'userId' : $scope.user.userId,
+					'logoutRequest' : true
 				 }
 			});
 			mainService.logout();
 		};
 		$scope.init = function (){
-			userService.getUsername();
-			userService.getAllUsers();
-			//userService.getAllLoggedInUsers();
+			userService.getUser();
 		};
 		$scope.selectChannel = function (channel){
 			$scope.messageIdtoEntityMap = {};
 			$scope.messageHistoryList = [];
+			$scope.messageMode = $scope.CHANNEL_MODE;
 			$scope.chatType = $scope.CHANNEL_SELECTED;
 			$scope.selectedUser = {'username':channel};
 			messengerService.fetchAllChannelMessage({
@@ -40,45 +41,45 @@ angular.module('mainApp', [])
 				'channelName' : channel
 			});
 		};
-		$scope.selectUser = function (selectedUsername){
+		$scope.selectUser = function (selectedUser){
 			$scope.messageIdtoEntityMap = {};
 			$scope.messageHistoryList = [];
+			$scope.messageMode = $scope.DIRECT_MODE;
 			$scope.chatType = $scope.USER_SELECTED;
 			angular.forEach(this.userList, function(user){
-				if(user.username == selectedUsername){
+				if(user.userId == selectedUser.userId){
 					$scope.selectedUser = user;
 				}
 			});
-			//saves to $scope.messageHistoryList
-			messengerService.fetchAllMessage({
-				'fromUsername' : $scope.username,
-				'toUsername' : $scope.selectedUser.username
-			});
+			
 			socketService.send({
-				'sessioninfoEntity':{
-					'username' : $scope.username,
-					'isloginRequest' : true
+				'userSessionInfoEntity':{
+					'userId' : $scope.user.userId,
+					'loginRequest' : true
 				 }
 			});
-		};
-		$scope.displayChannelMessageHistoryOnChatBox = function (){
-			angular.forEach(this.messageHistoryList, function (message) {
-				if(message.username == $scope.username){// current user is the sender
-					$scope.addSenderMessageTemplateToChatBox(message);
-				}
-				else{// current user is the receiver
-					$scope.addReceipientMessageTemplateToChatBox(message);
-				}
+			
+			//saves to $scope.messageHistoryList
+			messengerService.fetchAllMessageBySourceAndDest({
+				'sourceId' : $scope.user.userId,
+				'destinationId' : $scope.selectedUser.userId
 			});
-			$scope.scrollToEnd(document.getElementById('message-history'));
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
-			angular.forEach(this.messageHistoryList, function (message) {
-				if(message.fromUsername == $scope.username){// current user is the sender
-					$scope.addSenderMessageTemplateToChatBox(message);
+			angular.forEach(this.messageHistoryList, function (messageTrnDto) {
+				if(messageTrnDto.sourceId == $scope.user.userId){
+					// current user is the sender
+					if(messageTrnDto.destinationId == $scope.selectedUser.userId){
+						$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
+						$scope.pushSenderMessageToChatBox(messageTrnDto);
+					}
 				}
-				else{// current user is the receiver
-					$scope.addReceipientMessageTemplateToChatBox(message);
+				else if(messageTrnDto.destinationId == $scope.user.userId){
+					// current user is the receiver
+					if(messageTrnDto.sourceId == $scope.selectedUser.userId){
+						$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
+						$scope.pushRecieverMessageToChatBox(messageTrnDto);
+					}
 				}
 			});
 			$scope.scrollToEnd(document.getElementById('message-history'));
@@ -94,75 +95,93 @@ angular.module('mainApp', [])
 		};
 		$scope.sendMessageOverSocket = function () {
 			var data = {};
-			data.isUsertyping = false;
-			if($scope.chatType == $scope.USER_SELECTED){
-				data.messageinfoentityList = [{
-						'fromUsername' : $scope.username,
-						'toUsername' : $scope.selectedUser.username,
-						'message' : $scope.message,
-						'isUsertyping': false
-				}];
-			}
-			else{
-				data.channelmessageinfoEntity = {
-						'username' : $scope.username,
-						'channelName' : $scope.selectedUser.username,
-						'message' : $scope.message
-				};
-			}
-			socketService.send(data);																																																								
+			data.messageTrnInfoEntity = {
+				'messageTrnDtoList':[{
+					'message' : $scope.message,
+					'sourceId' : $scope.user.userId,
+					'destinationId' : $scope.selectedUser.userId,
+					'messageMode' : $scope.messageMode
+				}]
+			};
+			socketService.send(data);																																																						
 		};
-		$scope.addSenderMessageTemplateToChatBox = function (message) {
-			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(message.messageId);
-			$scope.messageIdtoEntityMap[message.messageId] = message;
+		$scope.pushSenderMessageToChatBox = function(messageTrnDto){
+			angular.element(document.getElementById('message-history'))
+			.append($compile('<div id="'+ messageTrnDto.messageId+'" style="color:green"><b>'+
+					$scope.user.userName+':</b> '+messageTrnDto.message+
+					'-{{messageIdtoEntityMap["'+messageTrnDto.messageId+
+					'"].messageDeliveryStatus}}</div>')($scope));
+		}
+		$scope.addSenderMessageTemplateToChatBox = function (messageTrnDto) {
+			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(messageTrnDto.messageId);
+			$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
 			if(!exists){
-				angular.element(document.getElementById('message-history'))
-				.append($compile('<div id="'+ message.messageId+'" style="color:green"><b>'+
-						$scope.username+':</b> '+message.message+
-						'-{{messageIdtoEntityMap["'+message.messageId+'"].deliveryStatus}}</div>')($scope));
+				$scope.pushSenderMessageToChatBox(messageTrnDto);
 			}
+			$scope.scrollToEnd(document.getElementById('message-history'));
+	    	$scope.message = '';
+	    	$scope.$apply();
 		};
-		$scope.addReceipientMessageTemplateToChatBox = function (message, channelMemberName=null) {
-			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(message.messageId);
-			$scope.messageIdtoEntityMap[message.messageId] = message;
+		$scope.pushRecieverMessageToChatBox = function (messageTrnDto){
+			angular.element(document.getElementById('message-history'))
+			.append($compile(
+					'<div id="' +messageTrnDto.messageId+'" style="color:red"><b>'
+					+$scope.selectedUser.userName
+					+':</b>'+messageTrnDto.message+'</div>')($scope));
+		};
+		$scope.addReceipientMessageTemplateToChatBox = function (messageTrnDto) {
+			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(messageTrnDto.messageId);
+			$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
 			if(!exists){
-				angular.element(document.getElementById('message-history'))
-					.append($compile(
-							'<div id="' +message.messageId+'" style="color:red"><b>'
-							+(channelMemberName == null ? $scope.selectedUser.username :channelMemberName) 
-							+':</b>'+message.message+'</div>')($scope));
+				$scope.pushRecieverMessageToChatBox(messageTrnDto);
 			}
-			if(message.deliveryStatus != 'READ'){
-				$scope.notifyMessageAsRead(message);
+			$scope.scrollToEnd(document.getElementById('message-history'));
+	    	$scope.message = '';
+	    	$scope.$apply();
+			if(messageTrnDto.messageDeliveryStatus != 'READ'){
+				$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
+				$scope.notifyMessageAsRead([messageTrnDto]);
 			}
 		};
-		$scope.notifyMessageAsRead = function (message){
+		$scope.resetUnReadMessageCounterByUserId = function(userId){
+			var userListCopy = $scope.userList;
+			$scope.userList = [];
+			angular.forEach(userListCopy, function(user){
+				if(user.userId == userId){
+					user.unReadMessageCounter = 0;
+				}
+				$scope.userList.push(user);
+			});
+			$scope.$apply();
+		};
+		$scope.getAllNotReadMessageTrns = function(){
+			var messageTrnDtoList = [];
+			angular.forEach($scope.messageHistoryList, function(messageTrnDto){
+				if(messageTrnDto.sourceId == $scope.selectedUser.userId &&
+					messageTrnDto.messageDeliveryStatus != 'READ'){
+					messageTrnDtoList.push(messageTrnDto);
+				}
+			});
+			return messageTrnDtoList;
+		};
+		$scope.notifyMessageAsRead = function (messageTrnDtoList){
 			var data = {};
-			data.messageinfoentityList = [{
-					'fromUsername' : $scope.username,
-					'toUsername' : $scope.selectedUser.username,
-					'message' : message.message,
-					'messageId' : message.messageId,
-					'deliveryStatus' : 'READ'
-			}];
+			data.messageTrnInfoEntity = {
+				'markAllMessageAsRead' : true,
+				'messageTrnDtoList'	: messageTrnDtoList
+			};
 			socketService.send(data);
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};
-			data.isUsertyping = true;
-			if($scope.chatType == $scope.USER_SELECTED){
-				data.messageinfoentityList = [{
-					'fromUsername' : $scope.username,
-					'toUsername' : $scope.selectedUser.username
-				}];
-			}
-			else{
-				data.channelmessageinfoEntity = {
-					'username' : $scope.username,
-					'channelName' : $scope.selectedUser.username,
-				};
-			}
-			socketService.send(data);
+			data.userTyping = true;
+			data.messageTrnDto = {
+				'sourceId' : $scope.user.userId,
+				'destinationId' : $scope.selectedUser.userId
+			};
+			socketService.send({
+				'messageMiscellaneousInfoEntity' : data
+			});
 		};
 		$document.bind("keypress", function (event){
 			if(event.target != null && event.target.getAttribute('id') != null 
@@ -174,17 +193,20 @@ angular.module('mainApp', [])
 				}
 			}
 		});
-		$scope.setUserActiveStatus = function (value) {
+		$scope.setUserActiveStatus = function (userId, statusValue) {
+			//update in userList
 			angular.forEach($scope.userList, function(user){
-				if(user.username == $scope.selectedUser.username){
-					user.status = value;
+				if(user.userId == userId){
+					user.status = statusValue;
 				}
 			});
-			var captionValue = value;
-			if(value.search($scope.TYPING_CAPTION) >= 0){
-				value = $scope.TYPING_CAPTION;
+			
+			//update in selectedUser
+			var captionValue = statusValue;
+			if(captionValue.search($scope.TYPING_CAPTION) >= 0){
+				captionValue = $scope.TYPING_CAPTION;
 			}
-			switch (value){
+			switch (captionValue){
 			case $scope.ONLINE_CAPTION:
 				$scope.selectedUser.USER_STATUS_COLOR = $scope.ONLINE_COLOR;
 				break;
@@ -197,7 +219,7 @@ angular.module('mainApp', [])
 			default:
 				break;
 			};
-			$scope.selectedUser.status = captionValue;
+			$scope.selectedUser.status = statusValue;
 			$scope.$apply();
 		};
 		
@@ -206,8 +228,11 @@ angular.module('mainApp', [])
 		};
 		
 })
-.factory('commonService', __commonService);
-
-
+.factory('commonService', __commonService)
+.factory('messengerService', ['$http', 'commonService', __messengerService])
+.factory('channelService', ['$http', 'commonService', __channelService])
+.factory('socketService', ['$q', '$timeout', 'commonService', __socketService])
+.factory('userService', ['$http', 'commonService', 'channelService', 
+						'messengerService', 'socketService', __userService]);
 
 

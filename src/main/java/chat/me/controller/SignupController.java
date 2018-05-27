@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.dto.AccountMstDto;
+import chat.me.dto.UserMstDto;
 import chat.me.service.impl.UserAccountServiceImpl;
 
 
@@ -20,7 +20,7 @@ public class SignupController {
 
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.POST)
-	public AccountMstDto saveUserData(@RequestBody AccountMstDto dto) {
+	public UserMstDto saveUserData(@RequestBody UserMstDto dto) {
 		return userAccountServiceImpl.saveUserAccountData(dto);
 	}
 }

@@ -2,13 +2,15 @@ package chat.me.dao.spec;
 
 import java.util.List;
 
-import chat.me.dto.AccountMstDto;
+import chat.me.dto.UserMstDto;
 
 public interface UserAccountDao {
 
-	void insert(AccountMstDto entity);
+	void insert(UserMstDto entity);
 	
-	AccountMstDto getByUsername(String username);
+	UserMstDto getByUserId(String username);
 	
-	List<AccountMstDto> getAllUserAccounts();
+	List<UserMstDto> getAllUserAccounts();
+
+	UserMstDto getByUserName(String username);
 }

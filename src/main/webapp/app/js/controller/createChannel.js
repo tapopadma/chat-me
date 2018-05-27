@@ -3,26 +3,25 @@ angular.module('createChannelApp', [])
 	function createChannelController($scope, userService, commonService, channelService){
 		$scope.init = function () {
 			commonService.set('createChannelController', $scope);
-			$scope.memberList = [];
-			$scope.userList = [];	
-			userService.getUsername();
-			userService.getAllUsers();
+			userService.getUser();
 		};
 		$scope.addUser = function (){
 			var validSelection = false;
-			angular.forEach($scope.userList, function(username){
-				if(username == $scope.selectedMember){
+			var newMember = null;
+			angular.forEach($scope.userList, function(user){
+				if(user.userName == $scope.selectedMember){
 					validSelection = true;
+					newMember = user;
 				}
 			});
 			if(!validSelection)
 				return;
-			$scope.memberList.push($scope.selectedMember);
+			$scope.memberList.push(newMember);
 			var userListCopy = $scope.userList;
 			$scope.userList = [];
-			angular.forEach(userListCopy, function(username){
-				if(username != $scope.selectedMember){
-					$scope.userList.push(username);
+			angular.forEach(userListCopy, function(user){
+				if(user.userId != newMember.userId){
+					$scope.userList.push(user);
 				}
 			});
 			$scope.selectedMember = '';
@@ -31,71 +30,24 @@ angular.module('createChannelApp', [])
 			var memberListCopy = $scope.memberList;
 			$scope.memberList = [];
 			angular.forEach(memberListCopy, function(mem){
-				if(mem != member){
+				if(mem.userId != member.userId){
 					$scope.memberList.push(mem);
 				}
 			});
 			$scope.userList.push(member);
 		};
 		$scope.createNewChannel = function (){
-			channelService.createChannel({
-				channelName: $scope.channelName, 
-				userList: $scope.memberList
+			channelInfoList = [];
+			angular.forEach($scope.memberList, function(member){
+				var channelInfo = {};
+				channelInfo.channelName = $scope.channelName;
+				channelInfo.userId = member.userId;
+				channelInfoList.push(channelInfo);
 			});
+			channelService.createChannel(channelInfoList);
 		};
 	}
 )
-.factory('channelService', ['$http', function($http){
-	return {
-		createChannel : function (data){
-			$http(
-				{
-					url : '/chat-me/channel/create',
-					method: 'POST',
-					data: data
-				}		
-			).then(function(response){
-				if(response.status == 200){
-					window.location.href = '/chat-me/app/main.html';
-				}
-			});
-		}		
-	};
-}])
-.factory('userService', ['$http', 'commonService', function ($http, commonService){
-	return {
-		getAllUsers : function (){
-			$http(
-				{
-					url: "/chat-me/user/getAllUsers",
-					method: 'GET'
-				}
-			).then(function(response){
-				if(response.status == 200){
-					var scope = commonService.get('createChannelController');
-					scope.userList = [];
-					angular.forEach(response.data, function(data){
-						if(data.accountMstDto.username != scope.username)
-							scope.userList.push(data.accountMstDto.username);
-					});
-				}
-			});
-		},
-		getUsername : function () {
-			$http(
-				{
-					method: 'GET',
-					url: '/chat-me/user/getLoggedInUser'
-				}
-			)
-			.then(function (response){
-				if(response.status == 200){
-					var scope = commonService.get('createChannelController');
-					scope.username =  response.data.username;
-					scope.memberList.push(scope.username);
-				}
-			});
-		}
-	}
-}])
-.factory('commonService', __commonService);
+.factory('commonService', __commonService)
+.factory('channelService', ['$http', 'commonService', __channelService])
+.factory('userService', ['$http', 'commonService', 'channelService', __userService]);

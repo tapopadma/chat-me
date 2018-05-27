@@ -1,6 +1,7 @@
 package chat.me.dto;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class ChannelMstDto implements Serializable{
 
@@ -9,32 +10,20 @@ public class ChannelMstDto implements Serializable{
 	 */
 	private static final long serialVersionUID = -7366956643471956051L;
 
-	private String channelMstId;
-	
 	private String channelId;
 	
-	private String username;
-	
 	private String channelName;
+	
+	private Timestamp channelCreationDate;
 
-	public ChannelMstDto(String channelMstId, String channelId, String username, String channelName) {
-		super();
-		this.channelMstId = channelMstId;
+
+	public ChannelMstDto(String channelId, String channelName, Timestamp channelCreationDate) {
 		this.channelId = channelId;
-		this.username = username;
 		this.channelName = channelName;
-	}
-
-	public String getChannelMstId() {
-		return channelMstId;
-	}
-
-	public void setChannelMstId(String channelMstId) {
-		this.channelMstId = channelMstId;
+		this.channelCreationDate = channelCreationDate;
 	}
 
 	public ChannelMstDto() {
-		super();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -46,19 +35,19 @@ public class ChannelMstDto implements Serializable{
 		this.channelId = channelId;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public String getChannelName() {
 		return channelName;
 	}
 
 	public void setChannelName(String channelName) {
 		this.channelName = channelName;
+	}
+
+	public Timestamp getChannelCreationDate() {
+		return channelCreationDate;
+	}
+
+	public void setChannelCreationDate(Timestamp channelCreationDate) {
+		this.channelCreationDate = channelCreationDate;
 	}
 }

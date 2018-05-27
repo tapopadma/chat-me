@@ -3,12 +3,14 @@ package chat.me.dao.spec;
 import java.util.List;
 
 import chat.me.dto.ChannelMstDto;
-import chat.me.entity.ChannelmessageinfoEntity;
+import chat.me.dto.ChannelUserMstDto;
+import chat.me.entity.ChannelInfoEntity;
 
 public interface ChannelDao {
 
+	ChannelMstDto getByPk(String channelId);
 	ChannelMstDto insert(ChannelMstDto dto);
-	List<ChannelMstDto> insertInBatch(List<ChannelMstDto> dtoList);
-	List<ChannelMstDto> getAllDtoByUsername(String username);
+	List<ChannelUserMstDto> insertInBatch(List<ChannelUserMstDto> dtoList);
+	List<ChannelInfoEntity> getAllChannelInfoByUserId(String username);
 	String getChannelIdFromChannelName(String channelName);
 }

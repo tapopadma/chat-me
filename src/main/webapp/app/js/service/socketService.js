@@ -1,5 +1,4 @@
-angular.module('mainApp')
-.factory('socketService', ['$q', '$timeout', 'commonService', function($q, $timeout, commonService){
+var __socketService = function($q, $timeout, commonService){
 	var service = {};
 	var listener = $q.defer();
 	var socket = {
@@ -31,85 +30,87 @@ angular.module('mainApp')
       }, this.RECONNECT_TIMEOUT);
     };
     
+    var updateMessageTrnInfo = function(messageTrnInfoEntity, scope){
+    	if(messageTrnInfoEntity == null)
+    		return;
+        
+    	var messageTrnDtoList = messageTrnInfoEntity.messageTrnDtoList;
+    	
+    	angular.forEach(messageTrnDtoList, function(messageTrnDto){
+    		if(messageTrnDto.sourceId == scope.user.userId){
+    			//i sent this message
+    			if(scope.hasOwnProperty('selectedUser') && 
+    				messageTrnDto.destinationId == scope.selectedUser.userId){
+    				scope.addSenderMessageTemplateToChatBox(messageTrnDto);
+    			}
+    		}
+    		else if(messageTrnDto.destinationId == scope.user.userId){
+    			//the message sent to me
+    			if(scope.hasOwnProperty('selectedUser') &&
+    					messageTrnDto.sourceId == scope.selectedUser.userId){
+    				scope.addReceipientMessageTemplateToChatBox(messageTrnDto);
+    			}
+    			else{
+    				var userListCopy = scope.userList;
+    				scope.userList = [];
+    				angular.forEach(userListCopy, function(user){
+    					if(user.userId == messageTrnDto.sourceId){
+    						user.unReadMessageCounter += 1;
+    					}
+    					scope.userList.push(user);
+    				});
+    			}
+    		}
+    	});
+    	scope.$apply();
+    };
+    
+    var updateMessageMiscellaneousInfo = function (messageMiscellaneousInfoEntity, scope){
+    	if(messageMiscellaneousInfoEntity == null)
+    		return;
+    	
+    	var messageTrnDto = messageMiscellaneousInfoEntity.messageTrnDto;
+    	var isUserTyping = messageMiscellaneousInfoEntity.userTyping;
+    	
+    	if(isUserTyping){
+    	  if(scope.hasOwnProperty('selectedUser') && 
+    			  messageTrnDto.sourceId == scope.selectedUser.userId){
+    		if(messageTrnDto.destinationId == scope.user.userId){
+    		  scope.setUserActiveStatus(scope.selectedUser.userId, scope.TYPING_CAPTION);
+    		  $timeout(function () {
+    			  scope.setUserActiveStatus(scope.selectedUser.userId, scope.ONLINE_CAPTION);
+    		  },1000);
+    		}
+    	  }
+    	}
+    };
+    
+    var updateUserSessionInfo = function (userSessionInfoEntity, scope){
+		if(userSessionInfoEntity == null)
+			return;
+  	  	if(scope.hasOwnProperty('selectedUser') && 
+  	  			userSessionInfoEntity.userId == scope.selectedUser.userId){
+  		  if(userSessionInfoEntity.loginRequest){
+  			  scope.setUserActiveStatus(userSessionInfoEntity.userId, scope.ONLINE_CAPTION);
+  		  }
+  		  else if(userSessionInfoEntity.logoutRequest){
+  			  scope.setUserActiveStatus(userSessionInfoEntity.userId, scope.OFFLINE_CAPTION);
+  		  }
+  	  }
+    };
+    
     var getMessage = function(data) {
-      var socketMessageInfo = JSON.parse(data);
-      var isUserTyping = socketMessageInfo.isUsertyping;
-      var channelMessageInfo =socketMessageInfo.channelmessageinfoEntity;
-      var messageInfoList = socketMessageInfo.messageinfoentityList;
-      var sessionInfo = socketMessageInfo.sessioninfoEntity;
+      var socketMessageEntity = JSON.parse(data);
+      
+      var messageTrnInfoEntity = socketMessageEntity.messageTrnInfoEntity;
+      var messageMiscellaneousInfoEntity = socketMessageEntity.messageMiscellaneousInfoEntity;
+      var userSessionInfoEntity = socketMessageEntity.userSessionInfoEntity;
       var scope = commonService.get('mainController');
-      if(channelMessageInfo != null){
-    	  if(channelMessageInfo.channelName != null){
-    		  if(channelMessageInfo.message != null){
-    			  if(channelMessageInfo.channelName == scope.selectedUser.username){
-    				  scope.messageHistoryList.push(channelMessageInfo);
-    				  if(channelMessageInfo.username == scope.username){
-    					  scope.addSenderMessageTemplateToChatBox(
-    							  channelMessageInfo);
-    				  } 	    			  
-    				  else {
-    					  scope.addReceipientMessageTemplateToChatBox(
-    							  channelMessageInfo, channelMessageInfo.username);
-    				  }
-    	    	  }
-    	    	  scope.scrollToEnd(document.getElementById('message-history'));
-    	    	  scope.message = '';
-    	    	  scope.$apply();
-    		  }
-    		  else if(isUserTyping){
-            	  if(channelMessageInfo.channelName == scope.selectedUser.username
-            			  && channelMessageInfo.username != scope.username){
-            		  scope.setUserActiveStatus(
-            				  channelMessageInfo.username + ' ' + scope.TYPING_CAPTION);
-            		  $timeout(function () {
-            			  scope.setUserActiveStatus('');
-            		  },1000);
-            	  }
-              }
-    	  }
-      }
-      else if(messageInfoList != null){
-    	  angular.forEach(messageInfoList, function(messageInfo){
-    		  if(messageInfo.fromUsername != null && messageInfo.toUsername != null){
-            	  if(messageInfo.message != null){
-            		  scope.messageHistoryList.push(messageInfo);
-        	    	  if(messageInfo.fromUsername == scope.username && 
-        	    			  messageInfo.toUsername == scope.selectedUser.username){
-        	    		  scope.addSenderMessageTemplateToChatBox(messageInfo);
-        	    	  }
-        	    	  else if(messageInfo.fromUsername == scope.selectedUser.username && 
-        	    			  messageInfo.toUsername == scope.username){
-        	    		  scope.addReceipientMessageTemplateToChatBox(messageInfo);
-        	    	  }
-        	    	  scope.scrollToEnd(document.getElementById('message-history'));
-        	    	  scope.message = '';
-        	    	  scope.$apply();
-            	  }
-            	  else if(isUserTyping){
-                	  if(messageInfo.fromUsername == scope.selectedUser.username && 
-                			  messageInfo.toUsername == scope.username){
-                		  scope.setUserActiveStatus(scope.TYPING_CAPTION);
-                		  $timeout(function () {
-                			  scope.setUserActiveStatus(scope.ONLINE_CAPTION);
-                		  },1000);
-                	  }
-                  }
-              }
-              else{
-        		  console.log('something wrong with message received: ' + messageInfo);
-              }
-    	  });
-      }
-      if(sessionInfo != null){
-    	  if(sessionInfo.username == scope.selectedUser.username){
-    		  if(sessionInfo.isloginRequest){
-    			  scope.setUserActiveStatus(scope.ONLINE_CAPTION);
-    		  }
-    		  else if(sessionInfo.islogoutRequest){
-    			  scope.setUserActiveStatus(scope.OFFLINE_CAPTION);
-    		  }
-    	  }
-      }
+      
+      updateMessageTrnInfo(messageTrnInfoEntity, scope);
+      updateMessageMiscellaneousInfo(messageMiscellaneousInfoEntity, scope);
+      updateUserSessionInfo(userSessionInfoEntity, scope);
+      
     };
     
     var startListener = function() {
@@ -127,4 +128,4 @@ angular.module('mainApp')
     
     initialize();
     return service;
-}]);
+};

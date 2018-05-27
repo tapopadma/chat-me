@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import chat.me.dto.AccountMstDto;
+import chat.me.dto.UserMstDto;
 import chat.me.entity.ActiveUserStore;
 import chat.me.entity.UserBasicInfoEntity;
 import chat.me.service.impl.UserAccountServiceImpl;
@@ -27,11 +27,10 @@ public class UserAccountController {
 	
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getLoggedInUser")
-	public AccountMstDto getAuthentication() {
-		AccountMstDto entity = new AccountMstDto();
-		entity.setUsername(
-				SecurityContextHolder.getContext().getAuthentication().getName());
-		return entity;
+	public UserMstDto getAuthentication() {
+		String userName = SecurityContextHolder.getContext()
+				.getAuthentication().getName();
+		return userAccountServiceImpl.getUserInfoByUserName(userName);
 	}
 	
 	@ResponseBody
@@ -41,9 +40,9 @@ public class UserAccountController {
 		userAccountServiceImpl.getAllUsers().stream().forEach(
 				dto -> {
 					UserBasicInfoEntity entity = new UserBasicInfoEntity();
-					entity.setAccountMstDto(dto);
-					entity.setLoggedIn(activeUserStore.getUserList().contains(
-							dto.getUsername()));
+					entity.setUserMstDto(dto);
+					entity.setLoggedIn(activeUserStore.getUserIds().contains(
+							dto.getUserId()));
 					res.add(entity);
 				}
 				);
