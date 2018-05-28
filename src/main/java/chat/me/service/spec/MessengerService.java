@@ -12,5 +12,7 @@ public interface MessengerService {
 	List<MessageTrnDto> markSentMessageAsUnreadByDestinationId(String userId);
 	List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds);
 	List<MessageTrnDto> markAllMessageAsReadBySourceAndDest(String sourceId, String destinationId);
-	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(String userId, String deliveryStatus);
+	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(String destinationId, String deliveryStatus);
+	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(List<String> destinationIds, String deliveryStatus);
+	List<MessageTrnDto> fetchAllUnreadMessage(String userId);
 }

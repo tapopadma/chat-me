@@ -37,27 +37,50 @@ var __socketService = function($q, $timeout, commonService){
     	var messageTrnDtoList = messageTrnInfoEntity.messageTrnDtoList;
     	
     	angular.forEach(messageTrnDtoList, function(messageTrnDto){
-    		if(messageTrnDto.sourceId == scope.user.userId){
-    			//i sent this message
-    			if(scope.hasOwnProperty('selectedUser') && 
-    				messageTrnDto.destinationId == scope.selectedUser.userId){
-    				scope.addSenderMessageTemplateToChatBox(messageTrnDto);
-    			}
+    		if(scope.messageMode == scope.DIRECT_MODE){
+    			if(messageTrnDto.sourceId == scope.user.userId){
+        			//i sent this message
+        			if(scope.hasOwnProperty('selectedUser') && 
+        				messageTrnDto.destinationId == scope.selectedUser.userId){
+        				scope.addSenderMessageTemplateToChatBox(messageTrnDto);
+        			}
+        		}
+        		else if(messageTrnDto.destinationId == scope.user.userId){
+        			//the message sent to me
+        			if(scope.hasOwnProperty('selectedUser') &&
+        					messageTrnDto.sourceId == scope.selectedUser.userId){
+        				scope.addReceipientMessageTemplateToChatBox(messageTrnDto);
+        			}
+        			else{
+        				var userListCopy = scope.userList;
+        				scope.userList = [];
+        				angular.forEach(userListCopy, function(user){
+        					if(user.userId == messageTrnDto.sourceId){
+        						user.unReadMessageCounter += 1;
+        					}
+        					scope.userList.push(user);
+        				});
+        			}
+        		}
     		}
-    		else if(messageTrnDto.destinationId == scope.user.userId){
-    			//the message sent to me
-    			if(scope.hasOwnProperty('selectedUser') &&
-    					messageTrnDto.sourceId == scope.selectedUser.userId){
-    				scope.addReceipientMessageTemplateToChatBox(messageTrnDto);
+    		else{
+    			if(messageTrnDto.destinationId == scope.selectedUser.userId){//message for the currently selected Channel
+    				if(messageTrnDto.sourceId == scope.user.userId){//mine 
+    					scope.addSenderMessageTemplateToChatBox(messageTrnDto);
+    				}
+    				else{//other people
+    					scope.addReceipientMessageTemplateToChatBox(messageTrnDto, 
+    							scope.getUserNameById(messageTrnDto.sourceId));
+    				}
     			}
-    			else{
-    				var userListCopy = scope.userList;
-    				scope.userList = [];
-    				angular.forEach(userListCopy, function(user){
-    					if(user.userId == messageTrnDto.sourceId){
-    						user.unReadMessageCounter += 1;
+    			else{//message to other channel
+    				var channelListCopy = scope.channelList;
+    				scope.channelList = [];
+    				angular.forEach(channelListCopy, function(channel){
+    					if(channel.channelId == messageTrnDto.destinationId){
+    						channel.unReadMessageCounter += 1;
     					}
-    					scope.userList.push(user);
+    					scope.channelList.push(channel);
     				});
     			}
     		}

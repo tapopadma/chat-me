@@ -1,14 +1,17 @@
 package chat.me.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import chat.me.dao.impl.ChannelDaoImpl;
 import chat.me.dao.impl.MessageDaoImpl;
 import chat.me.dto.MessageTrnDto;
 import chat.me.entity.ActiveUserStore;
+import chat.me.entity.ChannelInfoEntity;
 import chat.me.service.spec.MessengerService;
 
 @Service
@@ -16,6 +19,8 @@ public class MessengerServiceImpl implements MessengerService{
 
 	@Autowired
 	private MessageDaoImpl messageDaoImpl;
+	@Autowired
+	private ChannelDaoImpl channelDaoImpl;
 	@Autowired
 	private ActiveUserStore activeUserStore;
 	
@@ -77,6 +82,21 @@ public class MessengerServiceImpl implements MessengerService{
 	@Override
 	public List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds){
 		return messageDaoImpl.updateMessageDeliveryStatus(messageIds, MESSAGE_READ);
+	}
+
+	@Override
+	public List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(List<String> destinationIds,
+			String deliveryStatus) {
+		return messageDaoImpl.getByDestinationIdAndDeliveryStatus(destinationIds, deliveryStatus);
+	}
+
+	@Override
+	public List<MessageTrnDto> fetchAllUnreadMessage(String userId) {
+		List<String> destinationIds = new ArrayList<>();
+		destinationIds.add(userId);
+		destinationIds.addAll(channelDaoImpl.getAllChannelInfoByUserId(userId).stream()
+				.map(ChannelInfoEntity::getChannelId).collect(Collectors.toList()));
+		return fetchAllMessageByDestAndDeliveryStatus(destinationIds, MESSAGE_UNREAD);
 	}
 	
 }

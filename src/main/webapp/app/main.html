@@ -89,6 +89,9 @@
 						<td>
 							<button type="button" class="hyperlinkButton"
 							ng-click="selectChannel(channel)">{{channel.channelName}}</button>
+							<span class="label label-danger" 
+							ng-show="channel.unReadMessageCounter > 0">
+							{{channel.unReadMessageCounter}}</span>
 						</td>
 					</tr>
 				</table>

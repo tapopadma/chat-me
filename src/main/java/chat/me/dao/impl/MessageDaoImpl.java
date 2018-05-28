@@ -114,5 +114,28 @@ public class MessageDaoImpl implements MessageDao{
 				new Object[] {sourceId, destinationId},
 				new BeanPropertyRowMapper(MessageTrnDto.class));
 	}
+
+	@Override
+	public List<MessageTrnDto> getByDestinationIdAndDeliveryStatus(List<String> destinationIds, 
+			String messageDeliveryStatus) {
+		if(destinationIds.isEmpty())
+			return new ArrayList<>();
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from message_trn where ( ");
+		for(int i=0;i<destinationIds.size();++i) {
+			sb.append(" destination_id = ? ");
+			if(i < destinationIds.size() - 1) {
+				sb.append(" or ");
+			}
+		}
+		sb.append(" ) and message_delivery_status = ?");
+		Object[] args = new Object[destinationIds.size()+1];
+		for(int i=0;i<destinationIds.size();++i)
+			args[i] = destinationIds.get(i);
+		args[destinationIds.size()] = messageDeliveryStatus;
+		return jdbcTemplate.query(sb.toString(), 
+				args,
+				new BeanPropertyRowMapper(MessageTrnDto.class));
+	}
 	
 }

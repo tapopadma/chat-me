@@ -87,7 +87,7 @@ public class MessengerController {
 	@ResponseBody
 	@RequestMapping(value="/fetchAllUnreadMessage", method=RequestMethod.POST)
 	public List<MessageTrnDto> fetchAllUnreadMessage(@RequestBody String userId){
-		return messengerServiceImpl.fetchAllMessageByDestAndDeliveryStatus(userId, "UNREAD");
+		return messengerServiceImpl.fetchAllUnreadMessage(userId);
 	}
 	
 	@Deprecated

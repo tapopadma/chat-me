@@ -3,6 +3,26 @@ var __messengerService = function($http, commonService) {
 	service.getScope = function(){
 		return commonService.get('mainController');
 	};
+	service.reCalculateUnReadMessageCounter = function(messageTrnDtoList, scope){
+		for(var i=0;i<scope.userList.length; ++i){
+			scope.userList[i].unReadMessageCounter = 0;
+		}
+		for(var i=0;i<scope.channelList.length; ++i){
+			scope.channelList[i].unReadMessageCounter = 0;
+		}
+		angular.forEach(messageTrnDtoList, function(messageTrnDto){
+			for(var i=0;i<scope.userList.length; ++i){
+				if(scope.userList[i].userId == messageTrnDto.sourceId){
+					scope.userList[i].unReadMessageCounter += 1;
+				}
+			}
+			for(var i=0;i<scope.channelList.length; ++i){
+				if(scope.channelList[i].channelId == messageTrnDto.destinationId){
+					scope.channelList[i].unReadMessageCounter += 1;
+				}
+			}
+		});
+	};
 	service.fetchAllUnreadMessage = function (data) {
 		$http(
 			{
@@ -14,17 +34,8 @@ var __messengerService = function($http, commonService) {
 		.then(function (response){
 			if(response.status == 200){
 				var scope = service.getScope();
-				var messageTrnData = response.data;
-				angular.forEach(scope.userList, function(user){
-					user.unReadMessageCounter = 0;
-				});
-				angular.forEach(messageTrnData, function(message){
-					angular.forEach(scope.userList, function(user){
-						if(user.userId == message.sourceId){
-							user.unReadMessageCounter += 1;
-						}
-					});
-				});
+				var messageTrnDtoList = response.data;
+				service.reCalculateUnReadMessageCounter(messageTrnDtoList, scope);
 			}
 		});
 	};

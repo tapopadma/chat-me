@@ -11,7 +11,9 @@ public interface MessageDao {
 	
 	MessageTrnDto saveNewMessage(MessageTrnDto dto);
 	
-	List<MessageTrnDto> getByDestinationIdAndDeliveryStatus(String userId, String messageDeliveryStatus);
+	List<MessageTrnDto> getByDestinationIdAndDeliveryStatus(String destinationId, String messageDeliveryStatus);
+	
+	List<MessageTrnDto> getByDestinationIdAndDeliveryStatus(List<String> destinationIds, String messageDeliveryStatus);
 	
 	List<MessageTrnDto> getBySourceAndDest(MessageTrnDto dto);
 	

@@ -36,12 +36,21 @@ angular.module('mainApp', [])
 		};
 		$scope.selectChannel = function (channel){
 			$scope.initializeScopeVariables();
-			$scope.loadChatBoxInfo($scope.CHANNEL_MODE, {'userId':channel.channelId});
+			$scope.loadChatBoxInfo($scope.CHANNEL_MODE, {'userId':channel.channelId, 'userName':channel.channelName});
 		};
 		$scope.selectUser = function (selectedUser){
 			$scope.initializeScopeVariables();
 			$scope.loadChatBoxInfo($scope.DIRECT_MODE, selectedUser);
 		};
+		$scope.getUserNameById = function(userId){//assuming we load all registered users to our main page
+			var result = null;
+			angular.forEach($scope.userList, function(user){
+				if(user.userId == userId){
+					result = user.userName;
+				}
+			});
+			return result;
+		};	
 		$scope.loadChatBoxInfo = function(messageMode, selectedUser){
 			$scope.messageMode = messageMode;
 			$scope.selectedUser = selectedUser;
@@ -64,18 +73,30 @@ angular.module('mainApp', [])
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
 			angular.forEach(this.messageHistoryList, function (messageTrnDto) {
-				if(messageTrnDto.sourceId == $scope.user.userId){
-					// current user is the sender
-					if(messageTrnDto.destinationId == $scope.selectedUser.userId){
+				if($scope.messageMode == $scope.DIRECT_MODE){//DM
+					if(messageTrnDto.sourceId == $scope.user.userId){
+						// current user is the sender
+						if(messageTrnDto.destinationId == $scope.selectedUser.userId){
+							$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
+							$scope.pushSenderMessageToChatBox(messageTrnDto);
+						}
+					}
+					else if(messageTrnDto.destinationId == $scope.user.userId){
+						// current user is the receiver
+						if(messageTrnDto.sourceId == $scope.selectedUser.userId){
+							$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
+							$scope.pushRecieverMessageToChatBox(messageTrnDto);
+						}
+					}
+				}
+				else{//CHANNEL
+					if(messageTrnDto.sourceId == $scope.user.userId){//mine
 						$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
 						$scope.pushSenderMessageToChatBox(messageTrnDto);
 					}
-				}
-				else if(messageTrnDto.destinationId == $scope.user.userId){
-					// current user is the receiver
-					if(messageTrnDto.sourceId == $scope.selectedUser.userId){
+					else{//other people
 						$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
-						$scope.pushRecieverMessageToChatBox(messageTrnDto);
+						$scope.pushRecieverMessageToChatBox(messageTrnDto, $scope.getUserNameById(messageTrnDto.sourceId));
 					}
 				}
 			});
@@ -119,18 +140,18 @@ angular.module('mainApp', [])
 	    	$scope.message = '';
 	    	$scope.$apply();
 		};
-		$scope.pushRecieverMessageToChatBox = function (messageTrnDto){
+		$scope.pushRecieverMessageToChatBox = function (messageTrnDto, memberName=null){
 			angular.element(document.getElementById('message-history'))
 			.append($compile(
 					'<div id="' +messageTrnDto.messageId+'" style="color:red"><b>'
-					+$scope.selectedUser.userName
+					+(memberName == null ? $scope.selectedUser.userName : memberName)
 					+':</b>'+messageTrnDto.message+'</div>')($scope));
 		};
-		$scope.addReceipientMessageTemplateToChatBox = function (messageTrnDto) {
+		$scope.addReceipientMessageTemplateToChatBox = function (messageTrnDto, memberName=null) {
 			var exists = $scope.messageIdtoEntityMap.hasOwnProperty(messageTrnDto.messageId);
 			$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
 			if(!exists){
-				$scope.pushRecieverMessageToChatBox(messageTrnDto);
+				$scope.pushRecieverMessageToChatBox(messageTrnDto, memberName);
 			}
 			$scope.scrollToEnd(document.getElementById('message-history'));
 	    	$scope.message = '';
