@@ -22,7 +22,7 @@ var __channelService =	function channelService($http, commonService){
 			if(response.status == 200){
 				scope.channelList = [];
 				angular.forEach(response.data, function(channel){
-					scope.channelList.push(channel.channelName);
+					scope.channelList.push(channel);
 				});
 			}
 		});

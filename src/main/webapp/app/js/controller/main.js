@@ -36,35 +36,30 @@ angular.module('mainApp', [])
 		};
 		$scope.selectChannel = function (channel){
 			$scope.initializeScopeVariables();
-			$scope.messageMode = $scope.CHANNEL_MODE;
-			$scope.chatType = $scope.CHANNEL_SELECTED;
-			$scope.selectedUser = {'username':channel};
-			messengerService.fetchAllChannelMessage({
-				'username' : $scope.username,
-				'channelName' : channel
-			});
+			$scope.loadChatBoxInfo($scope.CHANNEL_MODE, {'userId':channel.channelId});
 		};
 		$scope.selectUser = function (selectedUser){
 			$scope.initializeScopeVariables();
-			$scope.messageMode = $scope.DIRECT_MODE;
-			$scope.chatType = $scope.USER_SELECTED;
-			angular.forEach(this.userList, function(user){
-				if(user.userId == selectedUser.userId){
-					$scope.selectedUser = user;
-				}
-			});
+			$scope.loadChatBoxInfo($scope.DIRECT_MODE, selectedUser);
+		};
+		$scope.loadChatBoxInfo = function(messageMode, selectedUser){
+			$scope.messageMode = messageMode;
+			$scope.selectedUser = selectedUser;
 			
-			socketService.send({
-				'userSessionInfoEntity':{
-					'userId' : $scope.user.userId,
-					'loginRequest' : true
-				 }
-			});
+			if($scope.user.status != $scope.ONLINE_CAPTION){
+				socketService.send({
+					'userSessionInfoEntity':{
+						'userId' : $scope.user.userId,
+						'loginRequest' : true
+					 }
+				});
+			}
 			
 			//saves to $scope.messageHistoryList
 			messengerService.fetchAllMessageBySourceAndDest({
 				'sourceId' : $scope.user.userId,
-				'destinationId' : $scope.selectedUser.userId
+				'destinationId' : $scope.selectedUser.userId,
+				'messageMode' : messageMode
 			});
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
@@ -196,10 +191,13 @@ angular.module('mainApp', [])
 		});
 		$scope.setUserActiveStatus = function (userId, statusValue) {
 			//update in userList
-			angular.forEach($scope.userList, function(user){
+			var userListCopy = $scope.userList;
+			$scope.userList = [];
+			angular.forEach(userListCopy, function(user){
 				if(user.userId == userId){
 					user.status = statusValue;
 				}
+				$scope.userList.push(user);
 			});
 			
 			//update in selectedUser

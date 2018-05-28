@@ -20,6 +20,10 @@ public class MessageDaoImpl implements MessageDao{
 	
 	private final String INSERT_SQL = "insert into message_trn values(?,?,?,?,?,?,?,?)";
 	
+	private final String DIRECT_MODE = "DIRECT";
+	
+	private final String CHANNEL_MODE = "CHANNEL";
+	
 	@Override
 	public MessageTrnDto saveNewMessage(MessageTrnDto dto) {
 		dto.setMessageId(UUID.randomUUID().toString());
@@ -32,14 +36,25 @@ public class MessageDaoImpl implements MessageDao{
 
 	@Override
 	public List<MessageTrnDto> getBySourceAndDest(MessageTrnDto dto) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("select * from message_trn where (source_id = ? and destination_id = ?)"
-				+ " or (source_id = ? and destination_id = ?) order by message_creation_time");
-		
-		return jdbcTemplate.query(sb.toString(), 
-				new Object [] {dto.getSourceId(), dto.getDestinationId(),
-						dto.getDestinationId(), dto.getSourceId()},
-				new BeanPropertyRowMapper(MessageTrnDto.class));
+		if(dto.getMessageMode().equals(DIRECT_MODE)) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("select * from message_trn where (source_id = ? and destination_id = ?)"
+					+ " or (source_id = ? and destination_id = ?) order by message_creation_time");
+			
+			return jdbcTemplate.query(sb.toString(), 
+					new Object [] {dto.getSourceId(), dto.getDestinationId(),
+							dto.getDestinationId(), dto.getSourceId()},
+					new BeanPropertyRowMapper(MessageTrnDto.class));
+		}
+		else {
+			StringBuilder sb = new StringBuilder();
+			sb.append("select * from message_trn where destination_id = ?"
+					+ " order by message_creation_time");
+			
+			return jdbcTemplate.query(sb.toString(), 
+					new Object [] {dto.getDestinationId()},
+					new BeanPropertyRowMapper(MessageTrnDto.class));
+		}
 	}
 
 	@Override
