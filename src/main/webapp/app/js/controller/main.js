@@ -30,9 +30,12 @@ angular.module('mainApp', [])
 		$scope.init = function (){
 			userService.getUser();
 		};
-		$scope.selectChannel = function (channel){
+		$scope.initializeScopeVariables = function (){
 			$scope.messageIdtoEntityMap = {};
 			$scope.messageHistoryList = [];
+		};
+		$scope.selectChannel = function (channel){
+			$scope.initializeScopeVariables();
 			$scope.messageMode = $scope.CHANNEL_MODE;
 			$scope.chatType = $scope.CHANNEL_SELECTED;
 			$scope.selectedUser = {'username':channel};
@@ -42,8 +45,7 @@ angular.module('mainApp', [])
 			});
 		};
 		$scope.selectUser = function (selectedUser){
-			$scope.messageIdtoEntityMap = {};
-			$scope.messageHistoryList = [];
+			$scope.initializeScopeVariables();
 			$scope.messageMode = $scope.DIRECT_MODE;
 			$scope.chatType = $scope.USER_SELECTED;
 			angular.forEach(this.userList, function(user){
@@ -137,9 +139,9 @@ angular.module('mainApp', [])
 			}
 			$scope.scrollToEnd(document.getElementById('message-history'));
 	    	$scope.message = '';
+	    	$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
 	    	$scope.$apply();
 			if(messageTrnDto.messageDeliveryStatus != 'READ'){
-				$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
 				$scope.notifyMessageAsRead([messageTrnDto]);
 			}
 		};
@@ -152,7 +154,6 @@ angular.module('mainApp', [])
 				}
 				$scope.userList.push(user);
 			});
-			$scope.$apply();
 		};
 		$scope.getAllNotReadMessageTrns = function(){
 			var messageTrnDtoList = [];
