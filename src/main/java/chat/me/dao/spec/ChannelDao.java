@@ -13,4 +13,6 @@ public interface ChannelDao {
 	List<ChannelUserMstDto> insertInBatch(List<ChannelUserMstDto> dtoList);
 	List<ChannelInfoEntity> getAllChannelInfoByUserId(String username);
 	String getChannelIdFromChannelName(String channelName);
+	List<ChannelUserMstDto> getAllUserInfoByChannelId(String channelId);
+	List<ChannelMstDto> getByPk(List<String> channelIds);
 }

@@ -1,7 +1,5 @@
 package chat.me.service.impl;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,27 +19,17 @@ public class ChannelServiceImpl implements ChannelService {
 	private ChannelDaoImpl channelDaoImpl;
 	
 	@Override
-	public List<ChannelInfoEntity> create(List<ChannelInfoEntity> entityList) {
-		if(entityList.isEmpty())
-			return new ArrayList<ChannelInfoEntity>();
+	public ChannelInfoEntity create(ChannelInfoEntity entity) {
 		String newChannelId = UUID.randomUUID().toString();
-		ChannelMstDto dto = new ChannelMstDto();
+		ChannelMstDto dto = entity.getChannelMstDto();
 		dto.setChannelId(newChannelId);
-		dto.setChannelName(entityList.get(0).getChannelName());
 		dto = channelDaoImpl.insert(dto);
-		Timestamp creationDate = dto.getChannelCreationDate();
-		List<ChannelUserMstDto> dtoList = new ArrayList<>();
-		entityList.stream().forEach(entity->{
-			ChannelUserMstDto dto1 = new ChannelUserMstDto();
+		List<ChannelUserMstDto> dtoList = entity.getChannelUserMstDtoList();
+		dtoList.stream().forEach(dto1->{
 			dto1.setChannelId(newChannelId);
-			dto1.setUserId(entity.getUserId());
-			dto1.setUserType(entity.getUserType());
-			dtoList.add(dto1);
-			entity.setChannelId(newChannelId);
-			entity.setChannelCreationDate(creationDate);
 		});
 		channelDaoImpl.insertInBatch(dtoList);
-		return entityList;
+		return entity;
 	}
 
 	@Override

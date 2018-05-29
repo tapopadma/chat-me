@@ -21,8 +21,8 @@ public class ChannelController {
 	
 	@ResponseBody
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public List<ChannelInfoEntity> create(@RequestBody List<ChannelInfoEntity> entityList) {
-		return channelServiceImpl.create(entityList);
+	public ChannelInfoEntity create(@RequestBody ChannelInfoEntity entity) {
+		return channelServiceImpl.create(entity);
 	}
 	
 	@ResponseBody

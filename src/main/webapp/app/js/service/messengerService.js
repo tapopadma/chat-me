@@ -3,7 +3,7 @@ var __messengerService = function($http, commonService) {
 	service.getScope = function(){
 		return commonService.get('mainController');
 	};
-	service.reCalculateUnReadMessageCounter = function(messageTrnDtoList, scope){
+	service.calculateUnReadMessageCounter = function(messageTrnDtoList, scope){
 		for(var i=0;i<scope.userList.length; ++i){
 			scope.userList[i].unReadMessageCounter = 0;
 		}
@@ -35,7 +35,7 @@ var __messengerService = function($http, commonService) {
 			if(response.status == 200){
 				var scope = service.getScope();
 				var messageTrnDtoList = response.data;
-				service.reCalculateUnReadMessageCounter(messageTrnDtoList, scope);
+				service.calculateUnReadMessageCounter(messageTrnDtoList, scope);
 			}
 		});
 	};

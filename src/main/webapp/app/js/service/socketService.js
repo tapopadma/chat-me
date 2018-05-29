@@ -96,14 +96,26 @@ var __socketService = function($q, $timeout, commonService){
     	var isUserTyping = messageMiscellaneousInfoEntity.userTyping;
     	
     	if(isUserTyping){
-    	  if(scope.hasOwnProperty('selectedUser') && 
-    			  messageTrnDto.sourceId == scope.selectedUser.userId){
-    		if(messageTrnDto.destinationId == scope.user.userId){
-    		  scope.setUserActiveStatus(scope.selectedUser.userId, scope.TYPING_CAPTION);
-    		  $timeout(function () {
-    			  scope.setUserActiveStatus(scope.selectedUser.userId, scope.ONLINE_CAPTION);
-    		  },1000);
-    		}
+    	  if(scope.messageMode == scope.DIRECT_MODE){
+			  if(scope.hasOwnProperty('selectedUser') && 
+	    			  messageTrnDto.sourceId == scope.selectedUser.userId){
+	    		if(messageTrnDto.destinationId == scope.user.userId){
+	    		  scope.setUserActiveStatus(scope.selectedUser.userId, scope.TYPING_CAPTION);
+	    		  $timeout(function () {
+	    			  scope.setUserActiveStatus(scope.selectedUser.userId, scope.ONLINE_CAPTION);
+	    		  },1000);
+	    		}
+	    	  }
+    	  }
+    	  else{
+    		  if(scope.hasOwnProperty('selectedUser') && 
+	    			  messageTrnDto.destinationId == scope.selectedUser.userId){
+	    		  scope.setUserActiveStatus(scope.selectedUser.userId, 
+	    				  scope.getUserNameById(messageTrnDto.sourceId) + ' ' + scope.TYPING_CAPTION);
+	    		  $timeout(function () {
+	    			  scope.setUserActiveStatus(scope.selectedUser.userId, '');
+	    		  },1000);
+	    	  }
     	  }
     	}
     };

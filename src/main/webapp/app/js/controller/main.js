@@ -36,7 +36,9 @@ angular.module('mainApp', [])
 		};
 		$scope.selectChannel = function (channel){
 			$scope.initializeScopeVariables();
-			$scope.loadChatBoxInfo($scope.CHANNEL_MODE, {'userId':channel.channelId, 'userName':channel.channelName});
+			$scope.loadChatBoxInfo($scope.CHANNEL_MODE, 
+					{'userId':channel.channelId, 
+					'userName':channel.channelName});
 		};
 		$scope.selectUser = function (selectedUser){
 			$scope.initializeScopeVariables();
@@ -250,7 +252,7 @@ angular.module('mainApp', [])
 })
 .factory('commonService', __commonService)
 .factory('messengerService', ['$http', 'commonService', __messengerService])
-.factory('channelService', ['$http', 'commonService', __channelService])
+.factory('channelService', ['$http', 'commonService', 'messengerService', __channelService])
 .factory('socketService', ['$q', '$timeout', 'commonService', __socketService])
 .factory('userService', ['$http', 'commonService', 'channelService', 
 						'messengerService', 'socketService', __userService]);

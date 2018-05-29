@@ -6,6 +6,6 @@ import chat.me.entity.ChannelInfoEntity;
 
 public interface ChannelService {
 
-	List<ChannelInfoEntity> create(List<ChannelInfoEntity> entityList);
+	ChannelInfoEntity create(ChannelInfoEntity entity);
 	List<ChannelInfoEntity> getAll(String username);
 }

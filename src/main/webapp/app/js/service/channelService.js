@@ -1,4 +1,4 @@
-var __channelService =	function channelService($http, commonService){
+var __channelService =	function channelService($http, commonService, messengerService){
 	var service = {};
 	service.getScope = function (){
 		var currentUrl = window.location.href;
@@ -23,8 +23,9 @@ var __channelService =	function channelService($http, commonService){
 				scope.channelList = [];
 				angular.forEach(response.data, function(channel){
 					channel.unReadMessageCounter = 0;
-					scope.channelList.push(channel);
+					scope.channelList.push(channel.channelMstDto);
 				});
+				messengerService.fetchAllUnreadMessage(scope.user.userId);
 			}
 		});
 	};

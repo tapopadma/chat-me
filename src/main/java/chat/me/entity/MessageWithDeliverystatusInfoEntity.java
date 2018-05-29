@@ -1,16 +1,10 @@
-package chat.me.dto;
+package chat.me.entity;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import chat.me.entity.MessageWithDeliverystatusInfoEntity;
+import chat.me.dto.MessageTrnDto;
 
-public class MessageTrnDto implements Serializable{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3231591947758033538L;
+public class MessageWithDeliverystatusInfoEntity {
 
 	private String messageId;
 	private String message;
@@ -20,54 +14,76 @@ public class MessageTrnDto implements Serializable{
 	private String sourceId;
 	private String destinationId;
 	
+	private String messageDeliveryStatus;
+
 	public String getMessageId() {
 		return messageId;
 	}
+
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
+
 	public String getMessage() {
 		return message;
 	}
+
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
 	public String getMessageMode() {
 		return messageMode;
 	}
+
 	public void setMessageMode(String messageMode) {
 		this.messageMode = messageMode;
 	}
+
 	public Timestamp getMessageCreationTime() {
 		return messageCreationTime;
 	}
+
 	public void setMessageCreationTime(Timestamp messageCreationTime) {
 		this.messageCreationTime = messageCreationTime;
 	}
+
 	public String getMessageOperationStatus() {
 		return messageOperationStatus;
 	}
+
 	public void setMessageOperationStatus(String messageOperationStatus) {
 		this.messageOperationStatus = messageOperationStatus;
 	}
+
 	public String getSourceId() {
 		return sourceId;
 	}
+
 	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
 	}
+
 	public String getDestinationId() {
 		return destinationId;
 	}
+
 	public void setDestinationId(String destinationId) {
 		this.destinationId = destinationId;
 	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+
+	public String getMessageDeliveryStatus() {
+		return messageDeliveryStatus;
 	}
-	public MessageTrnDto(String messageId, String message, String messageMode,
-			Timestamp messageCreationTime, String messageOperationStatus, 
-			String sourceId, String destinationId) {
+
+	public void setMessageDeliveryStatus(String messageDeliveryStatus) {
+		this.messageDeliveryStatus = messageDeliveryStatus;
+	}
+
+	public MessageWithDeliverystatusInfoEntity(String messageId, String message, String messageMode,
+			Timestamp messageCreationTime, String messageOperationStatus, String sourceId, String destinationId,
+			String messageDeliveryStatus) {
+		super();
 		this.messageId = messageId;
 		this.message = message;
 		this.messageMode = messageMode;
@@ -75,28 +91,24 @@ public class MessageTrnDto implements Serializable{
 		this.messageOperationStatus = messageOperationStatus;
 		this.sourceId = sourceId;
 		this.destinationId = destinationId;
+		this.messageDeliveryStatus = messageDeliveryStatus;
 	}
-	public MessageTrnDto() {
+
+	public MessageWithDeliverystatusInfoEntity() {
+		super();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public static MessageWithDeliverystatusInfoEntity toMessageWithDeliverystatusInfoEntity(
-			MessageTrnDto dto, String messageDeliveryStatus) {
-		
-		MessageWithDeliverystatusInfoEntity entity = new MessageWithDeliverystatusInfoEntity();
-		
-		entity.setDestinationId(dto.getDestinationId());
-		entity.setMessage(dto.getMessage());
-		entity.setMessageCreationTime(dto.getMessageCreationTime());
-		
-		entity.setMessageDeliveryStatus(messageDeliveryStatus);
-		
-		entity.setMessageId(dto.getMessageId());
-		entity.setMessageMode(dto.getMessageMode());
-		entity.setMessageOperationStatus(dto.getMessageOperationStatus());
-		entity.setSourceId(dto.getSourceId());
-		
-		return entity;
+	public static MessageTrnDto toMessageTrnDto(MessageWithDeliverystatusInfoEntity entity) {
+		MessageTrnDto dto = new MessageTrnDto();
+		dto.setDestinationId(entity.getDestinationId());
+		dto.setMessage(entity.getMessage());
+		dto.setMessageCreationTime(entity.getMessageCreationTime());
+		dto.setMessageId(entity.getMessageId());
+		dto.setMessageMode(entity.getMessageMode());
+		dto.setMessageOperationStatus(entity.getMessageOperationStatus());
+		dto.setSourceId(entity.getSourceId());
+		return dto;
 	}
-	
+
 }

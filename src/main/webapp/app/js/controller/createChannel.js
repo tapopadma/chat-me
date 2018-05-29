@@ -12,6 +12,7 @@ angular.module('createChannelApp', [])
 				if(user.userName == $scope.selectedMember){
 					validSelection = true;
 					newMember = user;
+					newMember.userType = 'user';
 				}
 			});
 			if(!validSelection)
@@ -37,14 +38,20 @@ angular.module('createChannelApp', [])
 			$scope.userList.push(member);
 		};
 		$scope.createNewChannel = function (){
-			channelInfoList = [];
+			var channelInfoEntity = {
+				'channelMstDto':{
+					'channelName' : $scope.channelName
+				}
+			};
+			var channelUserMstDtoList = [];
 			angular.forEach($scope.memberList, function(member){
-				var channelInfo = {};
-				channelInfo.channelName = $scope.channelName;
-				channelInfo.userId = member.userId;
-				channelInfoList.push(channelInfo);
+				channelUserMstDtoList.push({
+					'userId' : member.userId,
+					'userType' : member.userType
+				});
 			});
-			channelService.createChannel(channelInfoList);
+			channelInfoEntity.channelUserMstDtoList = channelUserMstDtoList;
+			channelService.createChannel(channelInfoEntity);
 		};
 	}
 )

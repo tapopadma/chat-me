@@ -2,7 +2,9 @@ package chat.me.dao.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 import chat.me.dao.spec.ChannelDao;
 import chat.me.dto.ChannelMstDto;
 import chat.me.dto.ChannelUserMstDto;
+import chat.me.dto.MessageTrnDto;
 import chat.me.entity.ChannelInfoEntity;
 
 @Component
@@ -51,15 +54,19 @@ public class ChannelDaoImpl implements ChannelDao {
 
 	@Override
 	public List<ChannelInfoEntity> getAllChannelInfoByUserId(String userId) {
-		return jdbcTemplate.query(
-				"select T1.channel_id, T1.user_id, T1.user_type, "
-				+ "T2.channel_name, T2.channel_creation_date from \n" + 
-				"channel_user_mst T1 left join channel_mst T2 \n" + 
-				"on T1.channel_id = T2.channel_id\n" + 
-				"where T1.user_id = ?",
+		List<ChannelUserMstDto> dtoList = jdbcTemplate.query(
+				"select * from channel_user_mst where user_id=?",
 				new Object[] { userId }, 
-				new BeanPropertyRowMapper(ChannelInfoEntity.class));
-		
+				new BeanPropertyRowMapper(ChannelUserMstDto.class));
+		List<ChannelMstDto> dtos = getByPk(dtoList.stream().map(ChannelUserMstDto::getChannelId)
+				.collect(Collectors.toList()));
+		List<ChannelInfoEntity> resultList = new ArrayList<>();
+		dtos.stream().forEach(dto->{
+			ChannelInfoEntity entity = new ChannelInfoEntity();
+			entity.setChannelMstDto(dto);
+			resultList.add(entity);
+		});
+		return resultList;
 	}
 
 	@Override
@@ -76,6 +83,32 @@ public class ChannelDaoImpl implements ChannelDao {
 		return (ChannelMstDto) jdbcTemplate.query("select * from channel_mst where channel_id=?", 
 				new Object[] {channelId},
 				new BeanPropertyRowMapper(ChannelMstDto.class)).get(0);
+	}
+
+	@Override
+	public List<ChannelUserMstDto> getAllUserInfoByChannelId(String channelId) {
+		return jdbcTemplate.query("select * from channel_user_mst where channel_id=?", 
+				new Object[] {channelId},
+				new BeanPropertyRowMapper(ChannelUserMstDto.class));
+	}
+
+	@Override
+	public List<ChannelMstDto> getByPk(List<String> channelIds) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from channel_mst where ( ");
+		for(int i=0;i<channelIds.size();++i) {
+			sb.append(" channel_id = ? ");
+			if(i < channelIds.size() - 1) {
+				sb.append(" or ");
+			}
+		}
+		sb.append(" )");
+		Object[] args = new Object[channelIds.size()];
+		for(int i=0;i<channelIds.size();++i)
+			args[i] = channelIds.get(i);
+		return jdbcTemplate.query(sb.toString(), 
+				args,
+				new BeanPropertyRowMapper(ChannelMstDto.class));
 	}
 
 }

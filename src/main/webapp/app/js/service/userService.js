@@ -47,7 +47,7 @@ var __userService =	function ($http, commonService, channelService, messengerSer
 					}
 				});
 				scope.userList = userList;
-				messengerService.fetchAllUnreadMessage(scope.user.userId);
+				channelService.getAllChannels(scope.user.userId);
 			}
 		});
 	};
@@ -63,9 +63,10 @@ var __userService =	function ($http, commonService, channelService, messengerSer
 				var scope = service.getScope();
 				scope.user = response.data;
 				scope.memberList = [];
-				scope.memberList.push(scope.user);
+				var member = scope.user;
+				member.userType = 'admin';
+				scope.memberList.push(member);
 				service.getFriendListByUser(scope.user);
-				channelService.getAllChannels(scope.user.userId);
 			}
 		});
 	};
