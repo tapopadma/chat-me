@@ -88,16 +88,17 @@ public class MessageDaoImpl implements MessageDao{
 
 	@Override
 	public List<MessageTrnDto> updateMessageDeliveryStatus(String userId, String deliveryStatus) {
-		List<String> messageIds = jdbcTemplate.query(
-				"select message_id from message_delivery_status_trn"
+		List<MessageDeliveryStatusTrnDto> dtos = jdbcTemplate.query(
+				"select * from message_delivery_status_trn"
 				+ " where user_id=? and message_delivery_status != 'READ'", 
 				new Object[] {userId},
-				new BeanPropertyRowMapper(String.class));
+				new BeanPropertyRowMapper(MessageDeliveryStatusTrnDto.class));
 		jdbcTemplate.update("update message_delivery_status_trn "
 				+ "set message_delivery_status = ? where user_id = ?"
 				+ " and message_delivery_status != 'READ'",
 				deliveryStatus, userId);
-		return getDtosByMessageIds(messageIds);
+		return getDtosByMessageIds(dtos.stream().map(MessageDeliveryStatusTrnDto::getMessageId)
+				.collect(Collectors.toList()));
 	}
 	
 	private List<MessageTrnDto> getDtosByMessageIds(List<String> messageIds) {
