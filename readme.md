@@ -54,3 +54,7 @@ This updates 1 user status per broadcast and hence efficient.
 b) Spring security framework will trigger an event each time a user logs in / out(for this developer needs to define login/outSucessHandler). So a Event Handler class implementing HttpSessionBindingListener will be good enough to update 
 our activeUserList. Developer has to maintain a bean for the activeuserlist which is nothing but a list of usernames. as soon as this list is updated it can be broadcasted over
 socket.
+
+ER Diagram
+----------
+https://www.lucidchart.com/invitations/accept/970a96a8-719e-4533-8e8e-2f72cf63101c
