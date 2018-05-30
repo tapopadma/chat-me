@@ -37,6 +37,7 @@ var __socketService = function($q, $timeout, commonService){
     	var messageTrnDtoList = messageTrnInfoEntity.messageTrnDtoList;
     	
     	angular.forEach(messageTrnDtoList, function(messageTrnDto){
+    		// if message belongs to currently selected chat box
     		if(scope.messageMode == scope.DIRECT_MODE){
     			if(messageTrnDto.sourceId == scope.user.userId){
         			//i sent this message
@@ -51,16 +52,6 @@ var __socketService = function($q, $timeout, commonService){
         					messageTrnDto.sourceId == scope.selectedUser.userId){
         				scope.addReceipientMessageTemplateToChatBox(messageTrnDto);
         			}
-        			else{
-        				var userListCopy = scope.userList;
-        				scope.userList = [];
-        				angular.forEach(userListCopy, function(user){
-        					if(user.userId == messageTrnDto.sourceId){
-        						user.unReadMessageCounter += 1;
-        					}
-        					scope.userList.push(user);
-        				});
-        			}
         		}
     		}
     		else{
@@ -73,27 +64,47 @@ var __socketService = function($q, $timeout, commonService){
     							scope.getUserNameById(messageTrnDto.sourceId));
     				}
     			}
-    			else{//message to other channel
-    				var channelListCopy = scope.channelList;
-    				scope.channelList = [];
-    				angular.forEach(channelListCopy, function(channel){
-    					if(channel.channelId == messageTrnDto.destinationId){
-    						channel.unReadMessageCounter += 1;
-    					}
-    					scope.channelList.push(channel);
-    				});
-    			}
+    		}
+    		// if message is beyond currently selected chat box
+    		if((messageTrnDto.messageMode == scope.DIRECT_MODE
+    				&& messageTrnDto.destinationId == scope.user.userId 
+    				&& messageTrnDto.sourceId != scope.selectedUser.userId)
+    			||(messageTrnDto.messageMode == scope.CHANNEL_MODE
+        				&& messageTrnDto.sourceId != scope.user.userId 
+        				&& messageTrnDto.destinationId != scope.selectedUser.userId)){
+    			if(messageTrnDto.messageMode == scope.DIRECT_MODE){
+        			var userListCopy = scope.userList;
+        			scope.userList = [];
+        			angular.forEach(userListCopy, function(user){
+        				if(user.userId == messageTrnDto.sourceId){
+        					if(user.unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+        						user.unReadMessages.push(messageTrnDto.messageId);
+        				}
+        				scope.userList.push(user);
+        			});
+        		}
+        		else{
+        			var channelListCopy = scope.channelList;
+        			scope.channelList = [];
+        			angular.forEach(channelListCopy, function(channel){
+        				if(channel.channelId == messageTrnDto.destinationId){
+        					if(channel.unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+        						channel.unReadMessages.push(messageTrnDto.messageId);
+        				}
+        				scope.channelList.push(channel);
+        			});
+        		}
     		}
     	});
     	scope.$apply();
     };
     
-    var updateMessageMiscellaneousInfo = function (messageMiscellaneousInfoEntity, scope){
-    	if(messageMiscellaneousInfoEntity == null)
+    var updateMessageTypingInfo = function (messageTypingInfoEntity, scope){
+    	if(messageTypingInfoEntity == null)
     		return;
     	
-    	var messageTrnDto = messageMiscellaneousInfoEntity.messageTrnDto;
-    	var isUserTyping = messageMiscellaneousInfoEntity.userTyping;
+    	var messageTrnDto = messageTypingInfoEntity.messageTrnDto;
+    	var isUserTyping = messageTypingInfoEntity.userTyping;
     	
     	if(isUserTyping){
     	  if(scope.messageMode == scope.DIRECT_MODE){
@@ -136,17 +147,25 @@ var __socketService = function($q, $timeout, commonService){
   	  }
     };
     
+    var updateMessageMarkAsReadInfo = function (messageMarkAsReadInfoEntity, scope){
+    	if(messageMarkAsReadInfoEntity == null)
+    		return;
+    	//nothing useful 
+    };
+    
     var getMessage = function(data) {
       var socketMessageEntity = JSON.parse(data);
       
       var messageTrnInfoEntity = socketMessageEntity.messageTrnInfoEntity;
-      var messageMiscellaneousInfoEntity = socketMessageEntity.messageMiscellaneousInfoEntity;
+      var messageTypingInfoEntity = socketMessageEntity.messageTypingInfoEntity;
       var userSessionInfoEntity = socketMessageEntity.userSessionInfoEntity;
+      var messageMarkAsReadInfoEntity = socketMessageEntity.messageMarkAsReadInfoEntity;
       var scope = commonService.get('mainController');
       
       updateMessageTrnInfo(messageTrnInfoEntity, scope);
-      updateMessageMiscellaneousInfo(messageMiscellaneousInfoEntity, scope);
+      updateMessageTypingInfo(messageTypingInfoEntity, scope);
       updateUserSessionInfo(userSessionInfoEntity, scope);
+      updateMessageMarkAsReadInfo(messageMarkAsReadInfoEntity, scope);
       
     };
     

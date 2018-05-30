@@ -2,19 +2,19 @@ package chat.me.entity;
 
 import chat.me.dto.MessageTrnDto;
 
-public class MessageMiscellaneousInfoEntity {
+public class MessageTypingInfoEntity {
 	
 	private MessageTrnDto messageTrnDto;
 	
 	private boolean userTyping;
 	
-	public MessageMiscellaneousInfoEntity(MessageTrnDto messageTrnDto, boolean userTyping) {
+	public MessageTypingInfoEntity(MessageTrnDto messageTrnDto, boolean userTyping) {
 		super();
 		this.messageTrnDto = messageTrnDto;
 		this.userTyping = userTyping;
 	}
 
-	public MessageMiscellaneousInfoEntity() {
+	public MessageTypingInfoEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}

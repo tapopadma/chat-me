@@ -22,7 +22,7 @@ var __channelService =	function channelService($http, commonService, messengerSe
 			if(response.status == 200){
 				scope.channelList = [];
 				angular.forEach(response.data, function(channel){
-					channel.unReadMessageCounter = 0;
+					channel.unReadMessages = [];
 					scope.channelList.push(channel.channelMstDto);
 				});
 				messengerService.fetchAllUnreadMessage(scope.user.userId);

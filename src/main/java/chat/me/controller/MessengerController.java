@@ -58,6 +58,8 @@ public class MessengerController {
 	@MessageMapping("/chat")
 	@SendTo("/topic/message")
 	public SocketMessageEntity sendMessage(SocketMessageEntity entity) {
+		
+		//messageTrnInfoEntity
 		if(entity.getMessageTrnInfoEntity() != null &&
 				entity.getMessageTrnInfoEntity().getMessageTrnDtoList() != null
 				&& !entity.getMessageTrnInfoEntity().getMessageTrnDtoList().isEmpty()) {
@@ -67,24 +69,15 @@ public class MessengerController {
 					.map(MessageWithDeliverystatusInfoEntity::toMessageTrnDto)
 					.collect(Collectors.toList());
 			
-			if(entity.getMessageTrnInfoEntity().isMarkAllMessageAsRead()) {
-				List<String> messageIds = messageTrnDtoList
-						.stream().map(MessageTrnDto::getMessageId).collect(Collectors.toList());
-				entity.getMessageTrnInfoEntity().setMessageTrnDtoList(
-						messengerServiceImpl.markAllMessageAsReadByMessageIds(messageIds)
-						.stream().map(dto->{
-							return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "READ");
-						}).collect(Collectors.toList()));
-			}
-			else {
-				// save the message to DB
-				List<MessageWithDeliverystatusInfoEntity> entityList = messengerServiceImpl.saveMessage(
-						messageTrnDtoList);
-				MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
-				entity1.setMessageTrnDtoList(entityList);
-				entity.setMessageTrnInfoEntity(entity1);
-			}
+			// save the message to DB
+			List<MessageWithDeliverystatusInfoEntity> entityList = messengerServiceImpl.saveMessage(
+					messageTrnDtoList);
+			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
+			entity1.setMessageTrnDtoList(entityList);
+			entity.setMessageTrnInfoEntity(entity1);
 		}
+		
+		//userSessionInfoEntity
 		else if(entity.getUserSessionInfoEntity()!= null && 
 				entity.getUserSessionInfoEntity().isLoginRequest()) {
 			// update all message status to unread if sent
@@ -95,6 +88,28 @@ public class MessengerController {
 				return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "UNREAD");
 			}).collect(Collectors.toList()));
 			entity.setMessageTrnInfoEntity(messageTrn);
+		}
+		
+		//messageMarkAsReadInfoEntity
+		else if(entity.getMessageMarkAsReadInfoEntity() != null &&
+				entity.getMessageMarkAsReadInfoEntity().getMessageIds() != null
+				&& !entity.getMessageMarkAsReadInfoEntity().getMessageIds().isEmpty()) {
+			//mark all messageIds of userId as READ
+			
+			List<MessageWithDeliverystatusInfoEntity> messageTrnDtoList = messengerServiceImpl.markAllMessageAsReadByMessageIds(
+							entity.getMessageMarkAsReadInfoEntity().getMessageIds(),
+							entity.getMessageMarkAsReadInfoEntity().getUserId())
+					.stream().map(dto->{
+						return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "READ");
+					}).collect(Collectors.toList());
+			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
+			entity1.setMessageTrnDtoList(messageTrnDtoList);
+			entity.setMessageTrnInfoEntity(entity1);
+		}
+		
+		//messageTypingInfoEntity
+		else {
+			//just broadcast via /topic/message
 		}
 		return entity;
 	}

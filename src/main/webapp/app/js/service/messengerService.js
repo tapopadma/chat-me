@@ -5,20 +5,26 @@ var __messengerService = function($http, commonService) {
 	};
 	service.calculateUnReadMessageCounter = function(messageTrnDtoList, scope){
 		for(var i=0;i<scope.userList.length; ++i){
-			scope.userList[i].unReadMessageCounter = 0;
+			scope.userList[i].unReadMessages = [];
 		}
 		for(var i=0;i<scope.channelList.length; ++i){
-			scope.channelList[i].unReadMessageCounter = 0;
+			scope.channelList[i].unReadMessages = [];
 		}
 		angular.forEach(messageTrnDtoList, function(messageTrnDto){
-			for(var i=0;i<scope.userList.length; ++i){
-				if(scope.userList[i].userId == messageTrnDto.sourceId){
-					scope.userList[i].unReadMessageCounter += 1;
+			if(messageTrnDto.messageMode == scope.DIRECT_MODE){
+				for(var i=0;i<scope.userList.length; ++i){
+					if(scope.userList[i].userId == messageTrnDto.sourceId){
+						if(scope.userList[i].unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+							scope.userList[i].unReadMessages.push(messageTrnDto.messageId);
+					}
 				}
 			}
-			for(var i=0;i<scope.channelList.length; ++i){
-				if(scope.channelList[i].channelId == messageTrnDto.destinationId){
-					scope.channelList[i].unReadMessageCounter += 1;
+			else{
+				for(var i=0;i<scope.channelList.length; ++i){
+					if(scope.channelList[i].channelId == messageTrnDto.destinationId){
+						if(scope.channelList[i].unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+							scope.channelList[i].unReadMessages.push(messageTrnDto.messageId);
+					}
 				}
 			}
 		});

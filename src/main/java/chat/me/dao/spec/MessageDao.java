@@ -9,6 +9,8 @@ import chat.me.entity.MessageWithDeliverystatusInfoEntity;
 public interface MessageDao {
 
 	
+	List<MessageTrnDto> updateMessageDeliveryStatus(List<String> messageIds, String userId, String deliveryStatus);
+	
 	List<MessageTrnDto> updateMessageDeliveryStatus(String userId, String deliveryStatus);
 	
 	MessageTrnDto saveNewMessage(MessageTrnDto dto, List<MessageDeliveryStatusTrnDto> dtoList);

@@ -68,24 +68,47 @@ public class MessageDaoImpl implements MessageDao{
 			
 			return jdbcTemplate.query(sb.toString(), 
 					new Object [] {dto.getSourceId(), dto.getDestinationId(),
-							dto.getDestinationId(), dto.getSourceId(), dto.getSourceId()},
+							dto.getDestinationId(), dto.getSourceId(), dto.getDestinationId()},
 					new BeanPropertyRowMapper(MessageWithDeliverystatusInfoEntity.class));
 		}
 		else {
 			StringBuilder sb = new StringBuilder();
-			sb.append("select T1.*, T2.message_delivery_status from message_trn T1"
-					+ " left join message_delivery_status_trn T2 "
-					+ " on T1.message_id=T2.message_id "
-					+ " where  T1.destination_id = ? "
-					+ " and T2.user_id=? "
-					+ "order by T1.message_creation_time");
+			sb.append("SELECT T1.*, IF( " + 
+					" ( SELECT COUNT(*) FROM message_delivery_status_trn T2 " + 
+					" WHERE T2.message_id=T1.message_id AND message_delivery_status != 'READ') > 0," + 
+					"'UNREAD', 'READ') AS message_delivery_status FROM message_trn T1 " + 
+					" WHERE T1.destination_id = ? " + 
+					" ORDER BY T1.message_creation_time");
 			
 			return jdbcTemplate.query(sb.toString(), 
-					new Object [] {dto.getDestinationId(), dto.getSourceId()},
+					new Object [] {dto.getDestinationId()},
 					new BeanPropertyRowMapper(MessageWithDeliverystatusInfoEntity.class));
 		}
 	}
 
+	@Override
+	public List<MessageTrnDto> updateMessageDeliveryStatus(List<String> messageIds, String userId, String deliveryStatus) {
+		Object[] args = new Object[messageIds.size() + 2];
+		StringBuilder sb = new StringBuilder();
+		sb.append("update message_delivery_status_trn "
+				+ "set message_delivery_status = ? where user_id = ?"
+				+ " and message_delivery_status != 'READ'");
+		sb.append(" and ( ");
+		args[0] = deliveryStatus;
+		args[1] = userId;
+		for(int i=0;i<messageIds.size();++i) {
+			args[i + 2] = messageIds.get(i);
+			if(i + 1 < messageIds.size()) {
+				sb.append(" message_id = ? or ");
+			}
+			else {
+				sb.append(" message_id = ? )");
+			}
+		}
+		jdbcTemplate.update(sb.toString(),args);
+		return getDtosByMessageIds(messageIds);
+	}
+	
 	@Override
 	public List<MessageTrnDto> updateMessageDeliveryStatus(String userId, String deliveryStatus) {
 		List<MessageDeliveryStatusTrnDto> dtos = jdbcTemplate.query(

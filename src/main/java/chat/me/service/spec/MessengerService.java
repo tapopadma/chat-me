@@ -11,7 +11,7 @@ public interface MessengerService {
 	List<MessageWithDeliverystatusInfoEntity> fetchAllMessageBySourceAndDest(MessageTrnDto dto);
 	List<MessageWithDeliverystatusInfoEntity> saveMessage(List<MessageTrnDto> dtoList);
 	List<MessageTrnDto> markSentMessageAsUnread(String userId);
-	List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds);
+	List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds, String userId);
 	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(String destinationId, String deliveryStatus);
 	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(List<String> destinationIds, String deliveryStatus);
 	List<MessageTrnDto> fetchAllUnreadMessage(String userId);

@@ -1,23 +1,26 @@
 package chat.me.entity;
 
 public class SocketMessageEntity {
+	
+	//every time user reads message
+	private MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity;
 
 	//every time user types 
-	private MessageMiscellaneousInfoEntity messageMiscellaneousInfoEntity;
+	private MessageTypingInfoEntity messageTypingInfoEntity;
 	
 	//every time user sends a message
-	private MessageTrnInfoEntity messageTrnInfoEntity; 
+	private MessageTrnInfoEntity messageTrnInfoEntity;
 	
 	//every time user logs in/out
 	private UserSessionInfoEntity userSessionInfoEntity;
 
-	public MessageMiscellaneousInfoEntity getMessageMiscellaneousInfoEntity() {
-		return messageMiscellaneousInfoEntity;
+
+	public MessageTypingInfoEntity getMessageTypingInfoEntity() {
+		return messageTypingInfoEntity;
 	}
 
-	public void setMessageMiscellaneousInfoEntity(
-			MessageMiscellaneousInfoEntity messageMiscellaneousInfoEntity) {
-		this.messageMiscellaneousInfoEntity = messageMiscellaneousInfoEntity;
+	public void setMessageTypingInfoEntity(MessageTypingInfoEntity messageTypingInfoEntity) {
+		this.messageTypingInfoEntity = messageTypingInfoEntity;
 	}
 
 	public MessageTrnInfoEntity getMessageTrnInfoEntity() {
@@ -36,15 +39,26 @@ public class SocketMessageEntity {
 		this.userSessionInfoEntity = userSessionInfoEntity;
 	}
 
-	public SocketMessageEntity(MessageMiscellaneousInfoEntity messageMiscellaneousInfoEntity,
-			MessageTrnInfoEntity messageTrnInfoEntity, UserSessionInfoEntity userSessionInfoEntity) {
-		this.messageMiscellaneousInfoEntity = messageMiscellaneousInfoEntity;
+	public SocketMessageEntity(MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity,
+			MessageTypingInfoEntity messageTypingInfoEntity, MessageTrnInfoEntity messageTrnInfoEntity,
+			UserSessionInfoEntity userSessionInfoEntity) {
+		super();
+		this.messageMarkAsReadInfoEntity = messageMarkAsReadInfoEntity;
+		this.messageTypingInfoEntity = messageTypingInfoEntity;
 		this.messageTrnInfoEntity = messageTrnInfoEntity;
 		this.userSessionInfoEntity = userSessionInfoEntity;
 	}
 
 	public SocketMessageEntity() {
 		// TODO Auto-generated constructor stub
+	}
+
+	public MessageMarkAsReadInfoEntity getMessageMarkAsReadInfoEntity() {
+		return messageMarkAsReadInfoEntity;
+	}
+
+	public void setMessageMarkAsReadInfoEntity(MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity) {
+		this.messageMarkAsReadInfoEntity = messageMarkAsReadInfoEntity;
 	}
 
 

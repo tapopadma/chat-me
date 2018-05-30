@@ -93,7 +93,9 @@ public class MessengerServiceImpl implements MessengerService{
 		entity.setDestinationId(messageDto.getDestinationId());
 		entity.setMessage(messageDto.getMessage());
 		entity.setMessageCreationTime(messageDto.getMessageCreationTime());
-		entity.setMessageDeliveryStatus(MESSAGE_SENT);
+		entity.setMessageDeliveryStatus(
+			messageDto.getMessageMode().equals(
+				DIRECT_MODE) ? getMessageDeliveryStatusUsingSessionInfo(dto.getDestinationId()):MESSAGE_UNREAD);
 		entity.setMessageId(messageDto.getMessageId());
 		entity.setMessageMode(messageDto.getMessageMode());
 		entity.setMessageOperationStatus(messageDto.getMessageOperationStatus());
@@ -135,8 +137,8 @@ public class MessengerServiceImpl implements MessengerService{
 	}
 
 	@Override
-	public List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds){
-		return messageDaoImpl.updateMessageDeliveryStatus("", MESSAGE_READ);
+	public List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds, String userId){
+		return messageDaoImpl.updateMessageDeliveryStatus(messageIds, userId, MESSAGE_READ);
 	}
 
 	@Override

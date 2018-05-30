@@ -103,6 +103,7 @@ angular.module('mainApp', [])
 				}
 			});
 			$scope.scrollToEnd(document.getElementById('message-history'));
+			$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
 		};
 		$scope.scrollToEnd = function (objDiv){
 			objDiv.scrollTop = objDiv.scrollHeight;
@@ -140,6 +141,7 @@ angular.module('mainApp', [])
 			}
 			$scope.scrollToEnd(document.getElementById('message-history'));
 	    	$scope.message = '';
+	    	$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
 	    	$scope.$apply();
 		};
 		$scope.pushRecieverMessageToChatBox = function (messageTrnDto, memberName=null){
@@ -168,9 +170,17 @@ angular.module('mainApp', [])
 			$scope.userList = [];
 			angular.forEach(userListCopy, function(user){
 				if(user.userId == userId){
-					user.unReadMessageCounter = 0;
+					user.unReadMessages = [];
 				}
 				$scope.userList.push(user);
+			});
+			var channelListCopy = $scope.channelList;
+			$scope.channelList = [];
+			angular.forEach(channelListCopy, function(channel){
+				if(channel.channelId == userId){
+					channel.unReadMessages = [];
+				}
+				$scope.channelList.push(channel);
 			});
 		};
 		$scope.getAllNotReadMessageTrns = function(){
@@ -184,10 +194,14 @@ angular.module('mainApp', [])
 			return messageTrnDtoList;
 		};
 		$scope.notifyMessageAsRead = function (messageTrnDtoList){
+			var messageIds = [];
+			angular.forEach(messageTrnDtoList, function(messageTrnDto){
+				messageIds.push(messageTrnDto.messageId);
+			});
 			var data = {};
-			data.messageTrnInfoEntity = {
-				'markAllMessageAsRead' : true,
-				'messageTrnDtoList'	: messageTrnDtoList
+			data.messageMarkAsReadInfoEntity = {
+				'userId' : $scope.user.userId,
+				'messageIds'	: messageIds
 			};
 			socketService.send(data);
 		};
@@ -199,7 +213,7 @@ angular.module('mainApp', [])
 				'destinationId' : $scope.selectedUser.userId
 			};
 			socketService.send({
-				'messageMiscellaneousInfoEntity' : data
+				'messageTypingInfoEntity' : data
 			});
 		};
 		$document.bind("keypress", function (event){

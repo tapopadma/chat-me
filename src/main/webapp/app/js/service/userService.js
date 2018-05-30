@@ -42,7 +42,7 @@ var __userService =	function ($http, commonService, channelService, messengerSer
 						obj.status = obj.isloggedIn ? 'online' : 'offline';
 						obj.USER_STATUS_COLOR = 
 							obj.isloggedIn ? scope.ONLINE_COLOR : scope.OFFLINE_COLOR;
-						obj.unReadMessageCounter = 0;
+						obj.unReadMessages = [];
 						userList.push(obj);
 					}
 				});

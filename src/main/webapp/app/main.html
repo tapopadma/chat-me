@@ -71,8 +71,8 @@
 							<button type="button" class="hyperlinkButton"
 							ng-click="selectUser(record)">{{record.userName}}</button>
 							<span class="label label-danger" 
-							ng-show="record.unReadMessageCounter > 0">
-							{{record.unReadMessageCounter}}</span>
+							ng-show="record.unReadMessages.length > 0">
+							{{record.unReadMessages.length}}</span>
 						</td>
 					</tr>
 				</table>
@@ -90,8 +90,8 @@
 							<button type="button" class="hyperlinkButton"
 							ng-click="selectChannel(channel)">{{channel.channelName}}</button>
 							<span class="label label-danger" 
-							ng-show="channel.unReadMessageCounter > 0">
-							{{channel.unReadMessageCounter}}</span>
+							ng-show="channel.unReadMessages.length > 0">
+							{{channel.unReadMessages.length}}</span>
 						</td>
 					</tr>
 				</table>
