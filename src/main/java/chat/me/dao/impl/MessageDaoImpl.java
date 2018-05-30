@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -187,12 +188,13 @@ public class MessageDaoImpl implements MessageDao{
 
 	@Override
 	public List<MessageTrnDto> getAllNotReadByUserId(String userId) {
-		List<String> messageIds = jdbcTemplate.query("select message_id from "
+		List<MessageDeliveryStatusTrnDto> dtos = jdbcTemplate.query("select * from "
 				+ " message_delivery_status_trn where "
 				+ " user_id = ? and message_delivery_status!='READ'", 
 				new Object[] {userId},
-				new BeanPropertyRowMapper(String.class));
-		return getDtosByMessageIds(messageIds);
+				new BeanPropertyRowMapper(MessageDeliveryStatusTrnDto.class));
+		return getDtosByMessageIds(dtos.stream().map(MessageDeliveryStatusTrnDto::getMessageId)
+				.collect(Collectors.toList()));
 	}
 	
 }

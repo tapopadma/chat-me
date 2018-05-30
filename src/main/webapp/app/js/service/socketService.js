@@ -110,11 +110,13 @@ var __socketService = function($q, $timeout, commonService){
     	  else{
     		  if(scope.hasOwnProperty('selectedUser') && 
 	    			  messageTrnDto.destinationId == scope.selectedUser.userId){
-	    		  scope.setUserActiveStatus(scope.selectedUser.userId, 
-	    				  scope.getUserNameById(messageTrnDto.sourceId) + ' ' + scope.TYPING_CAPTION);
-	    		  $timeout(function () {
-	    			  scope.setUserActiveStatus(scope.selectedUser.userId, '');
-	    		  },1000);
+    			  if(messageTrnDto.sourceId != scope.user.userId){
+    				  scope.setUserActiveStatus(scope.selectedUser.userId, 
+    	    				  scope.getUserNameById(messageTrnDto.sourceId) + ' ' + scope.TYPING_CAPTION);
+    	    		  $timeout(function () {
+    	    			  scope.setUserActiveStatus(scope.selectedUser.userId, '');
+    	    		  },1000);
+    			  }
 	    	  }
     	  }
     	}
