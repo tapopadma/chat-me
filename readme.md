@@ -35,6 +35,12 @@ When A sends a text to B following happens
 --------------------------------------------------------------------------------------------------------
 this is another important module from spring framework that supports a full-duplex web-socket protocol i.e Server-client can interact in both ways. 
 Hence server can broadcast a message to each client whenever necessary without the client concerning about sending request to server every second.
+
+The architecture for Messaging using STOMP (ref: https://stomp.github.io/stomp-specification-1.2.html)
+-----------------
+STOMP: Streaming Text Orientated Messaging Protocol is based on SOCKET (SOCKJS) and supports messaging in both direction between server and client. The client sends message using stomp.send as a producer and receives message using stomp.subscribe as a consumer.
+
+
 Developer just needs to add a spring configuration to configure the endpoint and application destination. At client side just need to connect to the 
 server at the socket url and send message to the desired end point and get reply from the corresponding desitnation url.
 This is efficient since in this environment client doesn't bother about updates from the server.
