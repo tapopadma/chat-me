@@ -57,15 +57,6 @@ angular.module('mainApp', [])
 			$scope.messageMode = messageMode;
 			$scope.selectedUser = selectedUser;
 			
-			if($scope.user.status != $scope.ONLINE_CAPTION){
-				socketService.send({
-					'userSessionInfoEntity':{
-						'userId' : $scope.user.userId,
-						'loginRequest' : true
-					 }
-				});
-			}
-			
 			//saves to $scope.messageHistoryList
 			messengerService.fetchAllMessageBySourceAndDest({
 				'sourceId' : $scope.user.userId,
@@ -103,6 +94,7 @@ angular.module('mainApp', [])
 				}
 			});
 			$scope.scrollToEnd(document.getElementById('message-history'));
+			$scope.notifyMessageAsReadByUserId($scope.selectedUser.userId, $scope.messageMode);
 			$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
 		};
 		$scope.scrollToEnd = function (objDiv){
@@ -193,6 +185,31 @@ angular.module('mainApp', [])
 			});
 			return messageTrnDtoList;
 		};
+		$scope.notifyMessageAsReadByUserId = function (userId, messageMode){
+			var messageIds = [];
+			if(messageMode == $scope.DIRECT_MODE){
+				angular.forEach($scope.userList, function(user){
+					if(userId == user.userId){
+						messageIds = user.unReadMessages;
+					}
+				});
+			}
+			else if(messageMode == $scope.CHANNEL_MODE){
+				angular.forEach($scope.channelList, function(channel){
+					if(userId == channel.channelId){
+						messageIds = channel.unReadMessages;
+					}
+				});
+			}
+			if(messageIds != null && messageIds.length > 0){
+				var data = {};
+				data.messageMarkAsReadInfoEntity = {
+					'userId' : $scope.user.userId,
+					'messageIds'	: messageIds
+				};
+				socketService.send(data);
+			}
+		};
 		$scope.notifyMessageAsRead = function (messageTrnDtoList){
 			var messageIds = [];
 			angular.forEach(messageTrnDtoList, function(messageTrnDto){
@@ -237,25 +254,34 @@ angular.module('mainApp', [])
 				$scope.userList.push(user);
 			});
 			
-			//update in selectedUser
-			var captionValue = statusValue;
-			if(captionValue.search($scope.TYPING_CAPTION) >= 0){
-				captionValue = $scope.TYPING_CAPTION;
+			
+			//update in user
+			if($scope.user != null && $scope.user.userId == userId){
+				$scope.user.status = statusValue;
 			}
-			switch (captionValue){
-			case $scope.ONLINE_CAPTION:
-				$scope.selectedUser.USER_STATUS_COLOR = $scope.ONLINE_COLOR;
-				break;
-			case $scope.OFFLINE_CAPTION:
-				$scope.selectedUser.USER_STATUS_COLOR = $scope.OFFLINE_COLOR;
-				break;
-			case $scope.TYPING_CAPTION:
-				$scope.selectedUser.USER_STATUS_COLOR = $scope.TYPING_COLOR;
-				break;
-			default:
-				break;
-			};
-			$scope.selectedUser.status = statusValue;
+			
+			//update in selectedUser
+			if($scope.selectedUser != null && $scope.selectedUser.userId == userId){
+				var captionValue = statusValue;
+				if(captionValue.search($scope.TYPING_CAPTION) >= 0){
+					captionValue = $scope.TYPING_CAPTION;
+				}
+				switch (captionValue){
+				case $scope.ONLINE_CAPTION:
+					$scope.selectedUser.USER_STATUS_COLOR = $scope.ONLINE_COLOR;
+					break;
+				case $scope.OFFLINE_CAPTION:
+					$scope.selectedUser.USER_STATUS_COLOR = $scope.OFFLINE_COLOR;
+					break;
+				case $scope.TYPING_CAPTION:
+					$scope.selectedUser.USER_STATUS_COLOR = $scope.TYPING_COLOR;
+					break;
+				default:
+					break;
+				};
+				$scope.selectedUser.status = statusValue;
+			}
+			
 			$scope.$apply();
 		};
 		

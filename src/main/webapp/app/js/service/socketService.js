@@ -134,17 +134,14 @@ var __socketService = function($q, $timeout, commonService){
     };
     
     var updateUserSessionInfo = function (userSessionInfoEntity, scope){
-		if(userSessionInfoEntity == null)
+    	if(userSessionInfoEntity == null)
 			return;
-  	  	if(scope.hasOwnProperty('selectedUser') && 
-  	  			userSessionInfoEntity.userId == scope.selectedUser.userId){
-  		  if(userSessionInfoEntity.loginRequest){
-  			  scope.setUserActiveStatus(userSessionInfoEntity.userId, scope.ONLINE_CAPTION);
-  		  }
-  		  else if(userSessionInfoEntity.logoutRequest){
-  			  scope.setUserActiveStatus(userSessionInfoEntity.userId, scope.OFFLINE_CAPTION);
-  		  }
-  	  }
+    	if(userSessionInfoEntity.loginRequest){
+			scope.setUserActiveStatus(userSessionInfoEntity.userId, scope.ONLINE_CAPTION);
+		}
+		else if(userSessionInfoEntity.logoutRequest){
+		    scope.setUserActiveStatus(userSessionInfoEntity.userId, scope.OFFLINE_CAPTION);
+		}
     };
     
     var updateMessageMarkAsReadInfo = function (messageMarkAsReadInfoEntity, scope){
@@ -173,6 +170,16 @@ var __socketService = function($q, $timeout, commonService){
       socket.stomp.subscribe(service.CHAT_TOPIC, function(data) {
         listener.notify(getMessage(data.body));
       });
+      var scope = commonService.get('mainController');
+      if(scope.user != null && (!scope.user.hasOwnProperty('status') ||
+    		  scope.user.status != scope.ONLINE_CAPTION)){
+    	  service.send({
+        	  'userSessionInfoEntity':{
+        		  'userId' : scope.user.userId,
+        		  'loginRequest' : true
+        	  }
+          });
+      }
     };
     
     var initialize = function() {

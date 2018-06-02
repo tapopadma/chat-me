@@ -75,7 +75,6 @@ var __messengerService = function($http, commonService) {
 				scope.messageHistoryList = response.data;
 				scope.clearChatBox();
 				scope.displayMessageHistoryOnChatBox();
-				scope.notifyMessageAsRead(scope.getAllNotReadMessageTrns());
 				console.log('fetched message history data successfully!!!');
 			}
 			else{
