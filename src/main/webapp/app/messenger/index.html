@@ -1,0 +1,165 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="" ng-app="mainApp"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ChatMe | Dashboard</title>
+    
+    <script type="text/javascript" 
+		src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<script type="text/javascript" 
+		src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
+	<script type="text/javascript" 
+		src="http://cdn.sockjs.org/sockjs-0.3.4.min.js"></script>
+	<script type="text/javascript" 
+		src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/service/commonService.js"></script>	
+	<script type="text/javascript" src="js/service/messengerService.js"></script>
+	<script type="text/javascript" src="js/service/channelService.js"></script>
+	<script type="text/javascript" src="js/service/socketService.js"></script>
+	<script type="text/javascript" src="js/service/userService.js"></script>
+	<script type="text/javascript" src="js/controller/main.js"></script>
+	<script type="text/javascript" src="js/service/mainService.js"></script>
+	<link rel="stylesheet" href="css/main.css">
+	    
+    <meta name="description" content="Sufee Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="apple-icon.png">
+
+    <link rel="stylesheet" href="assets/css/normalize.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/themify-icons.css">
+    <link rel="stylesheet" href="assets/css/flag-icon.min.css">
+    <link rel="stylesheet" href="assets/css/cs-skin-elastic.css">
+    <!-- <link rel="stylesheet" href="assets/css/bootstrap-select.less"> -->
+    <link rel="stylesheet" href="assets/scss/style.css">
+    <link href="assets/css/lib/vector-map/jqvmap.min.css" rel="stylesheet">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+</head>
+<body ng-controller="mainController" ng-init="init()">
+
+
+        <!-- Left Panel -->
+
+    <aside id="left-panel" class="left-panel">
+        <nav class="navbar navbar-expand-sm navbar-default">
+
+            <div>
+                <ul class="nav navbar-nav">
+                
+                <div id="user-profile-info-section">{{user.userName}}</div>
+               	<div class="user-area dropdown float-right">
+                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" 
+                       aria-haspopup="true" aria-expanded="false">
+                           <img class="user-avatar rounded-circle" 
+                           src="images/admin.jpg" 
+                           alt="User Avatar">
+                       </a>
+
+                       <div class="user-menu dropdown-menu">
+
+                         	<a><button type="button" ng-click="logout()" 
+                         	class="hyperlinkButton" href="#">
+                         		Logout</button></a>
+                       </div>
+                   </div>
+
+                    <h3 class="menu-title">List of users</h3><!-- /.menu-title -->
+					<li ng-repeat="record in userList" 
+						ng-class="{active : selectedUser != null && 
+						selectedUser.userId == record.userId}"
+						ng-show="record.userName != user.userName">
+						<button type="button" class="hyperlinkButton"
+						ng-class="{active : selectedUser != null && 
+						selectedUser.userId == record.userId}"
+						ng-click="selectUser(record)">{{record.userName}}</button>
+						<span class="label label-danger" 
+						ng-show="record.unReadMessages.length > 0">
+						{{record.unReadMessages.length}}</span>
+					</li>
+                    <h3 class="menu-title">List of Channels 
+                    <button type="button"  class="hyperlinkButton" 
+						ng-click="createNewChannel()" title="Create New Channel">+
+						</button></h3><!-- /.menu-title -->
+                    <li ng-repeat="channel in channelList"
+                    	ng-class="{active : selectedUser != null && 
+                    	selectedUser.userId == channel.channelId}">
+						<button type="button" class="hyperlinkButton"
+						ng-class="{active : selectedUser != null && 
+						selectedUser.userId == channel.channelId}"
+						ng-click="selectChannel(channel)">{{channel.channelName}}</button>
+						<span class="label label-danger" 
+						ng-show="channel.unReadMessages.length > 0">
+						{{channel.unReadMessages.length}}</span>
+					</li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+    </aside><!-- /#left-panel -->
+
+    <!-- Left Panel -->
+
+    <!-- Right Panel -->
+
+    <div id="right-panel" class="right-panel">
+
+        <!-- Header-->
+        <header id="header" class="header" ng-show="selectedUser != null">
+
+            <div class="header-menu">
+
+                <div class="col-sm-7">
+                </div>
+
+                <div class="col-sm-5">
+                	<div id="selected-user-info" style="height:30px;">
+						<b>{{selectedUser.userName}}</b>
+						<div id="selected-user-status" ng-style="{color:selectedUser.USER_STATUS_COLOR}">
+							{{selectedUser.status}}
+						</div>
+					</div>
+                </div>
+            </div>
+
+        </header><!-- /header -->
+        <!-- Header-->
+
+
+        <div class="content mt-3">
+
+			<div style="height:545px;width:1000px;border-style:groove;" ng-show="selectedUser != null">
+				<div style="height: 400px;max-width:100%;word-wrap: break-word;
+				max-height: 400px;overflow-y:scroll;"
+				 id="message-history">
+					{{messageHistory}}
+				</div>
+				<div>
+					<textarea id="chat-text-area"
+						style="height:100px;width:100%" ng-model="message" 
+						ng-change="sendUserTypingStatus()"></textarea><br>
+					<button class = "btn btn-lg btn-info" ng-click="sendMessage()" 
+						ng-disabled="message == null || message.length == 0">
+						Send
+					</button>
+				</div>
+			</div>
+
+        </div> <!-- .content -->
+    </div><!-- /#right-panel -->
+
+    <!-- Right Panel -->
+
+</body>
+</html>

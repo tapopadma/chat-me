@@ -36,7 +36,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
 		String userId = userAccountDao.getByUserName(userName).getUserId();
         if(!activeUserStore.getUserIds().contains(userId))
         	activeUserStore.getUserIds().add(userId);
-        redirectStrategy.sendRedirect(request, response, "/app/main.html");
+        redirectStrategy.sendRedirect(request, response, "/app/messenger/");
 	}
 
 	@Bean
