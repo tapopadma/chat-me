@@ -40,6 +40,7 @@ var __userService =	function ($http, commonService, channelService, messengerSer
 					}
 				});
 				scope.userList = userList;
+				scope.suggestedUserList = userList;
 				channelService.getAllChannels(scope.user.userId);
 			}
 		});

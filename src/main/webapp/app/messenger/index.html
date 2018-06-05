@@ -45,7 +45,7 @@
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
-    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+	<script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
 
 </head>
 <body ng-controller="mainController" ng-init="init()">
@@ -91,7 +91,9 @@
 					</li>
                     <h3 class="menu-title">List of Channels 
                     <button type="button"  class="hyperlinkButton" 
-						ng-click="createNewChannel()" title="Create New Channel">+
+						data-toggle="modal" data-target="#createChannelModal" 
+						data-backdrop="static" data-keyboard="false"
+						title="Create New Channel">+
 						</button></h3><!-- /.menu-title -->
                     <li ng-repeat="channel in channelList"
                     	ng-class="{active : selectedUser != null && 
@@ -160,6 +162,48 @@
     </div><!-- /#right-panel -->
 
     <!-- Right Panel -->
+
+	<div class="modal fade" id="createChannelModal" role="dialog"
+			style="padding-top:150px;">
+	    <div class="modal-dialog modal-lg">
+	    
+	      <div class="modal-content" style="height:500px;width:1000px;">
+	        <div class="modal-header">
+	          <h4 class="modal-title"><b>Create New Channel</b></h4>
+	        </div>
+	        <div class="modal-body">
+	          <div style="margin:50px;">
+				<form role="form" ng-submit="createNewChannel()">
+					Channel Name: <input type="text" ng-model="channelName" required><br><br>
+					<input list="suggested-user-list" type="text" ng-model="selectedMember">
+					 <button type="button" ng-click="addUser()">add</button>
+					<datalist id="suggested-user-list">
+						<option ng-repeat="record in suggestedUserList"
+							ng-show="record.userName != user.userName" 
+							value="{{record.userName}}"></option>
+					</datalist>
+				</form><br><br>
+				<table ng-show="memberList.length > 0">
+					<tr><th>Member</th><th></th></tr>
+					<tr ng-repeat="member in memberList">
+						<td>{{member.userName}}</td>
+						<td> <button type="button" ng-show="member.userName != user.userName"
+						ng-click="removeUser(member)">remove</button>
+						<span class="label label-default" 
+						ng-show="member.userName == user.userName">default</span></td>
+					</tr>
+				</table>
+			</div>
+	      </div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-lg btn-danger" data-dismiss="modal">cancel</button>
+	          <button type="submit" class="btn btn-lg btn-success" ng-click="createNewChannel()" 
+	          	ng-disabled="channelName == null || channelName.length == 0">create</button>
+	        </div>
+	     </div>
+	      
+	    </div>
+	</div>
 
 </body>
 </html>

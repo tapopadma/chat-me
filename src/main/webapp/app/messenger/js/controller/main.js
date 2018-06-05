@@ -1,8 +1,9 @@
-angular.module('mainApp', [])
+angular.module('mainApp', ['ui.bootstrap'])
 .controller('mainController',  
 	function mainController($scope, $compile, $interval, $document, 
 			mainService, userService, commonService, messengerService, 
-			socketService, channelService){
+			socketService, channelService,
+			$modal){
 	
 		commonService.set('mainController', $scope);
 		$scope.NONE_SELECTED = 'none';
@@ -347,7 +348,53 @@ angular.module('mainApp', [])
 		};
 		
 		$scope.createNewChannel = function (){
-			window.location.href = '/chat-me/app/messenger/create-channel.html';
+			var channelInfoEntity = {
+				'channelMstDto':{
+					'channelName' : $scope.channelName
+				}
+			};
+			var channelUserMstDtoList = [];
+			angular.forEach($scope.memberList, function(member){
+				channelUserMstDtoList.push({
+					'userId' : member.userId,
+					'userType' : member.userType
+				});
+			});
+			channelInfoEntity.channelUserMstDtoList = channelUserMstDtoList;
+			channelService.createChannel(channelInfoEntity);
+		};
+		
+		$scope.addUser = function (){
+			var validSelection = false;
+			var newMember = null;
+			angular.forEach($scope.suggestedUserList, function(user){
+				if(user.userName == $scope.selectedMember){
+					validSelection = true;
+					newMember = user;
+					newMember.userType = 'user';
+				}
+			});
+			if(!validSelection)
+				return;
+			$scope.memberList.push(newMember);
+			var suggestedUserListCopy = $scope.suggestedUserList;
+			$scope.suggestedUserList = [];
+			angular.forEach(suggestedUserListCopy, function(user){
+				if(user.userId != newMember.userId){
+					$scope.suggestedUserList.push(user);
+				}
+			});
+			$scope.selectedMember = '';
+		};
+		$scope.removeUser = function(member){
+			var memberListCopy = $scope.memberList;
+			$scope.memberList = [];
+			angular.forEach(memberListCopy, function(mem){
+				if(mem.userId != member.userId){
+					$scope.memberList.push(mem);
+				}
+			});
+			$scope.suggestedUserList.push(member);
 		};
 		
 })
