@@ -18,6 +18,20 @@ angular.module('mainApp', ['ui.bootstrap'])
 		$scope.TYPING_CAPTION = 'typing...';
 		$scope.DIRECT_MODE = 'DIRECT';
 		$scope.CHANNEL_MODE = 'CHANNEL';
+		$scope.SCREEN_WIDTH = window.innerWidth;
+		$scope.SCREEN_HEIGHT = window.innerHeight;
+		$scope.CHATBOX_HEIGHT = $scope.SCREEN_HEIGHT * 0.80;
+		$scope.CHATBOX_WIDTH = $scope.SCREEN_WIDTH * 0.75;
+		$scope.MESSAGE_TEMPLATE_WIDTH = $scope.CHATBOX_WIDTH * 0.40;
+		
+		$scope.updateScreenDimension = function (){
+			console.log(window.innerWidth + ', ' + window.innerHeight);
+			$scope.SCREEN_WIDTH = window.innerWidth;
+			$scope.SCREEN_HEIGHT = window.innerHeight;
+			$scope.CHATBOX_HEIGHT = $scope.SCREEN_HEIGHT * 0.80;
+			$scope.CHATBOX_WIDTH = $scope.SCREEN_WIDTH * 0.75;
+			$scope.MESSAGE_TEMPLATE_WIDTH = $scope.CHATBOX_WIDTH * 0.40;
+		};
 		
 		$scope.logout = function() {
 			socketService.send({
@@ -142,10 +156,12 @@ angular.module('mainApp', ['ui.bootstrap'])
 		};
 		
 		$scope.getMessageTemplateForSender = function(messageTrnDto){
-			return '<div style="float:right" id="' + messageTrnDto.messageId+ '">'+
+			return '<div style="padding-left:{{CHATBOX_WIDTH - MESSAGE_TEMPLATE_WIDTH}}px;" id="' + 
+			messageTrnDto.messageId+ '">'+
 			'<b>' + $scope.user.userName+':</b><br> '+
 			'<div class="well well-sm" style="color:white;background-color:steelblue;'+
-			'width:500px;display:block;word-wrap:break-word;">'+messageTrnDto.message+
+			'display:block;word-wrap:break-word;">'+
+			messageTrnDto.message+
 			'<p id="' + $scope.getHtmlIdForMessageDeliveryStatusByMessageId(
 					messageTrnDto.messageId)+'"></p></div></div>';
 		};
@@ -193,10 +209,12 @@ angular.module('mainApp', ['ui.bootstrap'])
 		};
 		
 		$scope.getMessageTemplateForReciever = function(messageTrnDto, ownerName){
-			return '<div style="float:left" id="' + messageTrnDto.messageId+ '">'+
+			return '<div style="width:{{MESSAGE_TEMPLATE_WIDTH}}px;" id="' +
+			messageTrnDto.messageId+ '">'+
 			'<b>' + ownerName+':</b><br> '+
 			'<div class="well well-sm" style="color:white;background-color:grey;'+
-			'width:500px;display:block;word-wrap:break-word;">'+messageTrnDto.message+
+			'display:block;word-wrap:break-word;">'+
+			messageTrnDto.message+
 			'</div></div>';
 		};
 		
@@ -403,6 +421,31 @@ angular.module('mainApp', ['ui.bootstrap'])
 .factory('channelService', ['$http', 'commonService', 'messengerService', __channelService])
 .factory('socketService', ['$q', '$timeout', 'commonService', __socketService])
 .factory('userService', ['$http', 'commonService', 'channelService', 
-						'messengerService', 'socketService', __userService]);
-
+						'messengerService', 'socketService', __userService])
+.directive('screenDimensionUpdater', ['$window', function ($window){
+	return {
+        link: link,
+        restrict: 'E',
+        template: ''
+     };
+     
+     function link(scope, element, attrs){
+       
+       scope.width = $window.innerWidth;
+       
+       angular.element($window).bind('resize', function(){
+       
+    	    scope.SCREEN_WIDTH = window.innerWidth;
+		    scope.SCREEN_HEIGHT = window.innerHeight;
+			scope.CHATBOX_HEIGHT = scope.SCREEN_HEIGHT * 0.80;
+			scope.CHATBOX_WIDTH = scope.SCREEN_WIDTH * 0.75;
+			scope.MESSAGE_TEMPLATE_WIDTH = scope.CHATBOX_WIDTH * 0.40;
+         
+         // manuall $digest required as resize event
+         // is outside of angular
+         scope.$digest();
+       });
+       
+     }
+}]);					
 

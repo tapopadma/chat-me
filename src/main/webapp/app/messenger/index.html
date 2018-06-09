@@ -50,6 +50,7 @@
 </head>
 <body ng-controller="mainController" ng-init="init()">
 
+<screen-dimension-updater></screen-dimension-updater>
 
         <!-- Left Panel -->
 
@@ -126,9 +127,9 @@
                 </div>
 
                 <div class="col-sm-5">
-                	<div id="selected-user-info" style="height:30px;">
+                	<div id="selected-user-info" style="height:{{0.10*SCREEN_HEIGHT}}px;">
 						<b>{{selectedUser.userName}}</b>
-						<div id="selected-user-status" ng-style="{color:selectedUser.USER_STATUS_COLOR}">
+						<div id="selected-user-status" style="color:{{selectedUser.USER_STATUS_COLOR}}">
 							{{selectedUser.status}}
 						</div>
 					</div>
@@ -141,15 +142,17 @@
 
         <div class="content mt-3">
 
-			<div style="height:545px;width:1000px;border-style:groove;" ng-show="selectedUser != null">
-				<div style="height: 400px;max-width:100%;word-wrap: break-word;
-				max-height: 400px;overflow-y:scroll;"
+			<div
+				style="border-style:groove;height:{{CHATBOX_HEIGHT}}px;width:{{CHATBOX_WIDTH}}px;" 
+				ng-show="selectedUser != null">
+				<div style="max-width:100%;word-wrap: break-word;
+				height: {{CHATBOX_HEIGHT*0.65}}px;overflow-y:scroll;"
 				 id="message-history">
 					{{messageHistory}}
 				</div>
 				<div>
 					<textarea id="chat-text-area"
-						style="height:100px;width:100%" ng-model="message" 
+						style="height:{{CHATBOX_HEIGHT*0.20}}px;width:100%" ng-model="message" 
 						ng-change="sendUserTypingStatus()"></textarea><br>
 					<button class = "btn btn-lg btn-info" ng-click="sendMessage()" 
 						ng-disabled="message == null || message.length == 0">
@@ -164,15 +167,16 @@
     <!-- Right Panel -->
 
 	<div class="modal fade" id="createChannelModal" role="dialog"
-			style="padding-top:150px;">
+			style="padding-top:{{0.20*SCREEN_HEIGHT}}px;">
 	    <div class="modal-dialog modal-lg">
 	    
-	      <div class="modal-content" style="height:500px;width:1000px;">
+	      <div class="modal-content" 
+	      	style="height:{{0.70*SCREEN_HEIGHT}}px;width:{{0.80*SCREEN_WIDTH}}px;overflow-y:scroll;">
 	        <div class="modal-header">
 	          <h4 class="modal-title"><b>Create New Channel</b></h4>
 	        </div>
 	        <div class="modal-body">
-	          <div style="margin:50px;">
+	          <div style="margin:{{0.10*SCREEN_HEIGHT}}px;">
 				<form role="form" ng-submit="createNewChannel()">
 					Channel Name: <input type="text" ng-model="channelName" required><br><br>
 					<input list="suggested-user-list" type="text" ng-model="selectedMember">
