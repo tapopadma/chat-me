@@ -18,9 +18,9 @@ public class DBResourceConfig {
 	public DataSource dataSource() {
 		DriverManagerDataSource ds = new DriverManagerDataSource();
 		ds.setDriverClassName("com.mysql.jdbc.Driver");
-		ds.setUrl("jdbc:mysql://localhost/chat_me");
-		ds.setUsername("tapo");
-		ds.setPassword("tapo123");
+		ds.setUrl("jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_a32b55e98ed6831");
+		ds.setUsername("b1a8f606c00912");
+		ds.setPassword("a944bb13");
 		return ds;
 	}
 		
