@@ -3,6 +3,7 @@ package chat.me.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,12 +15,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import chat.me.dao.spec.UserAccountDao;
+import chat.me.dao.spec.UserIpDao;
+import chat.me.dto.UserIpTrnDto;
 import chat.me.dto.UserMstDto;
 
 @Service
 public class UserAccountServiceImpl implements UserDetailsService{
 	@Autowired
 	private UserAccountDao userAccountDao;
+	@Autowired
+	private UserIpDao userIpDao;
 
 	public UserMstDto saveUserAccountData(UserMstDto dto) {
 		dto.setUserId(UUID.randomUUID().toString());
@@ -46,6 +51,14 @@ public class UserAccountServiceImpl implements UserDetailsService{
 		UserDetails userDetails = new User(
 				dto.getUserName(), dto.getPassword(), grantList);
 		return userDetails;
+	}
+	
+	public List<UserIpTrnDto> getAllUniqueIps(String newIp){
+		List<UserIpTrnDto> allDtos = userIpDao.getAllDtos();
+		if(allDtos.stream().map(UserIpTrnDto::getIp).collect(Collectors.toList()).contains(newIp))
+			return allDtos;
+		userIpDao.insert(newIp);
+		return userIpDao.getAllDtos();
 	}
 	
 }
