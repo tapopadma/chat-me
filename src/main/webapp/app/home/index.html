@@ -33,7 +33,7 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 <!--===============================================================================================-->
 </head>
-<body ng-controller="homeController">
+<body ng-controller="homeController" ng-init="init()">
 	
 	<div class="limiter">
 		<div class="container-login100">
@@ -82,6 +82,12 @@
 						<a href="/chat-me/app/home/signup.html" class="txt2 hov1">
 							Sign up
 						</a>
+					</div>
+					
+					<div class="text-center">
+						<span class="txt1">
+							Number of unique visitors <b>{{uniqueVisitor}}</b>
+						</span>
 					</div>
 				</form>
 			</div>

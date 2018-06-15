@@ -1,5 +1,5 @@
 angular.module('homeApp', [])
-.controller('homeController', function homeController($scope, homeService){
+.controller('homeController', function homeController($scope, $http, homeService){
 	$scope.show = function() {
 		homeService.show();
 	};
@@ -8,6 +8,18 @@ angular.module('homeApp', [])
 	};
 	$scope.signup = function() {
 		homeService.signup();
+	};
+	$scope.init = function(){
+		  $http(
+			{
+				method: 'GET',
+				url: '/chat-me/user/getUniqueVistors'
+			}
+		).then(function(response){
+			if(response.status == 200){
+				$scope.uniqueVisitor = response.data.length;
+			}
+		});
 	};
 })
 .factory('homeService', ['$http', '$window', function ($http, $window){

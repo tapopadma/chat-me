@@ -3,13 +3,17 @@ package chat.me.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import chat.me.dto.UserIpTrnDto;
 import chat.me.dto.UserMstDto;
 import chat.me.entity.ActiveUserStore;
 import chat.me.entity.UserBasicInfoEntity;
@@ -48,5 +52,10 @@ public class UserAccountController {
 				);
 		return res;
 	}
-	
+
+	@ResponseBody
+	@RequestMapping(method=RequestMethod.GET, value="/getUniqueVistors")
+	public List<UserIpTrnDto> getUniqueVisitors(HttpServletRequest request){
+		return userAccountServiceImpl.getAllUniqueIps(request.getRemoteAddr());
+	}
 }
