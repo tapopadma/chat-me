@@ -10,6 +10,11 @@
     
     <script type="text/javascript" 
 		src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-sanitize.js"></script>
+    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+    
 	<script type="text/javascript" 
 		src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
 	<script type="text/javascript" 
@@ -45,12 +50,27 @@
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
-	<script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
-
 </head>
 <body ng-controller="mainController" ng-init="init()">
 
-<screen-dimension-updater></screen-dimension-updater>
+	<script type="text/ng-template" id="editMessagePopupContent.html">
+        <!--<div class="modal-header">
+            <h3 class="modal-title" id="modal-title">I'm a modal!</h3>
+        </div>-->
+        <div class="modal-body" id="modal-body" style="margin-top:10%">
+            <table class="table table-hover">
+				<tr><td><a href="#" ng-click="$ctrl.delete()">Delete</a></td></tr>
+				<tr><td><a href="#" ng-click="$ctrl.cancel()">Cancel</a></td></tr>	
+				
+			</table>
+        </div>
+        <!--<div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">Cancel</button>
+        </div>-->
+	</script>
+
+	<screen-dimension-updater></screen-dimension-updater>
 
         <!-- Left Panel -->
 

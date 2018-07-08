@@ -102,6 +102,19 @@ var __messengerService = function($http, commonService) {
 			}
 		});
 	};
+	service.deleteMessageByMessageId = function(messageId){
+		$http({
+			url: '/chat-me/messenger/deleteMessage/'+messageId,
+		}).then(function(response){
+			if(response.status == 204){
+				var scope = service.getScope();
+				scope.selectUser(scope.selectedUser);
+			}
+			else{
+				console.log('something went wrong!!!');
+			}
+		});
+	};
 	return service;
 };
 

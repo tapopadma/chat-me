@@ -63,7 +63,7 @@ public class MessageDaoImpl implements MessageDao{
 					+ " on T1.message_id=T2.message_id "
 					+ " where ((T1.source_id = ? and T1.destination_id = ?)"
 					+ " or (T1.source_id = ? and T1.destination_id = ?))"
-					+ " and T2.user_id=? "
+					+ " and T2.user_id=? and T1.message_operation_status != 'DELETE' "
 					+ "order by T1.message_creation_time");
 			
 			return jdbcTemplate.query(sb.toString(), 
@@ -77,7 +77,7 @@ public class MessageDaoImpl implements MessageDao{
 					" ( SELECT COUNT(*) FROM message_delivery_status_trn T2 " + 
 					" WHERE T2.message_id=T1.message_id AND message_delivery_status != 'READ') > 0," + 
 					"'UNREAD', 'READ') AS message_delivery_status FROM message_trn T1 " + 
-					" WHERE T1.destination_id = ? " + 
+					" WHERE T1.destination_id = ?  and T1.message_operation_status != 'DELETE' " + 
 					" ORDER BY T1.message_creation_time");
 			
 			return jdbcTemplate.query(sb.toString(), 
@@ -135,7 +135,7 @@ public class MessageDaoImpl implements MessageDao{
 				sb.append(" or ");
 			}
 		}
-		sb.append(" order by message_creation_time");
+		sb.append("  and message_operation_status != 'DELETE' order by message_creation_time");
 		Object[] args = new Object[messageIds.size()];
 		for(int i=0;i<messageIds.size();++i)
 			args[i] = messageIds.get(i);
@@ -148,7 +148,7 @@ public class MessageDaoImpl implements MessageDao{
 	public List<MessageTrnDto> getByDestinationIdAndDeliveryStatus(
 			String destinationId, String messageDeliveryStatus) {
 		return jdbcTemplate.query("select * from message_trn where destination_id=? "
-				+ "and message_delivery_status=? order by message_creation_time", 
+				+ "and message_delivery_status=?  and message_operation_status != 'DELETE' order by message_creation_time", 
 				new Object[] {destinationId, messageDeliveryStatus},
 				new BeanPropertyRowMapper(MessageTrnDto.class));
 	}
@@ -157,7 +157,7 @@ public class MessageDaoImpl implements MessageDao{
 	public List<MessageTrnDto> getAllNotReadBySourceAndDest(String sourceId, String destinationId) {
 		return jdbcTemplate.query("string * from message_trn where"
 				+ " source_id=? and destination_id=?"
-				+ " and message_delivery_status!='READ'", 
+				+ " and message_delivery_status!='READ' and message_operation_status != 'DELETE' ", 
 				new Object[] {sourceId, destinationId},
 				new BeanPropertyRowMapper(MessageTrnDto.class));
 	}
@@ -178,7 +178,7 @@ public class MessageDaoImpl implements MessageDao{
 			}
 			args[i] = destinationIds.get(i);
 		}
-		sb.append(" ) and T2.user_id = ? and T2.message_delivery_status = ?");
+		sb.append(" ) and T2.user_id = ? and T2.message_delivery_status = ? and T1.message_operation_status != 'DELETE' ");
 		args[destinationIds.size()] = userId;
 		args[destinationIds.size() + 1] = messageDeliveryStatus;
 		return jdbcTemplate.query(sb.toString(), 
@@ -205,7 +205,7 @@ public class MessageDaoImpl implements MessageDao{
 			args[i] = destinationIds.get(i);
 		}
 		args[destinationIds.size()] = userId;
-		sb.append(" ) and T2.user_id =? and T2.message_delivery_status!='READ'");
+		sb.append(" ) and T2.user_id =? and T2.message_delivery_status!='READ' and T1.message_operation_status != 'DELETE' ");
 		return jdbcTemplate.query(sb.toString(),
 				args, new BeanPropertyRowMapper(MessageTrnDto.class));
 	}
@@ -219,6 +219,14 @@ public class MessageDaoImpl implements MessageDao{
 				new BeanPropertyRowMapper(MessageDeliveryStatusTrnDto.class));
 		return getDtosByMessageIds(dtos.stream().map(MessageDeliveryStatusTrnDto::getMessageId)
 				.collect(Collectors.toList()));
+	}
+
+	@Override
+	public void deleteMessageById(String messageId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("UPDATE message_trn SET message_operation_status = 'DELETE'\n" + 
+				"WHERE message_id = ?");
+		jdbcTemplate.update(sb.toString(), messageId);
 	}
 	
 }

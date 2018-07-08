@@ -151,5 +151,11 @@ public class MessengerServiceImpl implements MessengerService{
 	public List<MessageTrnDto> fetchAllUnreadMessage(String userId) {
 		return messageDaoImpl.getAllNotReadByUserId(userId);
 	}
+
+	@Override
+	public String deleteMessageByMessageId(String messageId) {
+		messageDaoImpl.deleteMessageById(messageId);
+		return messageId;
+	}
 	
 }

@@ -28,4 +28,6 @@ public interface MessageDao {
 	List<MessageTrnDto> getAllNotReadByDestIds(List<String> destinationIds, String userId);
 	
 	List<MessageTrnDto> getAllNotReadByUserId(String userId);
+	
+	void deleteMessageById(String messageId);
 }

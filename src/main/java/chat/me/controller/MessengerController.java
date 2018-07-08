@@ -5,15 +5,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import chat.me.dto.MessageTrnDto;
 import chat.me.entity.MessageTrnInfoEntity;
@@ -118,6 +121,12 @@ public class MessengerController {
 	@RequestMapping(value="/fetchAllUnreadMessage", method=RequestMethod.POST)
 	public List<MessageTrnDto> fetchAllUnreadMessage(@RequestBody String userId){
 		return messengerServiceImpl.fetchAllUnreadMessage(userId);
+	}
+	
+	@RequestMapping(value="/deleteMessage/{messageId}")
+	@ResponseStatus(value=HttpStatus.NO_CONTENT)
+	public void deleteMessage(@PathVariable("messageId") String messageId) {
+		messengerServiceImpl.deleteMessageByMessageId(messageId);
 	}
 	
 }

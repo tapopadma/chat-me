@@ -15,4 +15,5 @@ public interface MessengerService {
 	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(String destinationId, String deliveryStatus);
 	List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(List<String> destinationIds, String deliveryStatus);
 	List<MessageTrnDto> fetchAllUnreadMessage(String userId);
+	String deleteMessageByMessageId(String messageId);
 }

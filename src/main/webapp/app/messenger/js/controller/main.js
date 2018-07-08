@@ -1,9 +1,8 @@
-angular.module('mainApp', ['ui.bootstrap'])
-.controller('mainController',  
-	function mainController($scope, $compile, $interval, $document, 
+angular.module('mainApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
+angular.module('mainApp').controller('mainController',  
+	function mainController($uibModal, $log, $scope, $compile, $interval, $document, 
 			mainService, userService, commonService, messengerService, 
-			socketService, channelService,
-			$modal){
+			socketService, channelService){
 	
 		commonService.set('mainController', $scope);
 		$scope.NONE_SELECTED = 'none';
@@ -59,7 +58,9 @@ angular.module('mainApp', ['ui.bootstrap'])
 			$scope.initializeScopeVariables();
 			$scope.loadChatBoxInfo($scope.DIRECT_MODE, selectedUser);
 		};
-		$scope.getUserNameById = function(userId){//assuming we load all registered users to our main page
+		$scope.getUserNameById = function(userId){// assuming we load all
+													// registered users to our
+													// main page
 			var result = null;
 			angular.forEach($scope.userList, function(user){
 				if(user.userId == userId){
@@ -72,7 +73,7 @@ angular.module('mainApp', ['ui.bootstrap'])
 			$scope.messageMode = messageMode;
 			$scope.selectedUser = selectedUser;
 			
-			//saves to $scope.messageHistoryList
+			// saves to $scope.messageHistoryList
 			messengerService.fetchAllMessageBySourceAndDest({
 				'sourceId' : $scope.user.userId,
 				'destinationId' : $scope.selectedUser.userId,
@@ -81,7 +82,7 @@ angular.module('mainApp', ['ui.bootstrap'])
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
 			angular.forEach(this.messageHistoryList, function (messageTrnDto) {
-				if($scope.messageMode == $scope.DIRECT_MODE){//DM
+				if($scope.messageMode == $scope.DIRECT_MODE){// DM
 					if(messageTrnDto.sourceId == $scope.user.userId){
 						// current user is the sender
 						if(messageTrnDto.destinationId == $scope.selectedUser.userId){
@@ -97,12 +98,12 @@ angular.module('mainApp', ['ui.bootstrap'])
 						}
 					}
 				}
-				else{//CHANNEL
-					if(messageTrnDto.sourceId == $scope.user.userId){//mine
+				else{// CHANNEL
+					if(messageTrnDto.sourceId == $scope.user.userId){// mine
 						$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
 						$scope.pushSenderMessageToChatBox(messageTrnDto);
 					}
-					else{//other people
+					else{// other people
 						$scope.messageIdtoEntityMap[messageTrnDto.messageId] = messageTrnDto;
 						$scope.pushRecieverMessageToChatBox(messageTrnDto, $scope.getUserNameById(messageTrnDto.sourceId));
 					}
@@ -155,15 +156,44 @@ angular.module('mainApp', ['ui.bootstrap'])
 			return glyphicon;
 		};
 		
+		$scope.deleteMessageByMessageId = function (messageId){
+			messengerService.deleteMessageByMessageId(messageId);
+		}
+		
+		$scope.displayEditMessagePopup = function (messageId){
+			var modalInstance = $uibModal.open({
+				  animation: true,
+			      component: 'editMessagePopupComponent',
+			      resolve: {
+			    	  items: function(){
+			    		  return [];
+			    	  }
+			      }
+			});
+			modalInstance.result.then(function (operation) {
+				$log.info('operation performed : ' + operation);
+				switch(operation){
+				case 'DELETE':
+					$scope.deleteMessageByMessageId(messageId);
+					break;
+				default:
+					break;
+				};
+			}, function () {
+			      $log.info('Modal dismissed at: ' + new Date());
+		    });
+		}
+		
 		$scope.getMessageTemplateForSender = function(messageTrnDto){
 			return '<div style="padding-left:{{CHATBOX_WIDTH - MESSAGE_TEMPLATE_WIDTH}}px;" id="' + 
 			messageTrnDto.messageId+ '">'+
 			'<b>' + $scope.user.userName+':</b><br> '+
+			'<a href="#" ng-click="displayEditMessagePopup(\''+messageTrnDto.messageId+'\')">'+
 			'<div class="well well-sm" style="color:white;background-color:steelblue;'+
 			'display:block;word-wrap:break-word;">'+
 			messageTrnDto.message+
 			'<p id="' + $scope.getHtmlIdForMessageDeliveryStatusByMessageId(
-					messageTrnDto.messageId)+'"></p></div></div>';
+					messageTrnDto.messageId)+'"></p></div></a></div>';
 		};
 		
 		$scope.getHtmlIdForMessageDeliveryStatusByMessageId = function(messageId){
@@ -177,7 +207,7 @@ angular.module('mainApp', ['ui.bootstrap'])
 		}
 		
 		$scope.updateMessageDeliveryStatusByMessageTrn = function(messageTrnDto){
-			//update the delivery status for this message
+			// update the delivery status for this message
 			var deliveryStatusElement = angular.element(
 					document.getElementById(
 							$scope.getHtmlIdForMessageDeliveryStatusByMessageId(
@@ -324,7 +354,7 @@ angular.module('mainApp', ['ui.bootstrap'])
 			}
 		});
 		$scope.setUserActiveStatus = function (userId, statusValue) {
-			//update in userList
+			// update in userList
 			var userListCopy = $scope.userList;
 			$scope.userList = [];
 			angular.forEach(userListCopy, function(user){
@@ -335,12 +365,12 @@ angular.module('mainApp', ['ui.bootstrap'])
 			});
 			
 			
-			//update in user
+			// update in user
 			if($scope.user != null && $scope.user.userId == userId){
 				$scope.user.status = statusValue;
 			}
 			
-			//update in selectedUser
+			// update in selectedUser
 			if($scope.selectedUser != null && $scope.selectedUser.userId == userId){
 				var captionValue = statusValue;
 				if(captionValue.search($scope.TYPING_CAPTION) >= 0){
@@ -447,5 +477,28 @@ angular.module('mainApp', ['ui.bootstrap'])
        });
        
      }
-}]);					
+}])
+.component('editMessagePopupComponent', {
+	templateUrl: 'editMessagePopupContent.html',
+	  bindings: {
+	    resolve: '<',
+	    close: '&',
+	    dismiss: '&'
+	  },
+	  controller: function () {
+	    var $ctrl = this;
+
+	    $ctrl.$onInit = function () {
+	      $ctrl.items = $ctrl.resolve.items;	   
+	    };
+
+	    $ctrl.delete = function () {
+	      $ctrl.close({$value: 'DELETE'});
+	    };
+
+	    $ctrl.cancel = function () {
+	      $ctrl.dismiss({$value: 'CANCEL'});
+	    };
+	  }
+});					
 
