@@ -110,6 +110,18 @@ public class MessengerController {
 			entity.setMessageTrnInfoEntity(entity1);
 		}
 		
+		else if(entity.getMessageOperationEntity() != null) {
+			String operation = entity.getMessageOperationEntity().getOperation();
+			String messageId = entity.getMessageOperationEntity().getMessageId();
+			switch(operation) {
+				case "DELETE":
+					messengerServiceImpl.deleteMessageByMessageId(messageId);
+					break;
+				default:
+					break;
+			}
+		}
+		
 		//messageTypingInfoEntity
 		else {
 			//just broadcast via /topic/message

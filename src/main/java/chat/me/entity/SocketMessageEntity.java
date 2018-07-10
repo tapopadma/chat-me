@@ -2,6 +2,9 @@ package chat.me.entity;
 
 public class SocketMessageEntity {
 	
+	//every time user edits/deletes a message
+	private MessageOperationEntity messageOperationEntity;
+	
 	//every time user reads message
 	private MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity;
 
@@ -39,10 +42,13 @@ public class SocketMessageEntity {
 		this.userSessionInfoEntity = userSessionInfoEntity;
 	}
 
-	public SocketMessageEntity(MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity,
-			MessageTypingInfoEntity messageTypingInfoEntity, MessageTrnInfoEntity messageTrnInfoEntity,
-			UserSessionInfoEntity userSessionInfoEntity) {
+	
+
+	public SocketMessageEntity(MessageOperationEntity messageOperationEntity,
+			MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity, MessageTypingInfoEntity messageTypingInfoEntity,
+			MessageTrnInfoEntity messageTrnInfoEntity, UserSessionInfoEntity userSessionInfoEntity) {
 		super();
+		this.messageOperationEntity = messageOperationEntity;
 		this.messageMarkAsReadInfoEntity = messageMarkAsReadInfoEntity;
 		this.messageTypingInfoEntity = messageTypingInfoEntity;
 		this.messageTrnInfoEntity = messageTrnInfoEntity;
@@ -59,6 +65,14 @@ public class SocketMessageEntity {
 
 	public void setMessageMarkAsReadInfoEntity(MessageMarkAsReadInfoEntity messageMarkAsReadInfoEntity) {
 		this.messageMarkAsReadInfoEntity = messageMarkAsReadInfoEntity;
+	}
+
+	public MessageOperationEntity getMessageOperationEntity() {
+		return messageOperationEntity;
+	}
+
+	public void setMessageOperationEntity(MessageOperationEntity messageOperationEntity) {
+		this.messageOperationEntity = messageOperationEntity;
 	}
 
 

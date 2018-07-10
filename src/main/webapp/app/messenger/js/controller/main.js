@@ -157,7 +157,20 @@ angular.module('mainApp').controller('mainController',
 		};
 		
 		$scope.deleteMessageByMessageId = function (messageId){
-			messengerService.deleteMessageByMessageId(messageId);
+			//messengerService.deleteMessageByMessageId(messageId);
+			socketService.send({
+				'messageOperationEntity':{
+					'messageId' : messageId,
+					'operation' : 'DELETE'
+				}
+			});
+		};
+		
+		$scope.deleteMessageElementByMessageId = function(messageId){
+			var messageTemplateElement = angular.element(
+					document.getElementById(messageId));
+			messageTemplateElement.remove();
+			$scope.$apply();
 		}
 		
 		$scope.displayEditMessagePopup = function (messageId){

@@ -152,6 +152,20 @@ var __socketService = function($q, $timeout, commonService){
     	//nothing useful 
     };
     
+    var updateMessageOperationInfo = function(messageOperationEntity, scope){
+    	if(messageOperationEntity == null)
+    		return;
+    	var operation = messageOperationEntity.operation;
+    	var messageId = messageOperationEntity.messageId;
+    	switch(operation){
+    		case 'DELETE':
+    			scope.deleteMessageElementByMessageId(messageId);
+    			break;
+    		default:
+    			break;
+    	}
+    };
+    
     var getMessage = function(data) {
       var socketMessageEntity = JSON.parse(data);
       
@@ -159,12 +173,14 @@ var __socketService = function($q, $timeout, commonService){
       var messageTypingInfoEntity = socketMessageEntity.messageTypingInfoEntity;
       var userSessionInfoEntity = socketMessageEntity.userSessionInfoEntity;
       var messageMarkAsReadInfoEntity = socketMessageEntity.messageMarkAsReadInfoEntity;
+      var messageOperationEntity = socketMessageEntity.messageOperationEntity;
       var scope = commonService.get('mainController');
       
       updateMessageTrnInfo(messageTrnInfoEntity, scope);
       updateMessageTypingInfo(messageTypingInfoEntity, scope);
       updateUserSessionInfo(userSessionInfoEntity, scope);
       updateMessageMarkAsReadInfo(messageMarkAsReadInfoEntity, scope);
+      updateMessageOperationInfo(messageOperationEntity, scope);
       
     };
     
