@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class UserLogoutSuccessHandler implements LogoutSuccessHandler{
 	private ActiveUserStore activeUserStore;
 	
 	@Autowired
+	@Qualifier("userAccountDaoCassandraImpl")
 	private UserAccountDao userAccountDao;
 	
 	@Override

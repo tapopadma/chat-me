@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,6 +23,7 @@ import chat.me.dto.UserMstDto;
 @Service
 public class UserAccountServiceImpl implements UserDetailsService{
 	@Autowired
+	@Qualifier("userAccountDaoCassandraImpl")
 	private UserAccountDao userAccountDao;
 	@Autowired
 	private UserIpDao userIpDao;

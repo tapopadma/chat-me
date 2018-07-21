@@ -94,6 +94,8 @@ public class ChannelDaoImpl implements ChannelDao {
 
 	@Override
 	public List<ChannelMstDto> getByPk(List<String> channelIds) {
+		if(channelIds.isEmpty())
+			return new ArrayList<>();
 		StringBuilder sb = new StringBuilder();
 		sb.append("select * from channel_mst where ( ");
 		for(int i=0;i<channelIds.size();++i) {

@@ -11,7 +11,7 @@ import chat.me.dao.spec.UserAccountDao;
 import chat.me.dto.UserMstDto;
 
 @Component
-public class UserAccountDaoImpl implements UserAccountDao{
+public class UserAccountDaoMySQLImpl implements UserAccountDao{
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
@@ -29,13 +29,6 @@ public class UserAccountDaoImpl implements UserAccountDao{
 
 	public List<UserMstDto> getAllUserAccounts() {
 		return jdbcTemplate.query(SQL_SELECT_ALL, new BeanPropertyRowMapper(UserMstDto.class));
-	}
-	
-	@Override
-	public UserMstDto getByUserId(String userId) {
-		UserMstDto result = (UserMstDto) jdbcTemplate.queryForObject(SQL_SELECT, 
-				new Object[] {userId}, new BeanPropertyRowMapper(UserMstDto.class));
-		return result;
 	}
 
 	@Override

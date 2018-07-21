@@ -64,4 +64,16 @@ public class UserMstDto implements Serializable{
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+	
+	public UserMstCassandraDto toCassandraDto() {
+		UserMstCassandraDto cassandraDto = new UserMstCassandraDto();
+		cassandraDto.setEmail(this.getEmail());
+		cassandraDto.setFullName(this.getFullName());
+		cassandraDto.setPassword(this.getPassword());
+		cassandraDto.setPhone(this.getPhone());
+		cassandraDto.setUserId(this.getUserId());
+		cassandraDto.setUserName(this.getUserName());
+		return cassandraDto;
+	}
+	
 }
