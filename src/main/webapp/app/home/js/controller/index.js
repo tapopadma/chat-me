@@ -10,7 +10,18 @@ angular.module('homeApp', [])
 		homeService.signup();
 	};
 	$scope.init = function(){
-		  $http(
+		$http(
+			{
+				method: 'GET',
+				url: '/chat-me/user/isUserLoggedInAlready'
+			}
+		).then(function(response){
+			if(response.status == 200 && response.data == true){				
+				console.log('already logged in!!!');
+				window.location.href = '/chat-me/app/messenger/';
+			}
+		});
+		$http(
 			{
 				method: 'GET',
 				url: '/chat-me/user/getUniqueVistors'

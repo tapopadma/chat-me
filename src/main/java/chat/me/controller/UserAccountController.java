@@ -1,12 +1,17 @@
 package chat.me.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +33,22 @@ public class UserAccountController {
 
 	@Autowired
 	private ActiveUserStore activeUserStore;
+	
+	@Autowired
+	private AuthenticationTrustResolver authenticationTrustResolver;
+	
+	@Autowired
+	private RedirectStrategy redirectStrategy;
+	
+	@ResponseBody
+	@RequestMapping(method=RequestMethod.GET, value="/isUserLoggedInAlready")
+	public boolean isUserLoggedInAlready(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		Authentication authentication = SecurityContextHolder.getContext()
+				.getAuthentication();
+		//condition if the current client is already authenticated by the server
+		return !authenticationTrustResolver.isAnonymous(authentication);
+	}
 	
 	@ResponseBody
 	@RequestMapping(method=RequestMethod.GET, value="/getLoggedInUser")

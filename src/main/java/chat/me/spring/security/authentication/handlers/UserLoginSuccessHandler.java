@@ -40,10 +40,5 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
         	activeUserStore.getUserIds().add(userId);
         redirectStrategy.sendRedirect(request, response, "/app/messenger/");
 	}
-
-	@Bean
-	public RedirectStrategy redirectStrategy() {
-		return new DefaultRedirectStrategy();
-	}
 	
 }
