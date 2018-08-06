@@ -1,13 +1,15 @@
 package chat.me.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import chat.me.dao.impl.ChannelDaoImpl;
+import chat.me.dao.spec.UserAccountDao;
 import chat.me.dto.MessageTrnDto;
 import chat.me.entity.MessageTrnInfoEntity;
 import chat.me.entity.MessageWithDeliverystatusInfoEntity;
@@ -30,6 +34,16 @@ public class MessengerController {
 
 	@Autowired
 	private MessengerServiceImpl messengerServiceImpl;
+
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
+	
+	@Autowired
+	private ChannelDaoImpl channelDaoImpl;
+	
+	@Autowired
+	@Qualifier("userAccountDaoMySQLImpl")
+	private UserAccountDao userAccountDao;
 	
 	@Autowired
 	private SessionRegistry sessionRegistry;
@@ -58,9 +72,101 @@ public class MessengerController {
 		return messengerServiceImpl.fetchAllMessageBySourceAndDest(dto);
 	}
 	
-	@MessageMapping("/chat")
-	@SendTo("/topic/message")
-	public SocketMessageEntity sendMessage(SocketMessageEntity entity) {
+	
+	@MessageMapping("/chat/userSessionInfo/{userId}")
+	public void sendUserSessionInfoMessage(@DestinationVariable String userId,
+			SocketMessageEntity entity) {
+		//userSessionInfoEntity
+		if(entity.getUserSessionInfoEntity()!= null && 
+				entity.getUserSessionInfoEntity().isLoginRequest()) {
+			// update all message status to unread if sent
+			MessageTrnInfoEntity messageTrn = new MessageTrnInfoEntity();
+			List<MessageTrnDto> messageTrnDtoList = messengerServiceImpl.markSentMessageAsUnread(
+					entity.getUserSessionInfoEntity().getUserId());
+			messageTrn.setMessageTrnDtoList(messageTrnDtoList.stream().map(dto->{
+				return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "UNREAD");
+			}).collect(Collectors.toList()));
+			entity.setMessageTrnInfoEntity(messageTrn);
+		}
+		userAccountDao.getAllUserAccounts().stream()
+			.filter(dto->!dto.getUserId().equals(userId)).forEach(dto->{
+			simpMessagingTemplate.convertAndSend("/topic/message/" + dto.getUserId(), entity);
+		});
+	}
+	
+	@MessageMapping("/chat/messageOperationInfo/{destinationId}/{messageMode}")
+	public void sendMessageOperationInfoMessage(@DestinationVariable String destinationId,
+			@DestinationVariable String messageMode,
+			SocketMessageEntity entity) {
+		if(entity.getMessageOperationEntity() != null) {
+			String operation = entity.getMessageOperationEntity().getOperation();
+			String messageId = entity.getMessageOperationEntity().getMessageId();
+			switch(operation) {
+				case "DELETE":
+					messengerServiceImpl.deleteMessageByMessageId(messageId);
+					break;
+				default:
+					break;
+			}
+			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		}
+	}
+	
+	@MessageMapping("/chat/messageMarkAsReadInfo/{destinationId}/{messageMode}")
+	public void sendMessageMarkAsReadInfoMessage(@DestinationVariable String destinationId,
+			@DestinationVariable String messageMode,
+			SocketMessageEntity entity) {
+
+		//messageMarkAsReadInfoEntity
+		if(entity.getMessageMarkAsReadInfoEntity() != null &&
+				entity.getMessageMarkAsReadInfoEntity().getMessageIds() != null
+				&& !entity.getMessageMarkAsReadInfoEntity().getMessageIds().isEmpty()) {
+			//mark all messageIds of userId as READ
+			
+			List<MessageWithDeliverystatusInfoEntity> messageTrnDtoList = 
+					messengerServiceImpl.markAllMessageAsReadByMessageIds(
+							entity.getMessageMarkAsReadInfoEntity().getMessageIds(),
+							entity.getMessageMarkAsReadInfoEntity().getUserId())
+					.stream().map(dto->{
+						return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "READ");
+					}).collect(Collectors.toList());
+			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
+			entity1.setMessageTrnDtoList(messageTrnDtoList);
+			entity.setMessageTrnInfoEntity(entity1);
+			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		}
+	}
+	
+	private void sendSocketMessageByMessageMode(String messageMode, 
+			SocketMessageEntity entity, String destinationId) {
+		if(messageMode.equals("CHANNEL")) {
+			String channelId = destinationId;
+			channelDaoImpl.getAllUserInfoByChannelId(channelId).stream()
+				.forEach(dto->{
+					simpMessagingTemplate.convertAndSend("/topic/message/" + dto.getUserId(),
+							entity);
+				});
+		}
+		else {
+			simpMessagingTemplate.convertAndSend("/topic/message/"+destinationId, entity);
+		}
+	}
+
+	@MessageMapping("/chat/messageTypingInfo/{destinationId}/{messageMode}")
+	public void sendMessageTypingInfoMessage(@DestinationVariable String destinationId,
+			@DestinationVariable String messageMode,
+			SocketMessageEntity entity) {
+		if(entity.getMessageTypingInfoEntity() != null
+				&& entity.getMessageTypingInfoEntity().getMessageTrnDto() != null) {
+			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		}
+	}
+	
+	
+	@MessageMapping("/chat/messageTrnInfo/{destinationId}/{messageMode}")
+	public void sendMessageTrnInfoMessage(@DestinationVariable String destinationId,
+			@DestinationVariable String messageMode,
+			SocketMessageEntity entity) {
 		
 		//messageTrnInfoEntity
 		if(entity.getMessageTrnInfoEntity() != null &&
@@ -78,55 +184,8 @@ public class MessengerController {
 			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
 			entity1.setMessageTrnDtoList(entityList);
 			entity.setMessageTrnInfoEntity(entity1);
+			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 		}
-		
-		//userSessionInfoEntity
-		else if(entity.getUserSessionInfoEntity()!= null && 
-				entity.getUserSessionInfoEntity().isLoginRequest()) {
-			// update all message status to unread if sent
-			MessageTrnInfoEntity messageTrn = new MessageTrnInfoEntity();
-			List<MessageTrnDto> messageTrnDtoList = messengerServiceImpl.markSentMessageAsUnread(
-					entity.getUserSessionInfoEntity().getUserId());
-			messageTrn.setMessageTrnDtoList(messageTrnDtoList.stream().map(dto->{
-				return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "UNREAD");
-			}).collect(Collectors.toList()));
-			entity.setMessageTrnInfoEntity(messageTrn);
-		}
-		
-		//messageMarkAsReadInfoEntity
-		else if(entity.getMessageMarkAsReadInfoEntity() != null &&
-				entity.getMessageMarkAsReadInfoEntity().getMessageIds() != null
-				&& !entity.getMessageMarkAsReadInfoEntity().getMessageIds().isEmpty()) {
-			//mark all messageIds of userId as READ
-			
-			List<MessageWithDeliverystatusInfoEntity> messageTrnDtoList = messengerServiceImpl.markAllMessageAsReadByMessageIds(
-							entity.getMessageMarkAsReadInfoEntity().getMessageIds(),
-							entity.getMessageMarkAsReadInfoEntity().getUserId())
-					.stream().map(dto->{
-						return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "READ");
-					}).collect(Collectors.toList());
-			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
-			entity1.setMessageTrnDtoList(messageTrnDtoList);
-			entity.setMessageTrnInfoEntity(entity1);
-		}
-		
-		else if(entity.getMessageOperationEntity() != null) {
-			String operation = entity.getMessageOperationEntity().getOperation();
-			String messageId = entity.getMessageOperationEntity().getMessageId();
-			switch(operation) {
-				case "DELETE":
-					messengerServiceImpl.deleteMessageByMessageId(messageId);
-					break;
-				default:
-					break;
-			}
-		}
-		
-		//messageTypingInfoEntity
-		else {
-			//just broadcast via /topic/message
-		}
-		return entity;
 	}
 	
 	@ResponseBody

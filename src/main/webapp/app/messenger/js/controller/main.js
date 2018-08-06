@@ -33,12 +33,12 @@ angular.module('mainApp').controller('mainController',
 		};
 		
 		$scope.logout = function() {
-			socketService.send({
+			socketService.sendUserSessionInfo({
 				'userSessionInfoEntity':{
 					'userId' : $scope.user.userId,
 					'logoutRequest' : true
 				 }
-			});
+			}, $scope.user.userId);
 			mainService.logout();
 		};
 		$scope.init = function (){
@@ -132,7 +132,8 @@ angular.module('mainApp').controller('mainController',
 					'messageMode' : $scope.messageMode
 				}]
 			};
-			socketService.send(data);																																																						
+			socketService.sendMessageTrnInfo(
+					data, $scope.selectedUser.userId, $scope.messageMode);
 		};
 		
 		$scope.getSymbolByMessageDeliveryStatus = function (status){
@@ -158,12 +159,13 @@ angular.module('mainApp').controller('mainController',
 		
 		$scope.deleteMessageByMessageId = function (messageId){
 			//messengerService.deleteMessageByMessageId(messageId);
-			socketService.send({
+			socketService.sendMessageOperationInfo({
 				'messageOperationEntity':{
 					'messageId' : messageId,
-					'operation' : 'DELETE'
+					'operation' : 'DELETE',
+					'messageMode' : $scope.messageMode
 				}
-			});
+			}, $scope.selectedUser.userId, $scope.messageMode);
 		};
 		
 		$scope.deleteMessageElementByMessageId = function(messageId){
@@ -330,7 +332,8 @@ angular.module('mainApp').controller('mainController',
 					'userId' : $scope.user.userId,
 					'messageIds'	: messageIds
 				};
-				socketService.send(data);
+				socketService.sendMessageMarkAsReadInfo(
+						data, $scope.selectedUser.userId, $scope.messageMode);
 			}
 		};
 		$scope.notifyMessageAsRead = function (messageTrnDtoList){
@@ -343,7 +346,8 @@ angular.module('mainApp').controller('mainController',
 				'userId' : $scope.user.userId,
 				'messageIds'	: messageIds
 			};
-			socketService.send(data);
+			socketService.sendMessageMarkAsReadInfo(
+					data, $scope.selectedUser.userId, $scope.messageMode);
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};
@@ -352,9 +356,9 @@ angular.module('mainApp').controller('mainController',
 				'sourceId' : $scope.user.userId,
 				'destinationId' : $scope.selectedUser.userId
 			};
-			socketService.send({
+			socketService.sendMessageTypingInfo({
 				'messageTypingInfoEntity' : data
-			});
+			}, $scope.selectedUser.userId, $scope.messageMode);
 		};
 		$document.bind("keypress", function (event){
 			if(event.target != null && event.target.getAttribute('id') != null 

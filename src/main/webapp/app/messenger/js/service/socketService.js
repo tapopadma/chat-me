@@ -15,13 +15,35 @@ var __socketService = function($q, $timeout, commonService){
     service.receive = function() {
       return listener.promise;
     };
+
+    //send at /app/chat/userSessionInfo/{userId}
+    service.sendUserSessionInfo = function(message, userId){
+    	service.sendUsingSTOMP(message, service.CHAT_BROKER + '/userSessionInfo/' + userId);
+    };
     
-    service.send = function(message) {
-      socket.stomp.send(
-    		  service.CHAT_BROKER, 
-    		  {},
-    		  JSON.stringify(message)
-      );
+    //send at /app/chat/messageTrnInfo/{userId}    
+    service.sendMessageTrnInfo = function(message, destinationId, messageMode){
+    	service.sendUsingSTOMP(message, service.CHAT_BROKER + '/messageTrnInfo/' 
+    			+ destinationId + '/' + messageMode);
+    };
+    
+    service.sendMessageOperationInfo = function(message, destinationId, messageMode){
+    	service.sendUsingSTOMP(message, service.CHAT_BROKER + '/messageOperationInfo/' + destinationId
+    			 + '/' + messageMode);
+    };
+    
+    service.sendMessageMarkAsReadInfo = function(message, destinationId, messageMode){
+    	service.sendUsingSTOMP(message, service.CHAT_BROKER + '/messageMarkAsReadInfo/' 
+    			+ destinationId + '/' + messageMode);
+    };
+    
+    service.sendMessageTypingInfo = function(message, destinationId, messageMode){
+    	service.sendUsingSTOMP(message, service.CHAT_BROKER + '/messageTypingInfo/' 
+    			+ destinationId + '/' + messageMode);
+    };
+    
+    service.sendUsingSTOMP = function(message, destination) {
+      socket.stomp.send(destination, {}, JSON.stringify(message));
     };
     
     var reconnect = function() {
@@ -185,18 +207,21 @@ var __socketService = function($q, $timeout, commonService){
     };
     
     var startListener = function() {
-      socket.stomp.subscribe(service.CHAT_TOPIC, function(data) {
-        listener.notify(getMessage(data.body));
-      });
       var scope = commonService.get('mainController');
+      if(scope.user != null){
+    	  // subscribe to a single topic '/topic/message/{userId}' for all kinda socket message info
+    	  socket.stomp.subscribe(service.CHAT_TOPIC + '/' + scope.user.userId, function(data) {
+    	        listener.notify(getMessage(data.body));
+    	      });
+      }
       if(scope.user != null && (!scope.user.hasOwnProperty('status') ||
     		  scope.user.status != scope.ONLINE_CAPTION)){
-    	  service.send({
+    	  service.sendUserSessionInfo({
         	  'userSessionInfoEntity':{
         		  'userId' : scope.user.userId,
         		  'loginRequest' : true
         	  }
-          });
+          }, scope.user.userId);
       }
     };
     

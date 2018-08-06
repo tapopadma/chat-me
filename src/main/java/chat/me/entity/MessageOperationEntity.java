@@ -5,6 +5,8 @@ public class MessageOperationEntity {
 	private String messageId;
 	
 	private String operation;
+	
+	private String messageMode;
 
 	public String getMessageId() {
 		return messageId;
@@ -22,15 +24,22 @@ public class MessageOperationEntity {
 		this.operation = operation;
 	}
 
-	public MessageOperationEntity(String messageId, String operation) {
-		super();
+	public MessageOperationEntity(String messageId, String operation, String messageMode) {
 		this.messageId = messageId;
 		this.operation = operation;
+		this.setMessageMode(messageMode);
 	}
 
 	public MessageOperationEntity() {
-		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public String getMessageMode() {
+		return messageMode;
+	}
+
+	public void setMessageMode(String messageMode) {
+		this.messageMode = messageMode;
 	}
 	
 	

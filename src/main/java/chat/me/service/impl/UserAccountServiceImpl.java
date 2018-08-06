@@ -23,7 +23,7 @@ import chat.me.dto.UserMstDto;
 @Service
 public class UserAccountServiceImpl implements UserDetailsService{
 	@Autowired
-	@Qualifier("userAccountDaoCassandraImpl")
+	@Qualifier("userAccountDaoMySQLImpl")
 	private UserAccountDao userAccountDao;
 	@Autowired
 	private UserIpDao userIpDao;

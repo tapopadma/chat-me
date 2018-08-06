@@ -28,7 +28,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler{
 	private ActiveUserStore activeUserStore;
 	
 	@Autowired
-	@Qualifier("userAccountDaoCassandraImpl")
+	@Qualifier("userAccountDaoMySQLImpl")
 	private UserAccountDao userAccountDao;
 	
 	@Override

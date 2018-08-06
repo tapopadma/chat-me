@@ -22,7 +22,7 @@ public class UserLogoutSuccessHandler implements LogoutSuccessHandler{
 	private ActiveUserStore activeUserStore;
 	
 	@Autowired
-	@Qualifier("userAccountDaoCassandraImpl")
+	@Qualifier("userAccountDaoMySQLImpl")
 	private UserAccountDao userAccountDao;
 	
 	@Override
