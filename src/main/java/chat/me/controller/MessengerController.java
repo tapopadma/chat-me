@@ -108,8 +108,8 @@ public class MessengerController {
 				default:
 					break;
 			}
-			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 		}
+		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 	}
 	
 	@MessageMapping("/chat/messageMarkAsReadInfo/{destinationId}/{messageMode}")
@@ -133,8 +133,8 @@ public class MessengerController {
 			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
 			entity1.setMessageTrnDtoList(messageTrnDtoList);
 			entity.setMessageTrnInfoEntity(entity1);
-			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 		}
+		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 	}
 	
 	private void sendSocketMessageByMessageMode(String messageMode, 
@@ -149,6 +149,14 @@ public class MessengerController {
 		}
 		else {
 			simpMessagingTemplate.convertAndSend("/topic/message/"+destinationId, entity);
+			if(entity.getMessageTrnInfoEntity() != null
+					&& entity.getMessageTrnInfoEntity().getMessageTrnDtoList() != null
+					&& !entity.getMessageTrnInfoEntity().getMessageTrnDtoList().isEmpty()
+					) {
+				String sourceId = entity.getMessageTrnInfoEntity()
+						.getMessageTrnDtoList().get(0).getSourceId();
+				simpMessagingTemplate.convertAndSend("/topic/message/"+sourceId, entity);
+			}
 		}
 	}
 
@@ -158,8 +166,9 @@ public class MessengerController {
 			SocketMessageEntity entity) {
 		if(entity.getMessageTypingInfoEntity() != null
 				&& entity.getMessageTypingInfoEntity().getMessageTrnDto() != null) {
-			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+			
 		}
+		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 	}
 	
 	
@@ -184,8 +193,8 @@ public class MessengerController {
 			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
 			entity1.setMessageTrnDtoList(entityList);
 			entity.setMessageTrnInfoEntity(entity1);
-			sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 		}
+		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
 	}
 	
 	@ResponseBody
