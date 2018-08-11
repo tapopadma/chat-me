@@ -1,26 +1,13 @@
-var __channelService =	function channelService($http, commonService, messengerService){
+var __channelService =	function channelService($http){
 	var service = {};
-	service.getScope = function (){
-		return commonService.get('mainController');
-	};
 	service.getAllChannels =  function(userId){
-		$http(
+		return $http(
 			{
 				url : '/chat-me/channel/getAll',
 				method: 'POST',
 				data: userId
 			}
-		).then(function(response){
-			var scope = service.getScope();
-			if(response.status == 200){
-				scope.channelList = [];
-				angular.forEach(response.data, function(channel){
-					channel.unReadMessages = [];
-					scope.channelList.push(channel.channelMstDto);
-				});
-				messengerService.fetchAllUnreadMessage(scope.user.userId);
-			}
-		});
+		);
 	};
 	service.createChannel = function (data){
 		$http(

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
@@ -94,8 +93,10 @@ public class MessengerController {
 		});
 	}
 	
-	@MessageMapping("/chat/messageOperationInfo/{destinationId}/{messageMode}")
-	public void sendMessageOperationInfoMessage(@DestinationVariable String destinationId,
+	@MessageMapping("/chat/messageOperationInfo/{sourceId}/{destinationId}/{messageMode}")
+	public void sendMessageOperationInfoMessage(
+			@DestinationVariable String sourceId,
+			@DestinationVariable String destinationId,
 			@DestinationVariable String messageMode,
 			SocketMessageEntity entity) {
 		if(entity.getMessageOperationEntity() != null) {
@@ -109,11 +110,13 @@ public class MessengerController {
 					break;
 			}
 		}
-		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		sendSocketMessageByMessageMode(sourceId, destinationId, messageMode, entity);
 	}
 	
-	@MessageMapping("/chat/messageMarkAsReadInfo/{destinationId}/{messageMode}")
-	public void sendMessageMarkAsReadInfoMessage(@DestinationVariable String destinationId,
+	@MessageMapping("/chat/messageMarkAsReadInfo/{sourceId}/{destinationId}/{messageMode}")
+	public void sendMessageMarkAsReadInfoMessage(
+			@DestinationVariable String sourceId,
+			@DestinationVariable String destinationId,
 			@DestinationVariable String messageMode,
 			SocketMessageEntity entity) {
 
@@ -134,11 +137,12 @@ public class MessengerController {
 			entity1.setMessageTrnDtoList(messageTrnDtoList);
 			entity.setMessageTrnInfoEntity(entity1);
 		}
-		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		sendSocketMessageByMessageMode(sourceId, destinationId, messageMode, entity);
 	}
 	
-	private void sendSocketMessageByMessageMode(String messageMode, 
-			SocketMessageEntity entity, String destinationId) {
+	private void sendSocketMessageByMessageMode(
+			String sourceId, String destinationId, 
+			String messageMode, SocketMessageEntity entity) {
 		if(messageMode.equals("CHANNEL")) {
 			String channelId = destinationId;
 			channelDaoImpl.getAllUserInfoByChannelId(channelId).stream()
@@ -149,31 +153,28 @@ public class MessengerController {
 		}
 		else {
 			simpMessagingTemplate.convertAndSend("/topic/message/"+destinationId, entity);
-			if(entity.getMessageTrnInfoEntity() != null
-					&& entity.getMessageTrnInfoEntity().getMessageTrnDtoList() != null
-					&& !entity.getMessageTrnInfoEntity().getMessageTrnDtoList().isEmpty()
-					) {
-				String sourceId = entity.getMessageTrnInfoEntity()
-						.getMessageTrnDtoList().get(0).getSourceId();
-				simpMessagingTemplate.convertAndSend("/topic/message/"+sourceId, entity);
-			}
+			simpMessagingTemplate.convertAndSend("/topic/message/"+sourceId, entity);
 		}
 	}
 
-	@MessageMapping("/chat/messageTypingInfo/{destinationId}/{messageMode}")
-	public void sendMessageTypingInfoMessage(@DestinationVariable String destinationId,
+	@MessageMapping("/chat/messageTypingInfo/{sourceId}/{destinationId}/{messageMode}")
+	public void sendMessageTypingInfoMessage(
+			@DestinationVariable String sourceId,
+			@DestinationVariable String destinationId,
 			@DestinationVariable String messageMode,
 			SocketMessageEntity entity) {
 		if(entity.getMessageTypingInfoEntity() != null
 				&& entity.getMessageTypingInfoEntity().getMessageTrnDto() != null) {
 			
 		}
-		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		sendSocketMessageByMessageMode(sourceId, destinationId, messageMode, entity);
 	}
 	
 	
-	@MessageMapping("/chat/messageTrnInfo/{destinationId}/{messageMode}")
-	public void sendMessageTrnInfoMessage(@DestinationVariable String destinationId,
+	@MessageMapping("/chat/messageTrnInfo/{sourceId}/{destinationId}/{messageMode}")
+	public void sendMessageTrnInfoMessage(
+			@DestinationVariable String sourceId,
+			@DestinationVariable String destinationId,
 			@DestinationVariable String messageMode,
 			SocketMessageEntity entity) {
 		
@@ -194,7 +195,7 @@ public class MessengerController {
 			entity1.setMessageTrnDtoList(entityList);
 			entity.setMessageTrnInfoEntity(entity1);
 		}
-		sendSocketMessageByMessageMode(messageMode, entity, destinationId);
+		sendSocketMessageByMessageMode(sourceId, destinationId, messageMode, entity);
 	}
 	
 	@ResponseBody

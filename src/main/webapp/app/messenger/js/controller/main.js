@@ -1,10 +1,9 @@
 angular.module('mainApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
 angular.module('mainApp').controller('mainController',  
-	function mainController($uibModal, $log, $scope, $compile, $interval, $document, 
-			mainService, userService, commonService, messengerService, 
+	function mainController($uibModal, $log, $scope, $compile, $interval, $document, $timeout,
+			mainService, userService, messengerService, 
 			socketService, channelService){
 	
-		commonService.set('mainController', $scope);
 		$scope.NONE_SELECTED = 'none';
 		$scope.USER_SELECTED = 'user';
 		$scope.CHANNEL_SELECTED = 'channel';
@@ -39,10 +38,250 @@ angular.module('mainApp').controller('mainController',
 					'logoutRequest' : true
 				 }
 			}, $scope.user.userId);
-			mainService.logout();
+			mainService.logout()
+            .then(function (response) {
+                if (response.status == 200) {
+                	window.location.reload();
+                }
+                else {
+                    console.log("Logout failed!");
+                }
+            });
 		};
 		$scope.init = function (){
-			userService.getUser();
+			userService.getUser().then((response) => {
+				if(response.status == 200){
+					$scope.user = response.data;
+					socketService.setUserInfo($scope);
+					$scope.memberList = [];
+					var member = $scope.user;
+					member.userType = 'admin';
+					$scope.memberList.push(member);
+					userService.getFriendListByUser(
+						$scope.user).then((response) => {
+						if(response.status == 200){
+							var responseData = response.data;
+							var userList = [];
+							angular.forEach(responseData, (data) => {
+								var obj = data.userMstDto;
+								if(obj.userId != $scope.user.userId){
+									obj.isloggedIn = data.loggedIn;
+									obj.status = obj.isloggedIn ? 'online' : 'offline';
+									obj.USER_STATUS_COLOR = 
+										obj.isloggedIn ? $scope.ONLINE_COLOR : $scope.OFFLINE_COLOR;
+									obj.unReadMessages = [];
+									userList.push(obj);
+								}
+							});
+							$scope.userList = userList;
+							$scope.suggestedUserList = userList;
+							channelService.getAllChannels(
+								$scope.user.userId).then((response) => {
+								if(response.status == 200){
+									$scope.channelList = [];
+									angular.forEach(response.data, (channel) => {
+										channel.unReadMessages = [];
+										$scope.channelList.push(channel.channelMstDto);
+									});
+									messengerService.fetchAllUnreadMessage(
+										$scope.user.userId).then((response) => {
+										if(response.status == 200){
+											var messageTrnDtoList = response.data;
+											$scope.calculateUnReadMessageCounter(
+													messageTrnDtoList);
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+			socketService.receive().then(null, null, function(response){
+				$scope.processSocketMessageReceived(response);
+			});
+		};
+		
+		$scope.processSocketMessageReceived = (message) => {
+			
+		  var socketMessageEntity = JSON.parse(message);
+		      
+	      var messageTrnInfoEntity = socketMessageEntity.messageTrnInfoEntity;
+	      var messageTypingInfoEntity = socketMessageEntity.messageTypingInfoEntity;
+	      var userSessionInfoEntity = socketMessageEntity.userSessionInfoEntity;
+	      var messageMarkAsReadInfoEntity = socketMessageEntity.messageMarkAsReadInfoEntity;
+	      var messageOperationEntity = socketMessageEntity.messageOperationEntity;
+	      
+	      $scope.updateMessageTrnInfo(messageTrnInfoEntity);
+	      $scope.updateMessageTypingInfo(messageTypingInfoEntity);
+	      $scope.updateUserSessionInfo(userSessionInfoEntity);
+	      $scope.updateMessageMarkAsReadInfo(messageMarkAsReadInfoEntity);
+	      $scope.updateMessageOperationInfo(messageOperationEntity);
+		};
+		
+	    
+	    $scope.updateMessageTrnInfo = function(messageTrnInfoEntity){
+	    	if(messageTrnInfoEntity == null)
+	    		return;
+	        
+	    	var messageTrnDtoList = messageTrnInfoEntity.messageTrnDtoList;
+	    	
+	    	angular.forEach(messageTrnDtoList, function(messageTrnDto){
+	    		// if message belongs to currently selected chat box
+	    		if($scope.messageMode == $scope.DIRECT_MODE){
+	    			if(messageTrnDto.sourceId == $scope.user.userId){
+	        			//i sent this message
+	        			if($scope.hasOwnProperty('selectedUser') && 
+	        				messageTrnDto.destinationId == $scope.selectedUser.userId){
+	        				$scope.addSenderMessageTemplateToChatBox(messageTrnDto);
+	        			}
+	        		}
+	        		else if(messageTrnDto.destinationId == $scope.user.userId){
+	        			//the message sent to me
+	        			if($scope.hasOwnProperty('selectedUser') &&
+	        					messageTrnDto.sourceId == $scope.selectedUser.userId){
+	        				$scope.addReceipientMessageTemplateToChatBox(messageTrnDto);
+	        			}
+	        		}
+	    		}
+	    		else{
+	    			if($scope.hasOwnProperty('selectedUser') && 
+	    					messageTrnDto.destinationId == $scope.selectedUser.userId){
+	    				//message for the currently selected Channel
+	    				if(messageTrnDto.sourceId == $scope.user.userId){//mine 
+	    					$scope.addSenderMessageTemplateToChatBox(messageTrnDto);
+	    				}
+	    				else{//other people
+	    					$scope.addReceipientMessageTemplateToChatBox(messageTrnDto, 
+	    							$scope.getUserNameById(messageTrnDto.sourceId));
+	    				}
+	    			}
+	    		}
+	    		// if message is beyond currently selected chat box
+	    		if(!$scope.hasOwnProperty('selectedUser') ||
+	    				(messageTrnDto.messageMode == $scope.DIRECT_MODE
+	    				&& messageTrnDto.destinationId == $scope.user.userId 
+	    				&& messageTrnDto.sourceId != $scope.selectedUser.userId)
+	    			||(messageTrnDto.messageMode == $scope.CHANNEL_MODE
+	        				&& messageTrnDto.sourceId != $scope.user.userId 
+	        				&& messageTrnDto.destinationId != $scope.selectedUser.userId)){
+	    			if(messageTrnDto.messageMode == $scope.DIRECT_MODE){
+	        			var userListCopy = $scope.userList;
+	        			$scope.userList = [];
+	        			angular.forEach(userListCopy, function(user){
+	        				if(user.userId == messageTrnDto.sourceId){
+	        					if(user.unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+	        						user.unReadMessages.push(messageTrnDto.messageId);
+	        				}
+	        				$scope.userList.push(user);
+	        			});
+	        		}
+	        		else{
+	        			var channelListCopy = $scope.channelList;
+	        			$scope.channelList = [];
+	        			angular.forEach(channelListCopy, function(channel){
+	        				if(channel.channelId == messageTrnDto.destinationId){
+	        					if(channel.unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+	        						channel.unReadMessages.push(messageTrnDto.messageId);
+	        				}
+	        				$scope.channelList.push(channel);
+	        			});
+	        		}
+	    		}
+	    	});
+	    	//$scope.$apply();
+	    };
+	    
+	    $scope.updateMessageTypingInfo = function (messageTypingInfoEntity){
+	    	if(messageTypingInfoEntity == null)
+	    		return;
+	    	
+	    	var messageTrnDto = messageTypingInfoEntity.messageTrnDto;
+	    	var isUserTyping = messageTypingInfoEntity.userTyping;
+	    	
+	    	if(isUserTyping){
+	    	  if($scope.messageMode == $scope.DIRECT_MODE){
+				  if($scope.hasOwnProperty('selectedUser') && 
+		    			  messageTrnDto.sourceId == $scope.selectedUser.userId){
+		    		if(messageTrnDto.destinationId == $scope.user.userId){
+		    		  $scope.setUserActiveStatus($scope.selectedUser.userId, $scope.TYPING_CAPTION);
+		    		  $timeout(function () {
+		    			  $scope.setUserActiveStatus($scope.selectedUser.userId, $scope.ONLINE_CAPTION);
+		    		  },1000);
+		    		}
+		    	  }
+	    	  }
+	    	  else{
+	    		  if($scope.hasOwnProperty('selectedUser') && 
+		    			  messageTrnDto.destinationId == $scope.selectedUser.userId){
+	    			  if(messageTrnDto.sourceId != $scope.user.userId){
+	    				  $scope.setUserActiveStatus($scope.selectedUser.userId, 
+	    	    				  $scope.getUserNameById(messageTrnDto.sourceId) + ' ' + $scope.TYPING_CAPTION);
+	    	    		  $timeout(function () {
+	    	    			  $scope.setUserActiveStatus($scope.selectedUser.userId, '');
+	    	    		  },1000);
+	    			  }
+		    	  }
+	    	  }
+	    	}
+	    };
+	    
+	    $scope.updateUserSessionInfo = function (userSessionInfoEntity){
+	    	if(userSessionInfoEntity == null)
+				return;
+	    	if(userSessionInfoEntity.loginRequest){
+				$scope.setUserActiveStatus(userSessionInfoEntity.userId, $scope.ONLINE_CAPTION);
+			}
+			else if(userSessionInfoEntity.logoutRequest){
+			    $scope.setUserActiveStatus(userSessionInfoEntity.userId, $scope.OFFLINE_CAPTION);
+			}
+	    };
+	    
+	    $scope.updateMessageMarkAsReadInfo = function (messageMarkAsReadInfoEntity){
+	    	if(messageMarkAsReadInfoEntity == null)
+	    		return;
+	    	//nothing useful 
+	    };
+	    
+	    $scope.updateMessageOperationInfo = function(messageOperationEntity){
+	    	if(messageOperationEntity == null)
+	    		return;
+	    	var operation = messageOperationEntity.operation;
+	    	var messageId = messageOperationEntity.messageId;
+	    	switch(operation){
+	    		case 'DELETE':
+	    			$scope.deleteMessageElementByMessageId(messageId);
+	    			break;
+	    		default:
+	    			break;
+	    	}
+	    };
+		
+		$scope.calculateUnReadMessageCounter = function(messageTrnDtoList){
+			for(var i=0;i<$scope.userList.length; ++i){
+				$scope.userList[i].unReadMessages = [];
+			}
+			for(var i=0;i<$scope.channelList.length; ++i){
+				$scope.channelList[i].unReadMessages = [];
+			}
+			angular.forEach(messageTrnDtoList, (messageTrnDto) => {
+				if(messageTrnDto.messageMode == $scope.DIRECT_MODE){
+					for(var i=0;i<$scope.userList.length; ++i){
+						if($scope.userList[i].userId == messageTrnDto.sourceId){
+							if($scope.userList[i].unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+								$scope.userList[i].unReadMessages.push(messageTrnDto.messageId);
+						}
+					}
+				}
+				else{
+					for(var i=0;i<$scope.channelList.length; ++i){
+						if($scope.channelList[i].channelId == messageTrnDto.destinationId){
+							if($scope.channelList[i].unReadMessages.indexOf(messageTrnDto.messageId) < 0)
+								$scope.channelList[i].unReadMessages.push(messageTrnDto.messageId);
+						}
+					}
+				}
+			});
 		};
 		$scope.initializeScopeVariables = function (){
 			$scope.messageIdtoEntityMap = {};
@@ -78,6 +317,17 @@ angular.module('mainApp').controller('mainController',
 				'sourceId' : $scope.user.userId,
 				'destinationId' : $scope.selectedUser.userId,
 				'messageMode' : messageMode
+			})
+			.then((response) => {
+				if(response.status == 200){
+					$scope.messageHistoryList = response.data;
+					$scope.clearChatBox();
+					$scope.displayMessageHistoryOnChatBox();
+					console.log('fetched message history data successfully!!!');
+				}
+				else{
+					console.log('unable to fetch the data!!!');
+				}
 			});
 		};
 		$scope.displayMessageHistoryOnChatBox = function (){
@@ -133,7 +383,7 @@ angular.module('mainApp').controller('mainController',
 				}]
 			};
 			socketService.sendMessageTrnInfo(
-					data, $scope.selectedUser.userId, $scope.messageMode);
+					$scope.user.userId, $scope.selectedUser.userId, $scope.messageMode, data);
 		};
 		
 		$scope.getSymbolByMessageDeliveryStatus = function (status){
@@ -158,21 +408,31 @@ angular.module('mainApp').controller('mainController',
 		};
 		
 		$scope.deleteMessageByMessageId = function (messageId){
-			//messengerService.deleteMessageByMessageId(messageId);
-			socketService.sendMessageOperationInfo({
+			/*messengerService.deleteMessageByMessageId(messageId)
+			.then((response) => {
+				if(response.status == 204){
+					$scope.selectUser(scope.selectedUser);
+				}
+				else{
+					console.log('something went wrong!!!');
+				}
+			});*/
+			socketService.sendMessageOperationInfo(
+				$scope.user.userId, $scope.selectedUser.userId, $scope.messageMode,	
+				{
 				'messageOperationEntity':{
 					'messageId' : messageId,
 					'operation' : 'DELETE',
 					'messageMode' : $scope.messageMode
 				}
-			}, $scope.selectedUser.userId, $scope.messageMode);
+			});
 		};
 		
 		$scope.deleteMessageElementByMessageId = function(messageId){
 			var messageTemplateElement = angular.element(
 					document.getElementById(messageId));
 			messageTemplateElement.remove();
-			$scope.$apply();
+			//$scope.$apply();
 		}
 		
 		$scope.displayEditMessagePopup = function (messageId){
@@ -250,7 +510,7 @@ angular.module('mainApp').controller('mainController',
 			$scope.scrollToEnd(document.getElementById('message-history'));
 	    	$scope.message = '';
 	    	$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
-	    	$scope.$apply();
+	    	//$scope.$apply();
 		};
 		
 		$scope.getMessageTemplateForReciever = function(messageTrnDto, ownerName){
@@ -277,7 +537,7 @@ angular.module('mainApp').controller('mainController',
 			$scope.scrollToEnd(document.getElementById('message-history'));
 	    	$scope.message = '';
 	    	$scope.resetUnReadMessageCounterByUserId($scope.selectedUser.userId);
-	    	$scope.$apply();
+	    	//$scope.$apply();
 			if(messageTrnDto.messageDeliveryStatus != 'READ'){
 				$scope.notifyMessageAsRead([messageTrnDto]);
 			}
@@ -333,7 +593,7 @@ angular.module('mainApp').controller('mainController',
 					'messageIds'	: messageIds
 				};
 				socketService.sendMessageMarkAsReadInfo(
-						data, $scope.selectedUser.userId, $scope.messageMode);
+						$scope.user.userId, $scope.selectedUser.userId, $scope.messageMode, data);
 			}
 		};
 		$scope.notifyMessageAsRead = function (messageTrnDtoList){
@@ -347,7 +607,7 @@ angular.module('mainApp').controller('mainController',
 				'messageIds'	: messageIds
 			};
 			socketService.sendMessageMarkAsReadInfo(
-					data, $scope.selectedUser.userId, $scope.messageMode);
+					$scope.user.userId, $scope.selectedUser.userId, $scope.messageMode, data);
 		};
 		$scope.sendUserTypingStatus = function (){
 			var data = {};
@@ -356,9 +616,10 @@ angular.module('mainApp').controller('mainController',
 				'sourceId' : $scope.user.userId,
 				'destinationId' : $scope.selectedUser.userId
 			};
-			socketService.sendMessageTypingInfo({
+			socketService.sendMessageTypingInfo(
+				$scope.user.userId, $scope.selectedUser.userId, $scope.messageMode, {
 				'messageTypingInfoEntity' : data
-			}, $scope.selectedUser.userId, $scope.messageMode);
+			});
 		};
 		$document.bind("keypress", function (event){
 			if(event.target != null && event.target.getAttribute('id') != null 
@@ -409,7 +670,7 @@ angular.module('mainApp').controller('mainController',
 				$scope.selectedUser.status = statusValue;
 			}
 			
-			$scope.$apply();
+			//$scope.$apply();
 		};
 		
 		$scope.createNewChannel = function (){
@@ -463,12 +724,10 @@ angular.module('mainApp').controller('mainController',
 		};
 		
 })
-.factory('commonService', __commonService)
-.factory('messengerService', ['$http', 'commonService', __messengerService])
-.factory('channelService', ['$http', 'commonService', 'messengerService', __channelService])
-.factory('socketService', ['$q', '$timeout', 'commonService', __socketService])
-.factory('userService', ['$http', 'commonService', 'channelService', 
-						'messengerService', 'socketService', __userService])
+.factory('messengerService', ['$http', __messengerService])
+.factory('channelService', ['$http', __channelService])
+.factory('socketService', ['$q', '$timeout', __socketService])
+.factory('userService', ['$http', __userService])
 .directive('screenDimensionUpdater', ['$window', function ($window){
 	return {
         link: link,
