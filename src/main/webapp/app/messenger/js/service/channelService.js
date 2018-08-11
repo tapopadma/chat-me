@@ -1,4 +1,4 @@
-var __channelService =	function channelService($http){
+angular.module('mainApp').factory('channelService', ['$http', function channelService($http){
 	var service = {};
 	service.getAllChannels =  function(userId){
 		return $http(
@@ -25,5 +25,5 @@ var __channelService =	function channelService($http){
 	
 	return service;
 	
-};
+}]);
 

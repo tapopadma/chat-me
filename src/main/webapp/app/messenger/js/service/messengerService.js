@@ -1,4 +1,4 @@
-var __messengerService = function($http) {
+angular.module('mainApp').factory('messengerService', ['$http', function($http) {
 	var service = {};
 
 	service.fetchAllUnreadMessage = function (data) {
@@ -61,6 +61,6 @@ var __messengerService = function($http) {
 		});
 	};
 	return service;
-};
+}]);
 
 

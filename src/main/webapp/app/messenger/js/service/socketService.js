@@ -1,4 +1,4 @@
-var __socketService = function($q, $timeout){
+angular.module('mainApp').factory('socketService', ['$q', '$timeout',function($q, $timeout){
 	
 	var service = {};
 	var listener = $q.defer();
@@ -84,4 +84,4 @@ var __socketService = function($q, $timeout){
     
     initialize();
     return service;
-};
+}]);

@@ -1,4 +1,4 @@
-var __userService =	function ($http){
+angular.module('mainApp').factory('userService', ['$http', function ($http){
 	var service = {};
     service.getAllLoggedInUsers = function () {
 		$http(
@@ -30,4 +30,4 @@ var __userService =	function ($http){
 		);
 	};
 	return service;
-};
+}]);

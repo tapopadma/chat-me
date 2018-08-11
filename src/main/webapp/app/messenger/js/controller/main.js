@@ -724,10 +724,6 @@ angular.module('mainApp').controller('mainController',
 		};
 		
 })
-.factory('messengerService', ['$http', __messengerService])
-.factory('channelService', ['$http', __channelService])
-.factory('socketService', ['$q', '$timeout', __socketService])
-.factory('userService', ['$http', __userService])
 .directive('screenDimensionUpdater', ['$window', function ($window){
 	return {
         link: link,
