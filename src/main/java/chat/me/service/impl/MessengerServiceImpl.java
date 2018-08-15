@@ -6,27 +6,31 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import chat.me.dao.impl.ChannelDaoImpl;
-import chat.me.dao.impl.MessageDaoImpl;
-import chat.me.dto.ChannelUserMstDto;
+import chat.me.dao.spec.ChannelDao;
+import chat.me.dao.spec.MessageDao;
 import chat.me.dto.MessageDeliveryStatusTrnDto;
 import chat.me.dto.MessageTrnDto;
 import chat.me.entity.ActiveUserStore;
-import chat.me.entity.ChannelInfoEntity;
 import chat.me.entity.MessageWithDeliverystatusInfoEntity;
 import chat.me.service.spec.MessengerService;
 
 @Service
+@CacheConfig(cacheNames= {"chat_me_cache"})
 public class MessengerServiceImpl implements MessengerService{
 
 	@Autowired
-	private MessageDaoImpl messageDaoImpl;
+	private MessageDao messageDao;
 	@Autowired
-	private ChannelDaoImpl channelDaoImpl;
+	private ChannelDao channelDao;
 	@Autowired
 	private ActiveUserStore activeUserStore;
+	@Autowired	
+	private CacheManager cacheManager;
 	
 	private final String MESSAGE_SENT = "SENT";
 	private final String MESSAGE_UNREAD = "UNREAD";
@@ -63,7 +67,7 @@ public class MessengerServiceImpl implements MessengerService{
 		else {
 			//all registered users for this channel
 			String channelId = trnDto.getDestinationId();
-			channelDaoImpl.getAllUserInfoByChannelId(
+			channelDao.getAllUserInfoByChannelId(
 					channelId).stream().forEach(
 						channelDto->{
 							MessageDeliveryStatusTrnDto dto = new MessageDeliveryStatusTrnDto();
@@ -88,7 +92,7 @@ public class MessengerServiceImpl implements MessengerService{
 		MessageWithDeliverystatusInfoEntity entity = new MessageWithDeliverystatusInfoEntity();
 		dto.setMessageId(UUID.randomUUID().toString());
 		dto.setMessageOperationStatus("CREATE");
-		messageDto = messageDaoImpl.saveNewMessage(dto,
+		messageDto = messageDao.saveNewMessage(dto,
 				getMessageDeilveryStatusDtoFromMessageTrnDto(dto));
 		entity.setDestinationId(messageDto.getDestinationId());
 		entity.setMessage(messageDto.getMessage());
@@ -113,14 +117,15 @@ public class MessengerServiceImpl implements MessengerService{
 	
 
 	@Override
+	//@Cacheable(value="chat_me_cache", keyGenerator="customCacheKeyGenerator")
 	public List<MessageWithDeliverystatusInfoEntity> fetchAllMessageBySourceAndDest(MessageTrnDto dto) {
-		return messageDaoImpl.getBySourceAndDest(dto);
+		return messageDao.getBySourceAndDest(dto);
 	}
 	
 	private List<String> getAllDestinationIds(String userId){
 		List<String> destinationIds = new ArrayList<>();
 		destinationIds.add(userId);
-		destinationIds.addAll(channelDaoImpl.getAllChannelInfoByUserId(userId).stream()
+		destinationIds.addAll(channelDao.getAllChannelInfoByUserId(userId).stream()
 				.map(entity->{
 					return entity.getChannelMstDto().getChannelId();}).collect(Collectors.toList()));
 		return destinationIds;
@@ -128,33 +133,33 @@ public class MessengerServiceImpl implements MessengerService{
 
 	@Override
 	public List<MessageTrnDto> markSentMessageAsUnread(String userId) {
-		return messageDaoImpl.updateMessageDeliveryStatus(userId, MESSAGE_UNREAD);
+		return messageDao.updateMessageDeliveryStatus(userId, MESSAGE_UNREAD);
 	}
 
 	@Override
 	public List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(String userId, String deliveryStatus) {
-		return messageDaoImpl.getByDestinationIdAndDeliveryStatus(userId, MESSAGE_UNREAD);
+		return messageDao.getByDestinationIdAndDeliveryStatus(userId, MESSAGE_UNREAD);
 	}
 
 	@Override
 	public List<MessageTrnDto> markAllMessageAsReadByMessageIds(List<String> messageIds, String userId){
-		return messageDaoImpl.updateMessageDeliveryStatus(messageIds, userId, MESSAGE_READ);
+		return messageDao.updateMessageDeliveryStatus(messageIds, userId, MESSAGE_READ);
 	}
 
 	@Override
 	public List<MessageTrnDto> fetchAllMessageByDestAndDeliveryStatus(List<String> destinationIds,
 			String deliveryStatus) {
-		return messageDaoImpl.getByDestinationIdAndDeliveryStatus(destinationIds, "", deliveryStatus);
+		return messageDao.getByDestinationIdAndDeliveryStatus(destinationIds, "", deliveryStatus);
 	}
 
 	@Override
 	public List<MessageTrnDto> fetchAllUnreadMessage(String userId) {
-		return messageDaoImpl.getAllNotReadByUserId(userId);
+		return messageDao.getAllNotReadByUserId(userId);
 	}
 
 	@Override
 	public String deleteMessageByMessageId(String messageId) {
-		messageDaoImpl.deleteMessageById(messageId);
+		messageDao.deleteMessageById(messageId);
 		return messageId;
 	}
 	

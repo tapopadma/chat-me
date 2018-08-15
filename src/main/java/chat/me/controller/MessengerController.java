@@ -19,26 +19,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import chat.me.dao.impl.ChannelDaoImpl;
+import chat.me.dao.spec.ChannelDao;
 import chat.me.dao.spec.UserAccountDao;
 import chat.me.dto.MessageTrnDto;
 import chat.me.entity.MessageTrnInfoEntity;
 import chat.me.entity.MessageWithDeliverystatusInfoEntity;
 import chat.me.entity.SocketMessageEntity;
-import chat.me.service.impl.MessengerServiceImpl;
+import chat.me.service.spec.MessengerService;
 
 @Controller
 @RequestMapping("/messenger")
 public class MessengerController {
 
 	@Autowired
-	private MessengerServiceImpl messengerServiceImpl;
+	private MessengerService messengerService;
 
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
 	@Autowired
-	private ChannelDaoImpl channelDaoImpl;
+	private ChannelDao channelDao;
 	
 	@Autowired
 	@Qualifier("userAccountDaoMySQLImpl")
@@ -51,7 +51,7 @@ public class MessengerController {
 	@ResponseBody
 	@RequestMapping(value="/saveMessage", method=RequestMethod.POST)
 	public void saveMessage(@RequestBody MessageTrnDto dto) {
-		messengerServiceImpl.saveMessage(dto);
+		messengerService.saveMessage(dto);
 	}
 	
 	
@@ -68,7 +68,7 @@ public class MessengerController {
 	@RequestMapping(value="/fetchAllMessageBySourceAndDest", method=RequestMethod.POST)
 	public List<MessageWithDeliverystatusInfoEntity> fetchAllMessageBySourceAndDest(
 			@RequestBody MessageTrnDto dto) {
-		return messengerServiceImpl.fetchAllMessageBySourceAndDest(dto);
+		return messengerService.fetchAllMessageBySourceAndDest(dto);
 	}
 	
 	
@@ -80,7 +80,7 @@ public class MessengerController {
 				entity.getUserSessionInfoEntity().isLoginRequest()) {
 			// update all message status to unread if sent
 			MessageTrnInfoEntity messageTrn = new MessageTrnInfoEntity();
-			List<MessageTrnDto> messageTrnDtoList = messengerServiceImpl.markSentMessageAsUnread(
+			List<MessageTrnDto> messageTrnDtoList = messengerService.markSentMessageAsUnread(
 					entity.getUserSessionInfoEntity().getUserId());
 			messageTrn.setMessageTrnDtoList(messageTrnDtoList.stream().map(dto->{
 				return MessageTrnDto.toMessageWithDeliverystatusInfoEntity(dto, "UNREAD");
@@ -104,7 +104,7 @@ public class MessengerController {
 			String messageId = entity.getMessageOperationEntity().getMessageId();
 			switch(operation) {
 				case "DELETE":
-					messengerServiceImpl.deleteMessageByMessageId(messageId);
+					messengerService.deleteMessageByMessageId(messageId);
 					break;
 				default:
 					break;
@@ -127,7 +127,7 @@ public class MessengerController {
 			//mark all messageIds of userId as READ
 			
 			List<MessageWithDeliverystatusInfoEntity> messageTrnDtoList = 
-					messengerServiceImpl.markAllMessageAsReadByMessageIds(
+					messengerService.markAllMessageAsReadByMessageIds(
 							entity.getMessageMarkAsReadInfoEntity().getMessageIds(),
 							entity.getMessageMarkAsReadInfoEntity().getUserId())
 					.stream().map(dto->{
@@ -145,7 +145,7 @@ public class MessengerController {
 			String messageMode, SocketMessageEntity entity) {
 		if(messageMode.equals("CHANNEL")) {
 			String channelId = destinationId;
-			channelDaoImpl.getAllUserInfoByChannelId(channelId).stream()
+			channelDao.getAllUserInfoByChannelId(channelId).stream()
 				.forEach(dto->{
 					simpMessagingTemplate.convertAndSend("/topic/message/" + dto.getUserId(),
 							entity);
@@ -189,7 +189,7 @@ public class MessengerController {
 					.collect(Collectors.toList());
 			
 			// save the message to DB
-			List<MessageWithDeliverystatusInfoEntity> entityList = messengerServiceImpl.saveMessage(
+			List<MessageWithDeliverystatusInfoEntity> entityList = messengerService.saveMessage(
 					messageTrnDtoList);
 			MessageTrnInfoEntity entity1 = new MessageTrnInfoEntity();
 			entity1.setMessageTrnDtoList(entityList);
@@ -201,13 +201,13 @@ public class MessengerController {
 	@ResponseBody
 	@RequestMapping(value="/fetchAllUnreadMessage", method=RequestMethod.POST)
 	public List<MessageTrnDto> fetchAllUnreadMessage(@RequestBody String userId){
-		return messengerServiceImpl.fetchAllUnreadMessage(userId);
+		return messengerService.fetchAllUnreadMessage(userId);
 	}
 	
 	@RequestMapping(value="/deleteMessage/{messageId}")
 	@ResponseStatus(value=HttpStatus.NO_CONTENT)
 	public void deleteMessage(@PathVariable("messageId") String messageId) {
-		messengerServiceImpl.deleteMessageByMessageId(messageId);
+		messengerService.deleteMessageByMessageId(messageId);
 	}
 	
 }

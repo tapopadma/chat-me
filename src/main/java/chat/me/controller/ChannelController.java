@@ -10,24 +10,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import chat.me.entity.ChannelInfoEntity;
-import chat.me.service.impl.ChannelServiceImpl;
+import chat.me.service.spec.ChannelService;
 
 @Controller
 @RequestMapping("/channel")
 public class ChannelController {
 
 	@Autowired
-	private ChannelServiceImpl channelServiceImpl;
+	private ChannelService channelService;
 	
 	@ResponseBody
 	@RequestMapping(value="/create", method=RequestMethod.POST)
 	public ChannelInfoEntity create(@RequestBody ChannelInfoEntity entity) {
-		return channelServiceImpl.create(entity);
+		return channelService.create(entity);
 	}
 	
 	@ResponseBody
 	@RequestMapping(value="/getAll", method=RequestMethod.POST)
 	public List<ChannelInfoEntity> getAll(@RequestBody String userId){
-		return channelServiceImpl.getAll(userId);
+		return channelService.getAll(userId);
 	}
 }

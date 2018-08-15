@@ -19,15 +19,17 @@ import chat.me.dao.spec.UserAccountDao;
 import chat.me.dao.spec.UserIpDao;
 import chat.me.dto.UserIpTrnDto;
 import chat.me.dto.UserMstDto;
+import chat.me.service.spec.UserAccountService;
 
 @Service
-public class UserAccountServiceImpl implements UserDetailsService{
+public class UserAccountServiceImpl implements UserDetailsService, UserAccountService{
 	@Autowired
 	@Qualifier("userAccountDaoMySQLImpl")
 	private UserAccountDao userAccountDao;
 	@Autowired
 	private UserIpDao userIpDao;
 
+	@Override
 	public UserMstDto saveUserAccountData(UserMstDto dto) {
 		dto.setUserId(UUID.randomUUID().toString());
 		userAccountDao.insert(dto);
@@ -55,12 +57,19 @@ public class UserAccountServiceImpl implements UserDetailsService{
 		return userDetails;
 	}
 	
+	@Override
 	public List<UserIpTrnDto> getAllUniqueIps(String newIp){
 		List<UserIpTrnDto> allDtos = userIpDao.getAllDtos();
 		if(allDtos.stream().map(UserIpTrnDto::getIp).collect(Collectors.toList()).contains(newIp))
 			return allDtos;
 		userIpDao.insert(newIp);
 		return userIpDao.getAllDtos();
+	}
+
+	@Override
+	public UserDetails getUserDetailsByUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
