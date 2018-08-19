@@ -4,7 +4,7 @@ angular.module('mainApp').factory('userService', ['$http', function ($http){
 		$http(
 			{
 				method: 'GET',
-				url: '/chat-me/messenger/getAllLoggedInUsers'
+				url: '/messenger/getAllLoggedInUsers'
 			}
 		)
 		.then(function (response){
@@ -17,7 +17,7 @@ angular.module('mainApp').factory('userService', ['$http', function ($http){
 		return $http(
 			{
 				method: 'GET',
-				url: '/chat-me/user/getAllUsers'
+				url: '/user/getAllUsers'
 			}
 		);
 	};
@@ -25,7 +25,7 @@ angular.module('mainApp').factory('userService', ['$http', function ($http){
 		return $http(
 			{
 				method: 'GET',
-				url: '/chat-me/user/getLoggedInUser'
+				url: '/user/getLoggedInUser'
 			}
 		);
 	};

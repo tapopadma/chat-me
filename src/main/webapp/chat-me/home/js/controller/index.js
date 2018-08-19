@@ -15,18 +15,18 @@ angular.module('homeApp', [])
 		$http(
 			{
 				method: 'GET',
-				url: '/chat-me/user/isUserLoggedInAlready'
+				url: '/user/isUserLoggedInAlready'
 			}
 		).then(function(response){
 			if(response.status == 200 && response.data == true){				
 				console.log('already logged in!!!');
-				window.location.href = '/chat-me/app/messenger/';
+				window.location.href = '/app/messenger/';
 			}
 		});
 		$http(
 			{
 				method: 'GET',
-				url: '/chat-me/user/getUniqueVistors'
+				url: '/user/getUniqueVistors'
 			}
 		).then(function(response){
 			if(response.status == 200){
@@ -45,7 +45,7 @@ angular.module('homeApp', [])
 			$http(
 				{
 					method: 'POST',
-					url: '/chat-me/perform_login',
+					url: '/perform_login',
 					data:{
 						'username': username,
 						'password': password,
@@ -57,13 +57,13 @@ angular.module('homeApp', [])
 			});
 		},
 		signup : function (){
-			$window.location.href = '/chat-me/app/signup.html';
+			$window.location.href = '/chat-me/signup.html';
 		},
 		show : function (){
 			$http(
 				{
 					method: 'GET',
-					url: "/chat-me/user"
+					url: "/user"
 			})
 			.then(function (response) {
 	            if (response.status == 200) {
@@ -77,7 +77,7 @@ angular.module('homeApp', [])
 		logout : function (){
 			$http({
                 method: 'POST',
-                url: '/chat-me/perform_logout'
+                url: '/perform_logout'
             })
             .then(function (response) {
                 if (response.status == 200) {

@@ -76,13 +76,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         
         http
         .authorizeRequests()
-        .antMatchers("/app/home/**").permitAll()
+        .antMatchers("/chat-me/home/**").permitAll()
         .antMatchers("/user/**").permitAll()
         .antMatchers("/signup/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .formLogin()
-        .loginPage("/app/home/").permitAll()
+        .loginPage("/chat-me/home/").permitAll()
         .loginProcessingUrl("/perform_login")
         .successHandler(userLoginSuccessHandler)
         //.failureUrl("/app/home/")

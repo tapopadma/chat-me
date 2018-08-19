@@ -4,7 +4,7 @@ angular.module('mainApp')
 		logout : function (){
 			return $http({
                 method: 'POST',
-                url: '/chat-me/perform_logout'
+                url: '/perform_logout'
             });
 		} 
 	};

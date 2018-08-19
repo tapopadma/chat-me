@@ -3,7 +3,7 @@ angular.module('mainApp').factory('channelService', ['$http', function channelSe
 	service.getAllChannels =  function(userId){
 		return $http(
 			{
-				url : '/chat-me/channel/getAll',
+				url : '/channel/getAll',
 				method: 'POST',
 				data: userId
 			}
@@ -12,13 +12,13 @@ angular.module('mainApp').factory('channelService', ['$http', function channelSe
 	service.createChannel = function (data){
 		$http(
 			{
-				url : '/chat-me/channel/create',
+				url : '/channel/create',
 				method: 'POST',
 				data: data
 			}		
 		).then(function(response){
 			if(response.status == 200){
-				window.location.href = '/chat-me/app/messenger/';
+				window.location.href = '/chat-me/messenger/';
 			}
 		});
 	};

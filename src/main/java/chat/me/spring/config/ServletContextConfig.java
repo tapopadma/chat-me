@@ -14,8 +14,8 @@ public class ServletContextConfig extends WebMvcConfigurerAdapter{
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/app/**").addResourceLocations("/app/");
-		registry.addResourceHandler("/app/home/**").addResourceLocations("/app/home/");
-		registry.addResourceHandler("/app/messenger/**").addResourceLocations("/app/messenger/");
+		registry.addResourceHandler("/chat-me/**").addResourceLocations("/chat-me/");
+		registry.addResourceHandler("/chat-me/home/**").addResourceLocations("/chat-me/home/");
+		registry.addResourceHandler("/chat-me/messenger/**").addResourceLocations("/chat-me/messenger/");
 	}
 }

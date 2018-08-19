@@ -8,7 +8,7 @@ angular.module('mainApp').factory('socketService', ['$q', '$timeout',function($q
 	};
 	    
     service.RECONNECT_TIMEOUT = 30000;
-    service.SOCKET_URL = "/chat-me/chat";
+    service.SOCKET_URL = "/chat";
     service.CHAT_TOPIC = "/topic/message";
     service.CHAT_BROKER = "/app/chat";
     

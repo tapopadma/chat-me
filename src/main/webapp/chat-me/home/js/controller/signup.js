@@ -18,13 +18,13 @@ angular.module('signupApp', [])
 			$http(
 				{
 					method : 'POST',
-					url : '/chat-me/signup',
+					url : '/signup',
 					data : data
 				}
 			).then(
 				function (response) {
 					if(response.status == 200) {
-						$window.location.href = '/chat-me/app/login';
+						$window.location.href = '/chat-me/login';
 					}
 					else {
 						console.log('error in signup!!!');

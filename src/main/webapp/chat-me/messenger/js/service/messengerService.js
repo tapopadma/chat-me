@@ -5,7 +5,7 @@ angular.module('mainApp').factory('messengerService', ['$http', function($http) 
 		return $http(
 			{
 				method: 'POST',
-				url: '/chat-me/messenger/fetchAllUnreadMessage',
+				url: '/messenger/fetchAllUnreadMessage',
 				data:data
 			}
 		);
@@ -17,7 +17,7 @@ angular.module('mainApp').factory('messengerService', ['$http', function($http) 
 		$http(
 			{
 				method : 'POST',
-				url : '/chat-me/messenger/markAllMessageAsRead',
+				url : '/messenger/markAllMessageAsRead',
 				data : data
 			}		
 		).then(function(response){
@@ -30,7 +30,7 @@ angular.module('mainApp').factory('messengerService', ['$http', function($http) 
 		return $http(
 			{
 				method : 'POST',
-				url: '/chat-me/messenger/fetchAllMessageBySourceAndDest',
+				url: '/messenger/fetchAllMessageBySourceAndDest',
 				data: data
 			}
 		);
@@ -57,7 +57,7 @@ angular.module('mainApp').factory('messengerService', ['$http', function($http) 
 	};*/
 	service.deleteMessageByMessageId = function(messageId){
 		return $http({
-			url: '/chat-me/messenger/deleteMessage/'+messageId,
+			url: '/messenger/deleteMessage/'+messageId,
 		});
 	};
 	return service;
