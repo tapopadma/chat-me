@@ -1,5 +1,6 @@
 angular.module('homeApp', [])
 .controller('homeController', function homeController($scope, $http, homeService){
+	$scope.authenticationFailed = false;
 	$scope.show = function() {
 		homeService.show();
 	};
@@ -10,6 +11,7 @@ angular.module('homeApp', [])
 		homeService.signup();
 	};
 	$scope.init = function(){
+		$scope.checkIfLoginAttempted();
 		$http(
 			{
 				method: 'GET',
@@ -31,6 +33,10 @@ angular.module('homeApp', [])
 				$scope.uniqueVisitor = response.data.length;
 			}
 		});
+	};
+	$scope.checkIfLoginAttempted = function(){
+		var url = window.location.href;
+		$scope.authenticationFailed = url.endsWith('?error');
 	};
 })
 .factory('homeService', ['$http', '$window', function ($http, $window){
