@@ -8,10 +8,10 @@ import org.springframework.data.cassandra.core.mapping.BasicCassandraMappingCont
 import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
-@Configuration
-@EnableCassandraRepositories({
-	"chat.me.dao.spec"
-})
+//@Configuration
+//@EnableCassandraRepositories({
+//	"chat.me.dao.spec"
+//})
 public class CassandraConfig extends AbstractCassandraConfiguration{
 
 	@Override

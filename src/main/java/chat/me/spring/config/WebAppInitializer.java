@@ -8,7 +8,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 	protected Class<?>[] getRootConfigClasses() {
 		// TODO Auto-generated method stub
 		return new Class<?>[] {SecurityConfig.class, DBResourceConfig.class, 
-			SessionConfig.class, WebSocketConfig.class, CassandraConfig.class, CacheConfig.class};
+			SessionConfig.class, WebSocketConfig.class, CacheConfig.class};
 	}
 
 	@Override

@@ -2,7 +2,9 @@ package chat.me.dao.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,7 +35,7 @@ public class MessageDaoImpl implements MessageDao{
 		jdbcTemplate.update("insert into message_trn values(?,?,?,?,?,?,?)", 
 				dto.getMessageId(), dto.getMessage(), 
 				dto.getMessageMode(), 
-				dto.getMessageCreationTime(), dto.getMessageOperationStatus(),
+				new Timestamp(new Date().getTime()), dto.getMessageOperationStatus(),
 				dto.getSourceId(), dto.getDestinationId());
 		jdbcTemplate.batchUpdate("insert into message_delivery_status_trn values(?,?,?)", 
 				new BatchPreparedStatementSetter() {

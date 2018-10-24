@@ -11,7 +11,7 @@ import chat.me.dao.spec.UserAccountDao;
 import chat.me.dto.UserMstCassandraDto;
 import chat.me.dto.UserMstDto;
 
-@Component
+//@Component
 public class UserAccountDaoCassandraImpl implements UserAccountDao{
 
 	@Autowired
